@@ -1,0 +1,92 @@
+.profile-card {
+    max-width: 420px;
+    margin: 30px auto;
+    padding: 25px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .profile-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .profile-header img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #2c3e50;
+    margin-bottom: 10px;
+  }
+
+  .profile-header h2 {
+    font-size: 26px;
+    color: #2c3e50;
+    margin: 0;
+  }
+
+  .profile-details {
+    text-align: left;
+  }
+
+  .profile-details p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #555;
+    margin: 8px 0;
+  }
+
+  .profile-details strong {
+    color: #2c3e50;
+  }
+
+  .social-links {
+    margin-top: 15px;
+    text-align: left;
+  }
+
+  .social-links a {
+    margin-right: 12px;
+    text-decoration: none;
+    color: #2c3e50;
+    font-size: 20px;
+    transition: color 0.3s ease;
+  }
+
+  .social-links a:hover {
+    color: #0077b5;
+  }
+
+ .resume-section {
+  margin-top: 25px;
+  text-align: left;
+}
+
+.resume-section p {
+  font-size: 15px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.resume-button {
+  display: inline-block;
+  padding: 10px 18px;
+  background-color: #2c3e50;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.resume-button i {
+  margin-right: 8px;
+}
+
+.resume-button:hover {
+  background-color: #34495e;
+}
