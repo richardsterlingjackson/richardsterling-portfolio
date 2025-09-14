@@ -1,0 +1,20 @@
+<div class="counter-box">
+  <div class="counter-container">
+    <h1>Counter: {{ counter }}</h1>
+    <button (click)="decrement()">Decrement</button>
+    <button (click)="reset()">Reset</button>
+    <button (click)="increment()">Increment</button>
+
+    <div [ngSwitch]="getCounterStatus()">
+      <p *ngSwitchCase="'Positive'" [ngClass]="'positive'">The counter is positive.</p>
+      <p *ngSwitchCase="'Negative'" [ngClass]="'negative'">The counter is negative.</p>
+      <p *ngSwitchCase="'Zero'" [ngClass]="'zero'">The counter is zero.</p>
+    </div>
+
+    <div [ngClass]="getRangeMessage() === 'High Positive Count' ?
+       'positive-box' : getRangeMessage() === 'High Negative Count' ?
+        'negative-box' : 'zero-box'" class="status-box">
+      <p>Status: The counter is {{ getRangeMessage().toLowerCase() }}.</p>
+    </div>
+  </div>
+</div>
