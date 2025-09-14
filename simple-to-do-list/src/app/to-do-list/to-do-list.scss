@@ -1,0 +1,110 @@
+.to-do-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #f9f9f9;
+  border-radius: 8px;
+  background-color: #bbbbbb;
+  box-shadow: 0 2px 4px rgba(188, 183, 183, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+input[type="text"] {
+  width: 95%;
+  padding: 10px;
+  margin: 0 auto 10px auto; /* centers horizontally */
+  display: block;           /* ensures margin auto works */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 16px;
+  background-color: #fff; /* unified background */
+
+}
+
+.countdown-input {
+  width: 70px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff; /* match task input */
+
+}
+
+.button-wrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #05097a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+button:hover {
+  background-color: #4344a0;
+}   
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 10px 0;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #05097a;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.remove-btn {
+  background-color: #c10202;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background-color: #551d1d;
+}
+
+.countdown-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #333;
+}
+
+.divider {
+  display: inline-block; /* ensures it behaves like a visible item */
+  width: 2px;
+  height: 24px;
+  background-color: #000;
+  margin: 0 8px;
+  flex-shrink: 0; /* prevents it from shrinking */
+
+
+}

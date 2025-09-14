@@ -1,0 +1,41 @@
+<div class="to-do-container">
+  <h2>Simple To-Do List</h2>
+
+  <input type="text"
+         [(ngModel)]="newTask"
+         placeholder="Add a new task"
+         (keyup.enter)="addTask()" />
+
+  <div class="button-wrapper">
+    <button (click)="addTask()">Add Task</button>
+  </div>
+
+  <ul>
+    <li *ngFor="let task of tasks">
+      <span>{{ task }}</span>
+
+      <div class="task-controls">
+        <label>
+          <input type="checkbox"
+                 [(ngModel)]="autoRemoveEnabled[task]"
+                 (change)="toggleAutoRemove(task)" />
+          Auto-remove
+        </label>
+
+        <div class="divider"></div>
+
+        <label class="countdown-label">
+          Countdown Timer (minutes):
+          <input type="number"
+                 [(ngModel)]="countdownMinutes[task]"
+                 [disabled]="!autoRemoveEnabled[task]"
+                 (change)="toggleAutoRemove(task)"
+                 min="1"
+                 class="countdown-input" />
+        </label>
+
+        <button class="remove-btn" (click)="removeTask(task)">Remove</button>
+      </div>
+    </li>
+  </ul>
+</div>
