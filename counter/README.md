@@ -1,8 +1,6 @@
-<<<<<<< HEAD
-# richardsterling-portfolio
-Aspiring software engineer, developing skills to complement my engineering and science background.
-=======
 # Counter
+
+A modular Angular component that tracks and displays dynamic counts with responsive styling and clean state management. Built to showcase component architecture, CLI tooling, and real-time UI updates.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
 
@@ -61,4 +59,9 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
->>>>>>> 458291b (initial commit)
+---
+
+📁 [Return to Portfolio Overview](../README.md)
+
+
+
