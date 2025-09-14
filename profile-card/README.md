@@ -1,4 +1,18 @@
-# ProfileCardRichardSterling
+# 🧑‍💼 Profile Card Component
+
+Crafted by Richard Jackson — a responsive Angular component designed to showcase personal branding through contact links, downloadable assets, and modular design. Part of a broader portfolio that blends engineering clarity with front-end craftsmanship.
+
+## 🎯 Purpose
+
+This project is part of my public portfolio, built to demonstrate front-end precision, responsive design, and component-based architecture using Angular.
+
+## ✨ Features
+
+- Responsive layout with clean styling
+- Dynamic data binding for name, title, and contact info
+- Downloadable resume button
+- Social media icons with external links
+- Modular structure for easy reuse and customization
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
 
@@ -57,3 +71,7 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+👈 [Back to Portfolio Overview](../README.md)
+
+
