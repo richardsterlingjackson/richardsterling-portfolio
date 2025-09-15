@@ -4,7 +4,32 @@ A modular Angular component that tracks and displays dynamic counts with respons
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
 
+---
+
+## Features
+
+- Increment and decrement count with button controls  
+- Real-time UI updates using Angular reactive bindings  
+- Modular component structure for easy reuse  
+- Responsive styling with SCSS  
+- Clean separation of logic and presentation  
+- Built with Angular standalone components and CLI tooling  
+- Unit tested with Karma and Jasmine  
+
+---
+
+## Tech Stack
+
+- **Framework**: Angular 20.3.1  
+- **Languages**: TypeScript, HTML, SCSS  
+- **Testing**: Karma + Jasmine (unit tests), optional Cypress or Playwright (e2e)  
+- **Tooling**: Angular CLI, CommonModule  
+
+---
+
 👈 [Back to Portfolio Overview](../README.md)
+
+## Getting Started
 
 ## Development server
 
