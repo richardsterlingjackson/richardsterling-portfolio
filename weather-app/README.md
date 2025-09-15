@@ -1,4 +1,4 @@
-# WeatherApp
+# Weather App
 
 A responsive Angular weather app that delivers real-time weather data with a playful, emoji-enhanced interface. Built to showcase clean UI, robust error handling, and autocomplete-powered city search using OpenWeatherMap’s Geocoding API.
 
