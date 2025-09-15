@@ -22,8 +22,6 @@ A clean, responsive to-do list built with Angular. This app features dynamic tas
 
 ---
 
-## Getting Started
-
 ### Development Server
 
 To start a local dev server:
