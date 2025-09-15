@@ -4,8 +4,6 @@ Crafted by Richard Sterling Jackson — a responsive Angular component designed 
 
 ---
 
-👈 [Back to Portfolio Overview](../README.md)
-
 ## Purpose
 
 This component is part of my public portfolio, built to demonstrate:
@@ -96,6 +94,7 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
 👈 [Back to Portfolio Overview](../README.md)
+
 
 
 
