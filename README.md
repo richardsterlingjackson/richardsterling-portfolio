@@ -18,6 +18,16 @@ Full-stack developer with a background in engineering and science, now building 
 
 ## Projects
 
+### [Profile Card](./profile-card)
+
+A responsive Angular component designed to showcase personal branding, contact links, and downloadable assets. Part of a broader portfolio that blends engineering clarity with front-end craftsmanship.
+
+- Framework: Angular  
+- Key Features: Resume download, social links, modular design  
+- [View README](./profile-card/README.md)
+
+---
+
 ### [Counter](./counter)
 
 A modular Angular component that tracks and displays dynamic counts with responsive styling and clean state management. Built to demonstrate CLI tooling, component architecture, and real-time UI updates.
@@ -28,13 +38,13 @@ A modular Angular component that tracks and displays dynamic counts with respons
 
 ---
 
-### [Profile Card](./profile-card)
+### [SimpleToDoList](./simple-to-do-list)
 
-A responsive Angular component designed to showcase personal branding, contact links, and downloadable assets. Part of a broader portfolio that blends engineering clarity with front-end craftsmanship.
+A minimalist Angular to-do list application featuring dynamic task management, auto-remove countdowns, and clean UI design. Built to demonstrate component architecture, user interaction, and real-world functionality.
 
 - Framework: Angular  
-- Key Features: Resume download, social links, modular design  
-- [View README](./profile-card/README.md)
+- Key Features: Task creation, countdown-based auto-removal, responsive layout, modular structure  
+- [View README](./simple-to-do-list/README.md)
 
 ---
 
