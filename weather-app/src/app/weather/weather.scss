@@ -1,0 +1,129 @@
+.weather-app {
+  font-family: Arial, sans-serif;
+  margin: 40px;
+  max-width: 500px;
+  background-color: #e3f02d;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.weather-info {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.weather-info:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+h1 {
+  color: rgb(12, 11, 11);
+  margin-bottom: 20px;
+  font-size: 28px;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+form input {
+  flex-grow: 1;
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+form input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+form button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+
+.loading {
+  background-color: #0056b3;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.error {
+  color: red;
+  margin: 20px 0;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.weather-info {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #e0e0e0; 
+  border-radius: 8px;
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+}
+
+.weather-info p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 16px;
+}  
+
+.emoji {
+  font-size: 2em;
+  margin-left: 10px;
+  transition: transform 0.3s ease;
+}
+
+.emoji:hover {
+  transform: scale(1.2);
+}
+
+@media (max-width: 600px) {
+  .weather-app {
+    margin: 20px;
+    padding: 15px;
+  }
+
+  form {
+    flex-direction: column;
+  }
+
+  form input,
+  form button {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .weather-info {
+    text-align: center;
+  }
+}
+
+
