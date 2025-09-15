@@ -48,6 +48,16 @@ A minimalist Angular to-do list application featuring dynamic task management, a
 
 ---
 
+### [Weather App](./weather-app)
+
+A responsive Angular weather application that fetches real-time data using OpenWeatherMap’s API. It features autocomplete city search, emoji-enhanced feedback for weather conditions, and robust error handling—all wrapped in a clean, mobile-friendly UI.
+
+- Framework: Angular  
+- Key Features: Autocomplete city search, emoji-enhanced UI, loading states, error handling, responsive design  
+- [View README](./weather-app/README.md)
+
+---
+
 ## Goals
 
 This repository is a living portfolio. I’m actively refining each project, incorporating feedback, and expanding my toolkit. Future additions may include React/Vite builds, API integrations, machine learning demos, and automated testing pipelines.
