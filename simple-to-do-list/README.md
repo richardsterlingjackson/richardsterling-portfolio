@@ -20,6 +20,8 @@ A clean, responsive to-do list built with Angular. This app features dynamic tas
 - **Languages**: TypeScript, HTML, SCSS  
 - **Modules**: CommonModule, FormsModule  
 
+👈 [Back to Portfolio Overview](../README.md)
+
 ---
 
 ### Development Server
