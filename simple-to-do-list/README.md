@@ -4,9 +4,7 @@ A clean, responsive to-do list built with Angular. This app features dynamic tas
 
 ---
 
-[🔝 Return to Overview](#simpletodolist)
-
-## 🚀 Features
+## Features
 
 - Add tasks with bold, centered display  
 - Set countdown timers to auto-remove tasks  
@@ -16,7 +14,7 @@ A clean, responsive to-do list built with Angular. This app features dynamic tas
 
 ---
 
-## 📦 Tech Stack
+## Tech Stack
 
 - **Framework**: Angular 20.3.1 (CLI-generated)  
 - **Languages**: TypeScript, HTML, SCSS  
@@ -24,7 +22,7 @@ A clean, responsive to-do list built with Angular. This app features dynamic tas
 
 ---
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Development Server
 
@@ -80,3 +78,5 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+👈 [Back to Portfolio Overview](../README.md)
