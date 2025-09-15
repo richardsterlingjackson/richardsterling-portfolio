@@ -1,4 +1,4 @@
-# 📝 SimpleToDoList
+# SimpleToDoList
 
 A clean, responsive to-do list built with Angular. This app features dynamic task management, a customizable auto-remove countdown, and a bold, user-friendly UI. Designed to showcase component architecture, real-world interactivity, and thoughtful UX.
 
