@@ -1,22 +1,43 @@
-# 🧑‍💼 Profile Card Component
+# Profile Card Component
 
-Crafted by Richard Jackson — a responsive Angular component designed to showcase personal branding through contact links, downloadable assets, and modular design. Part of a broader portfolio that blends engineering clarity with front-end craftsmanship.
+Crafted by Richard Sterling Jackson — a responsive Angular component designed to showcase personal branding through contact links, downloadable assets, and modular design. Part of a broader portfolio that blends engineering clarity with front-end craftsmanship.
+
+---
+
+👈 [Back to Portfolio Overview](../README.md)
 
 ## Purpose
 
-This project is part of my public portfolio, built to demonstrate front-end precision, responsive design, and component-based architecture using Angular.
+This component is part of my public portfolio, built to demonstrate:
+
+- Front-end precision and layout clarity  
+- Responsive design principles  
+- Component-based architecture using Angular  
+- Personal branding through interactive UI elements  
+
+---
 
 ## Features
 
-- Responsive layout with clean styling
-- Dynamic data binding for name, title, and contact info
-- Downloadable resume button
-- Social media icons with external links
-- Modular structure for easy reuse and customization
+-  **Responsive Layout** — Adapts cleanly across screen sizes  
+-  **Dynamic Data Binding** — Displays name, title, and contact info via inputs  
+-  **Downloadable Resume Button** — Triggers file download with clear call-to-action  
+-  **Social Media Icons** — External links to GitHub, LinkedIn, and more  
+-  **Modular Structure** — Easily reusable and customizable in other Angular apps  
+-  **SCSS Styling** — Clean, scalable styles with visual hierarchy  
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
+---
+
+## Tech Stack
+
+- **Framework**: Angular 20.3.1 (CLI-generated)  
+- **Languages**: TypeScript, HTML, SCSS  
+- **Modules**: CommonModule, FormsModule  
+- **Tooling**: Angular CLI, Standalone Components  
 
 👈 [Back to Portfolio Overview](../README.md)
+
+---
 
 ## Development server
 
@@ -75,6 +96,7 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
 👈 [Back to Portfolio Overview](../README.md)
+
 
 
 
