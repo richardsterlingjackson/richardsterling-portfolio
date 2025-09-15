@@ -1,6 +1,31 @@
 # WeatherApp
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
+A responsive Angular weather app that delivers real-time weather data with a playful, emoji-enhanced interface. Built to showcase clean UI, robust error handling, and autocomplete-powered city search using OpenWeatherMap’s Geocoding API.
+
+---
+
+## Features
+
+- Emoji-enhanced UI for temperature, humidity, and conditions
+- Responsive design for desktop and mobile
+- Clear error messages for invalid input or API issues
+- Loading indicators for smooth UX
+
+---
+
+## Tech Stack
+
+| Tool / Framework       | Purpose                          |
+|------------------------|----------------------------------|
+| Angular 20.3.1         | Frontend framework               |
+| RxJS                   | Reactive programming             |
+| OpenWeatherMap API     | Weather and geolocation data     |
+| SCSS                   | Custom styling and responsiveness |
+| TypeScript             | Strong typing and structure      |
+
+---
+
+👈 [Back to Portfolio Overview](../README.md)
 
 ## Development server
 
@@ -57,3 +82,5 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+👈 [Back to Portfolio Overview](../README.md)
