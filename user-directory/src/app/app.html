@@ -1,0 +1,16 @@
+<h1>{{ title() }}</h1>
+
+<p class="app-description">
+  This User Directory app allows you to manage a list of users with detailed profiles. You can add new users, view their information, and delete entries — all powered by Angular and connected to a live backend.
+</p>
+
+<app-user-form (userAdded)="onUserAdded()"></app-user-form>
+
+<app-user-list
+  [reloadTrigger]="reloadUserList()"
+  (viewUser)="showUserDetails($event)">
+</app-user-list>
+
+<app-user-detail *ngIf="selectedUser()" [user]="selectedUser()"></app-user-detail>
+
+<button *ngIf="selectedUser()" mat-button (click)="clearUserDetails()">Close Details</button>

@@ -1,0 +1,40 @@
+<mat-card>
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Age</mat-label>
+      <input matInput type="number" formControlName="age" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Location</mat-label>
+      <input matInput formControlName="location" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Favorite Movie</mat-label>
+      <input matInput formControlName="favoriteMovie" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Favorite Car</mat-label>
+      <input matInput formControlName="favoriteCar" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Favorite Food</mat-label>
+      <input matInput formControlName="favoriteFood" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Biography</mat-label>
+      <textarea matInput formControlName="biography"></textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Add User</button>
+  </form>
+</mat-card>
