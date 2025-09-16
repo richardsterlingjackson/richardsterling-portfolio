@@ -8,9 +8,10 @@ A full-stack user management application built with Angular 20.3.1 (standalone a
 
 - Add new users with detailed profile fields
 - View user details in a polished card layout
+- Edit existing users directly from the list
 - Delete users from the list
-- Angular Material UI with custom SCSS styling
-- Live backend with Express and MongoDB
+- Responsive UI with Angular Material and custom SCSS styling
+- Data flow with Live backend using Express and MongoDB
 - Fully reactive frontend using Angular signals
 
 ---
