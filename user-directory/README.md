@@ -1,6 +1,38 @@
-# UserDirectory
+# User Directory App
+
+A full-stack user management application built with Angular 20.3.1 (standalone architecture), Angular Material, Node.js, and MongoDB. Users can be added, viewed in detail, and deleted — all through a clean, responsive UI.
+
+---
+
+## Features
+
+- Add new users with detailed profile fields
+- View user details in a polished card layout
+- Delete users from the list
+- Angular Material UI with custom SCSS styling
+- Live backend with Express and MongoDB
+- Fully reactive frontend using Angular signals
+
+---
+
+## Tech Stack
+
+| Frontend        | Backend         | Database |
+|----------------|-----------------|----------|
+| Angular 20.3.1 | Node.js + Express | MongoDB  |
+| Standalone Components | RESTful API | Mongoose ODM |
+| Angular Material | CORS + JSON parsing | Local or Atlas |
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
+---
+
+## Installation
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/your-username/user-directory.git
+cd user-directory
 
 ## Development server
 
