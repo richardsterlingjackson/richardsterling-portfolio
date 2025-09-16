@@ -26,6 +26,8 @@ A full-stack user management application built with Angular 20.3.1 (standalone a
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
 ---
 
+👈 [Back to Portfolio Overview](../README.md)
+
 ## Installation
 
 ### 1. Clone the repo
@@ -33,8 +35,6 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 ```bash
 git clone https://github.com/your-username/user-directory.git
 cd user-directory
-
-👈 [Back to Portfolio Overview](../README.md)
 
 ## Development server
 
