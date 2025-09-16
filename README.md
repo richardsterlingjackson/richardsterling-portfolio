@@ -58,6 +58,18 @@ A responsive Angular weather application that fetches real-time data using OpenW
 
 ---
 
+### [User Directory](./user-directory)
+
+A full-stack user management app built with Angular 20.3.1 (standalone components), Angular Material, Node.js, and MongoDB. It features a responsive UI, real-time backend integration, and clean architecture across the stack.
+
+- Framework: Angular  
+- Backend: Node.js + Express  
+- Database: MongoDB  
+- Key Features: Add/view/delete users, detail cards, Material UI, live backend  
+- [View README](./user-directory/README.md)
+
+---
+
 ## Goals
 
 This repository is a living portfolio. I’m actively refining each project, incorporating feedback, and expanding my toolkit. Future additions may include React/Vite builds, API integrations, machine learning demos, and automated testing pipelines.
