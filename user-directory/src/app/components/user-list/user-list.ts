@@ -23,6 +23,8 @@ import { CommonModule } from '@angular/common';
 export class UserListComponent implements OnInit, OnChanges {
   @Input() reloadTrigger: number = 0;
   @Output() viewUser = new EventEmitter<any>();
+  @Output() editUserEvent = new EventEmitter<any>(); // ✅ Added for editing
+
   users: any[] = [];
   displayedColumns: string[] = ['name', 'age', 'location', 'actions'];
 
@@ -52,5 +54,9 @@ export class UserListComponent implements OnInit, OnChanges {
 
   emitUser(user: any) {
     this.viewUser.emit(user);
+  }
+
+  editUser(user: any) {
+    this.editUserEvent.emit(user); // ✅ Emits user to parent for editing
   }
 }

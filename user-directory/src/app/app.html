@@ -4,11 +4,16 @@
   This User Directory app allows you to manage a list of users with detailed profiles. You can add new users, view their information, and delete entries — all powered by Angular and connected to a live backend.
 </p>
 
-<app-user-form (userAdded)="onUserAdded()"></app-user-form>
+<app-user-form
+  [userToEdit]="editingUser()"
+  (userAdded)="onUserAdded()"
+  (userUpdated)="onUserUpdated()">
+</app-user-form>
 
 <app-user-list
   [reloadTrigger]="reloadUserList()"
-  (viewUser)="showUserDetails($event)">
+  (viewUser)="showUserDetails($event)"
+  (editUserEvent)="startEditingUser($event)">
 </app-user-list>
 
 <app-user-detail *ngIf="selectedUser()" [user]="selectedUser()"></app-user-detail>

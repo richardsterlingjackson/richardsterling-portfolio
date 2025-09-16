@@ -14,6 +14,7 @@ import { UserDetailComponent } from './components/user-detail/user-detail';
 export class App {
   protected readonly title = signal('User Directory');
   selectedUser = signal<any | null>(null);
+  editingUser = signal<any | null>(null); // ✅ Added for editing
   reloadUserList = signal(0);
 
   showUserDetails(user: any) {
@@ -26,5 +27,14 @@ export class App {
 
   onUserAdded() {
     this.reloadUserList.update(n => n + 1);
+  }
+
+  onUserUpdated() {
+    this.reloadUserList.update(n => n + 1);
+    this.editingUser.set(null); // ✅ Clear editing state after update
+  }
+
+  startEditingUser(user: any) {
+    this.editingUser.set(user); // ✅ Set user to edit
   }
 }
