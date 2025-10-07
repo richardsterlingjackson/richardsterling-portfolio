@@ -35,6 +35,7 @@ python image-classifier.py
 
 ## Model Architecture
 
+```
 Input: 28x28x1 grayscale image
 ↓ Conv2D (32 filters, 3x3) + ReLU
 ↓ MaxPooling2D (2x2)
@@ -44,6 +45,7 @@ Input: 28x28x1 grayscale image
 ↓ Flatten
 ↓ Dense (64 units) + ReLU
 ↓ Dense (10 units) + Softmax
+```
 
 ## Sample Output
 
