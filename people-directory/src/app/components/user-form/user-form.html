@@ -1,0 +1,30 @@
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+  <mat-form-field appearance="fill">
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Location</mat-label>
+    <input matInput formControlName="location" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Role</mat-label>
+    <input matInput formControlName="role" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Tenure (months)</mat-label>
+    <input matInput type="number" formControlName="tenure" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Avatar URL</mat-label>
+    <input matInput formControlName="avatarUrl" />
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit">
+    {{ userToEdit ? 'Update User' : 'Add User' }}
+  </button>
+</form>

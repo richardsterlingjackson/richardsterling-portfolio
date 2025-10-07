@@ -1,0 +1,21 @@
+<h1>{{ title() }}</h1>
+
+<p class="app-description">
+  Help your team keep track of who’s who. Each card can show an employee bio, role, and tenure. Filters help you explore by location or team.
+</p>
+
+<section class="form-section">
+  <app-user-form
+    [userToEdit]="editingUser()"
+    (userAdded)="onUserAdded()"
+    (userUpdated)="onUserUpdated()">
+  </app-user-form>
+</section>
+
+<app-filter-bar (filterSelected)="onFilterChange($event)"></app-filter-bar>
+
+<app-user-grid
+  [filter]="selectedFilter()"
+  [reloadTrigger]="reloadUserList()"
+  (editUserEvent)="startEditingUser($event)">
+</app-user-grid>

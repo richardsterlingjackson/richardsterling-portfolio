@@ -1,0 +1,42 @@
+.user-card {
+  text-align: left;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background-color: #fff;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  }
+
+.avatar {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 8px; // Rounded corners; use 0 for sharp edges
+  margin-bottom: 1rem;
+  border: 2px solid #eee;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+  h3 {
+    margin: 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #222;
+  }
+
+  p {
+    margin: 0.25rem 0;
+    color: #555;
+    font-size: 0.95rem;
+  }
+
+  .meta {
+    font-size: 0.85rem;
+    color: #888;
+  }
+}

@@ -10,11 +10,11 @@ Full-stack developer with a background in engineering and science, now building 
 
 ## Core Skills
 
-- **Front-End**: Angular, React, Vite, Tailwind, SCSS
-- **Back-End**: Node.js, Express, Python, REST APIs
-- **Full-Stack**: GitHub workflows, modular architecture, deployment pipelines
-- **Machine Learning**: Python, scikit-learn, TensorFlow, model evaluation
-- **Software Quality Assurance**: Unit testing, end-to-end testing, CI/CD integration
+- **Front-End**: Angular, React, Vite, Tailwind, SCSS  
+- **Back-End**: Node.js, Express, Python, REST APIs  
+- **Full-Stack**: GitHub workflows, modular architecture, deployment pipelines  
+- **Machine Learning**: Python, scikit-learn, TensorFlow, model evaluation  
+- **Software Quality Assurance**: Unit testing, end-to-end testing, CI/CD integration  
 
 ## Projects
 
@@ -67,6 +67,17 @@ A full-stack user management app built with Angular 20.3.1 (standalone component
 - Database: MongoDB  
 - Key Features: Add/view/delete users, detail cards, Material UI, live backend  
 - [View README](./user-directory/README.md)
+
+---
+
+### [MNIST Image Classifier](./image-classifier)
+
+A standalone Python project that trains a Convolutional Neural Network (CNN) to classify handwritten digits using the MNIST dataset. It demonstrates model building, training, evaluation, and visualization using TensorFlow and Matplotlib.
+
+- Language: Python  
+- Framework: TensorFlow + Keras  
+- Key Features: CNN architecture, one-cdhot encoding, model evaluation, prediction visualization  
+- [View README](./image-classifier/README.md)
 
 ---
 

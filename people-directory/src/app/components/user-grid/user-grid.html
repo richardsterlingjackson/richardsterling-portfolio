@@ -1,0 +1,6 @@
+<div class="user-grid">
+  <div class="user-card-wrapper" *ngFor="let user of users">
+    <app-user-card [user]="user"></app-user-card>
+    <button class="edit-button" (click)="onEdit(user)">Edit</button>
+  </div>
+</div>
