@@ -1,4 +1,4 @@
-# 🧠 MNIST Image Classifier with TensorFlow & Keras
+# MNIST Image Classifier with TensorFlow & Keras
 
 This project builds and trains a Convolutional Neural Network (CNN) to classify handwritten digits from the [MNIST dataset](http://yann.lecun.com/exdb/mnist/). It uses TensorFlow's Keras API and visualizes predictions using Matplotlib.
 
