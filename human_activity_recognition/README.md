@@ -1,4 +1,4 @@
-# Spam Email Classifier — Logistic Regression on Spambase
+# Human Activity Recognition — Random Forest Classifier
 
 A machine learning project that classifies human physical activities using sensor data. Built with scikit-learn and visualized with Seaborn, this project demonstrates supervised learning, model evaluation, and performance visualization.
 
