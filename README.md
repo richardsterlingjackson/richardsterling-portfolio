@@ -81,6 +81,17 @@ A standalone Python project that trains a Convolutional Neural Network (CNN) to 
 
 ---
 
+### [Spam Email Classifier](./spam_filter)
+
+A Python-based machine learning project that classifies emails as spam or not spam using logistic regression. Built with scikit-learn and visualized with Seaborn, it demonstrates model training, evaluation, and confusion matrix visualization using the Spambase dataset from Kaggle.
+- Language: Python
+- Framework: scikit-learn
+- Dataset: Spambase Dataset
+- Key Features: Logistic regression, model evaluation metrics, Seaborn heatmap
+- [View README](./spam_filter/README.md)
+
+---
+
 ## Goals
 
 This repository is a living portfolio. I’m actively refining each project, incorporating feedback, and expanding my toolkit. Future additions may include React/Vite builds, API integrations, machine learning demos, and automated testing pipelines.
