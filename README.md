@@ -92,6 +92,16 @@ A Python-based machine learning project that classifies emails as spam or not sp
 
 ---
 
+### [Human Activity Recognition](./human_activity_recognition/)
+A Python-based machine learning project that classifies human physical activities using smartphone sensor data. Built with scikit-learn and visualized with Seaborn, it demonstrates supervised learning, model evaluation, and confusion matrix visualization using the Human Activity Recognition dataset from Kaggle.
+- Language: Python
+- Framework: scikit-learn
+- Dataset: Human Activity Recognition (HAR) Dataset
+- Key Features: Random Forest classifier, multiclass evaluation metrics, Seaborn heatmap
+- [View README](./human_activity_recognition/README.md)
+
+---
+
 ## Goals
 
 This repository is a living portfolio. I’m actively refining each project, incorporating feedback, and expanding my toolkit. Future additions may include React/Vite builds, API integrations, machine learning demos, and automated testing pipelines.
