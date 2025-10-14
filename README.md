@@ -70,6 +70,17 @@ A full-stack user management app built with Angular 20.3.1 (standalone component
 
 ---
 
+### [C++ User Database CLI](./cpp_user_database)
+
+A C++ command-line application that stores user profiles in a SQLite database. Built to demonstrate clean architecture, scoped logic, and direct database interaction using C++.
+
+- Language: C++  
+- Database: SQLite  
+- Key Features: CRUD operations, interactive CLI, pointer-free design, auto-generated schema  
+- [View README](./cpp_user_database/README.md)
+
+---
+
 ### [MNIST Image Classifier](./image-classifier)
 
 A standalone Python project that trains a Convolutional Neural Network (CNN) to classify handwritten digits using the MNIST dataset. It demonstrates model building, training, evaluation, and visualization using TensorFlow and Matplotlib.
