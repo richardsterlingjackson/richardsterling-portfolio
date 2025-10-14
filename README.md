@@ -50,7 +50,7 @@ A minimalist Angular to-do list application featuring dynamic task management, a
 
 ### [Weather App](./weather-app)
 
-A responsive Angular weather application that fetches real-time data using OpenWeatherMap’s API. It features city search, emoji-enhanced feedback for weather conditions, and robust error handling—all wrapped in a clean, mobile-friendly UI.
+A responsive Angular weather application that fetches real-time data using OpenWeatherMap’s API. It features city search, emoji-enhanced feedback for weather conditions, and robust error handling with a clean, mobile-friendly UI.
 
 - Framework: Angular  
 - Key Features: Autocomplete city search, emoji-enhanced UI, loading states, error handling, responsive design  

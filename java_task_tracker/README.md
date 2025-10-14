@@ -13,7 +13,7 @@ My first Java command-line application for tracking personal goals and daily pro
 - View task summaries with completion counts
 - Clear all tasks and logs
 - SQLite-backed persistence
-- Clean, readable code with onboarding clarity
+- Clean, readable code 
 
 ---
 
