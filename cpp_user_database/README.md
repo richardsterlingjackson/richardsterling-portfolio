@@ -1,4 +1,4 @@
-# C++ User Database CLI
+# C++ User Database
 
 My first C++ command-line application that stores user profiles in a SQLite database. I built this C++ project to demonstrate good architecture with clean code and direct database interaction.
 
@@ -12,7 +12,6 @@ My first C++ command-line application that stores user profiles in a SQLite data
 - **Pointer-free design** — no raw memory management; scoped logic for clarity and safety.
 - **CRUD operations** — add, update, delete, and list users from the database.
 - **Interactive CLI** — intuitive prompts for entering and managing user data.
-- **Portfolio-grade documentation** — designed for onboarding, learning, and emotional readability.
 
 ---
 

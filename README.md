@@ -70,7 +70,7 @@ A full-stack user management app built with Angular 20.3.1 (standalone component
 
 ---
 
-### [C++ User Database CLI](./cpp_user_database)
+### [C++ User Database](./cpp_user_database)
 
 A C++ command-line application that stores user profiles in a SQLite database. Built to demonstrate clean architecture, scoped logic, and direct database interaction using C++.
 
@@ -78,6 +78,17 @@ A C++ command-line application that stores user profiles in a SQLite database. B
 - Database: SQLite  
 - Key Features: CRUD operations, interactive CLI, pointer-free design, auto-generated schema  
 - [View README](./cpp_user_database/README.md)
+
+---
+
+### [Java Task Tracker CLI](./java_task_tracker)
+
+A modular Java 21 command-line application for tracking personal goals and daily progress. Built with SQLite and designed for task creation, daily logging, and summary view. Low resource usage and clean code makes this a good project for practicing and getting better at resource management.
+
+- Language: Java 21  
+- Database: SQLite  
+- Key Features: Add/log tasks, view summaries, clear logs, modular CLI design  
+- [View README](./java_task_tracker/README.md)
 
 ---
 
