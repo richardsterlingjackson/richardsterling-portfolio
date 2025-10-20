@@ -44,7 +44,8 @@ An Angular-based employee directory app with a connected database backend, desig
 
 - Framework: Angular
 - Architecture: Standalone components, signals, routing, animations
-- Backend: RESTful API integration via HttpClient
+- Back-End: Node.js + Express + MongoDB
+- Data Layer: Mongoose schema for user model
 - Key Features: Filterable user grid, editable user cards, form-driven CRUD, database-backed persistence, unit and e2e test scaffolding
 - [View README](./people-directory/README.md)
 
