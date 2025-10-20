@@ -39,6 +39,17 @@ A modular blog platform built with React and Vite, designed for clarity, polish,
 
 ---
 
+### [People-Directory](./people-directory)
+An Angular-based employee directory app with a connected database backend, designed to help teams track bios, roles, and tenure across departments. Built with standalone components and Angular signals for reactive state management, it features a dynamic user grid, filterable views, and a form-driven editing workflow. The app uses HttpClient for backend communication, supports routing and animations, and is scaffolded with Angular CLI for clean modularity and testability.
+
+- Framework: Angular
+- Architecture: Standalone components, signals, routing, animations
+- Backend: RESTful API integration via HttpClient
+- Key Features: Filterable user grid, editable user cards, form-driven CRUD, database-backed persistence, unit and e2e test scaffolding
+- [View README](./people-directory/README.md)
+
+---
+
 ### [Counter](./counter)
 
 A modular Angular component that tracks and displays dynamic counts with responsive styling and clean state management. Built to demonstrate CLI tooling, component architecture, and real-time UI updates.
