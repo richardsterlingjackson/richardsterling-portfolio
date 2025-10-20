@@ -6,7 +6,7 @@ Welcome to my public portfolio repository. This space showcases my journey into 
 
 ## About Me
 
-Full-stack developer with a background in engineering and science, now building scalable web applications, training machine learning models, and ensuring software quality through robust testing practices. I specialize in front-end frameworks like Angular and React, back-end development with Node.js and Python, and have hands-on experience in machine learning workflows and SQA methodologies. I value clarity, adaptability, and thoughtful design—both in code and in presentation.
+Full-stack developer with a background in engineering and science, now building scalable web applications, training machine learning models, and ensuring software quality through robust testing practices. I specialize in front-end frameworks like Angular and React, back-end development with Node.js and Python, and have hands-on experience in machine learning workflows and SQA methodologies. I value clarity, adaptability, and thoughtful design in code and in presentation.
 
 ## Core Skills
 
