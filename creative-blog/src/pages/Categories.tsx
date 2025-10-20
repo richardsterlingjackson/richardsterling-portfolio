@@ -1,9 +1,9 @@
-// src/pages/Categories.tsx
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { getStoredPosts } from "@/lib/postStore";
-import { slugifyCategory } from "@/lib/postStore"; // Add this helper if not already present
+import { slugifyCategory } from "@/lib/postStore";
 
 type CategoryInfo = {
   name: string;
@@ -12,6 +12,10 @@ type CategoryInfo = {
 };
 
 export default function Categories() {
+  useEffect(() => {
+    document.title = "Categories – Creative Blog";
+  }, []);
+
   const posts = getStoredPosts().filter((p) => p.status === "published");
 
   const categoryMap = new Map<string, number>();
@@ -53,7 +57,10 @@ export default function Categories() {
             ) : (
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {categories.map(({ name, slug, count }) => (
-                  <li key={slug} className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow">
+                  <li
+                    key={slug}
+                    className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+                  >
                     <Link to={`/category/${slug}`} className="block space-y-2">
                       <h3 className="text-xl font-semibold text-elegant-text hover:text-elegant-primary transition-colors">
                         {name}

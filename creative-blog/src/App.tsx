@@ -1,4 +1,3 @@
-// src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,9 +10,9 @@ import Categories from "@/pages/Categories";
 import Contact from "@/pages/Contact";
 import Admin from "@/pages/Admin";
 import PostPage from "@/pages/PostPage";
-import CategoryPage from "@/pages/Categories";
+import CategoryPage from "@/pages/CategoryPage"; // ✅ corrected import
 import NotFound from "@/pages/NotFound";
-import { SearchResults } from "@/pages/SearchResults"; // ✅ added import
+import { SearchResults } from "@/pages/SearchResults";
 
 const queryClient = new QueryClient();
 
@@ -30,8 +29,8 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/posts/:postId" element={<PostPage />} />
-          <Route path="/category/:categoryId" element={<CategoryPage />} /> {/* ✅ updated route */}
-          <Route path="/search" element={<SearchResults />} /> {/* ✅ added route */}
+          <Route path="/category/:categoryId" element={<CategoryPage />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -2,28 +2,40 @@ import { Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface BlogPostProps {
-  title: string;
-  date: string;
-  excerpt: string;
-  image: string;
-  content: string;
-  slug: string;
-  featured?: boolean;
+  post: {
+    title: string;
+    date: string;
+    excerpt: string;
+    image: string;
+    content: string;
+    slug: string;
+    category: string;
+    featured?: boolean;
+  };
 }
 
 const fallbackImage = "https://via.placeholder.com/800x400?text=Image+Unavailable";
 
-const BlogPost = ({
-  title,
-  date,
-  excerpt,
-  image,
-  slug,
-  featured = false,
-}: BlogPostProps) => {
+const BlogPost = ({ post }: BlogPostProps) => {
+  const {
+    title,
+    date,
+    excerpt,
+    image,
+    slug,
+    category,
+    featured = false,
+  } = post;
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = fallbackImage;
   };
+
+  const formattedDate = new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 
   const PostTitle = featured ? "h2" : "h3";
   const titleClass = featured
@@ -41,7 +53,11 @@ const BlogPost = ({
       <div className={featured ? "p-8" : "p-6"}>
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
           <Calendar className="h-4 w-4" />
-          <time dateTime={date}>{date}</time>
+          <time dateTime={date}>{formattedDate}</time>
+          <span>•</span>
+          <span className="uppercase tracking-wide text-xs text-elegant-primary">
+            {category}
+          </span>
         </div>
         <Link to={`/posts/${slug}`}>
           <PostTitle className={titleClass}>{title}</PostTitle>
@@ -61,3 +77,4 @@ const BlogPost = ({
 };
 
 export default BlogPost;
+

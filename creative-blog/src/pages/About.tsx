@@ -1,8 +1,12 @@
-// src/pages/About.tsx
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 
 export default function About() {
+  useEffect(() => {
+    document.title = "About – Creative Blog";
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

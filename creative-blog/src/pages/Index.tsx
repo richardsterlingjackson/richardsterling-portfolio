@@ -9,7 +9,7 @@ const Index = () => {
   const [posts, setPosts] = useState<BlogPostType[]>([]);
 
   useEffect(() => {
-    document.title = "Richard Sterling Jackson – A Custom Blog";
+    document.title = "Home – Creative Blog";
     setPosts(getStoredPosts());
   }, []);
 
@@ -28,17 +28,7 @@ const Index = () => {
             <Sidebar />
           </div>
           <div className="lg:col-span-9 space-y-12">
-            {featured && (
-              <BlogPost
-                featured
-                title={featured.title}
-                date={featured.date}
-                excerpt={featured.excerpt}
-                image={featured.image}
-                content={featured.content}
-                slug={featured.slug}
-              />
-            )}
+            {featured && <BlogPost post={featured} />}
 
             <div>
               <h2 className="font-playfair text-2xl font-semibold mb-6 text-elegant-text uppercase tracking-wide">
@@ -49,15 +39,7 @@ const Index = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {recentPosts.map((post) => (
-                    <BlogPost
-                      key={post.id}
-                      title={post.title}
-                      date={post.date}
-                      excerpt={post.excerpt || post.content.slice(0, 160)}
-                      image={post.image}
-                      content={post.content}
-                      slug={post.slug}
-                    />
+                    <BlogPost key={post.id} post={post} />
                   ))}
                 </div>
               )}

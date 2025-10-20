@@ -1,4 +1,3 @@
-// src/pages/SearchResults.tsx
 import { useLocation } from "react-router-dom";
 import { useMemo, useEffect, useState } from "react";
 import { getStoredPosts } from "@/lib/postStore";
@@ -15,6 +14,12 @@ export function SearchResults() {
   useEffect(() => {
     setPosts(getStoredPosts());
   }, []);
+
+  useEffect(() => {
+    document.title = query
+      ? `Search: “${query}” – Creative Blog`
+      : "Search – Creative Blog";
+  }, [query]);
 
   const filtered = useMemo(() => {
     return posts.filter((post) =>
@@ -41,15 +46,7 @@ export function SearchResults() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {filtered.map((post) => (
-                    <BlogPost
-                      key={post.id}
-                      title={post.title}
-                      date={post.date}
-                      excerpt={post.excerpt || post.content.slice(0, 160)}
-                      image={post.image}
-                      content={post.content}
-                      slug={post.slug}
-                    />
+                    <BlogPost key={post.id} post={post} />
                   ))}
                 </div>
               )}

@@ -1,4 +1,5 @@
-import { useState } from "react";
+// src/components/Header.tsx
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,20 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === "/";
+
+  // 🧠 Dynamic document title logic
+  useEffect(() => {
+    const routeTitleMap: Record<string, string> = {
+      "/": "Creative Blog – Home",
+      "/about": "About – Creative Blog",
+      "/categories": "Categories – Creative Blog",
+      "/contact": "Contact – Creative Blog",
+      "/admin": "Admin – Creative Blog",
+    };
+
+    const defaultTitle = "Creative Blog – Richard Sterling Jackson";
+    document.title = routeTitleMap[location.pathname] || defaultTitle;
+  }, [location.pathname]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

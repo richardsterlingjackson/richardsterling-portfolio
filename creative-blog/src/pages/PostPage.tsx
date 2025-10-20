@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { recentPosts } from "@/data/posts";
 import { getStoredPosts } from "@/lib/postStore";
@@ -10,6 +11,20 @@ export default function PostPage() {
   const { postId } = useParams();
   const allPosts = [...getStoredPosts(), ...recentPosts];
   const post = allPosts.find((p) => p.slug === postId);
+
+  useEffect(() => {
+    const baseTitle = "Creative Blog";
+    if (post) {
+      const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+      document.title = `${post.title} – ${post.category} – ${formattedDate} | ${baseTitle}`;
+    } else {
+      document.title = `Post Not Found | ${baseTitle}`;
+    }
+  }, [post]);
 
   if (!post) {
     return (

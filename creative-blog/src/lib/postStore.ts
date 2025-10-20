@@ -71,20 +71,49 @@ export function updatePost(updated: BlogPost): void {
 
 export function deletePost(id: string): void {
   const posts = getStoredPosts();
+  const postToDelete = posts.find((p) => p.id === id);
   const updated = posts.filter((p) => p.id !== id);
+
+  if (postToDelete) {
+    backupPost(postToDelete);
+  }
+
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 }
 
 export function backupPost(post: BlogPost): void {
   const raw = localStorage.getItem(BACKUP_KEY);
-  const backups = raw ? JSON.parse(raw) : [];
-  localStorage.setItem(BACKUP_KEY, JSON.stringify([...backups, post]));
+  const backups: BlogPost[] = raw ? JSON.parse(raw) : [];
+
+  const alreadyBackedUp = backups.some((p) => p.id === post.id);
+  if (!alreadyBackedUp) {
+    localStorage.setItem(BACKUP_KEY, JSON.stringify([...backups, post]));
+  }
+}
+
+export function getBackups(): BlogPost[] {
+  const raw = localStorage.getItem(BACKUP_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+
+export function getBackupCount(): number {
+  return getBackups().length;
+}
+
+export function restoreSingle(post: BlogPost): void {
+  updatePost(post);
+  removeBackup(post.id);
+}
+
+export function removeBackup(id: string): void {
+  const backups = getBackups();
+  const updated = backups.filter((p) => p.id !== id);
+  localStorage.setItem(BACKUP_KEY, JSON.stringify(updated));
 }
 
 export function restoreBackups(): BlogPost[] {
-  const raw = localStorage.getItem(BACKUP_KEY);
-  const backups = raw ? JSON.parse(raw) : [];
-  backups.forEach((post: BlogPost) => updatePost(post));
+  const backups = getBackups();
+  backups.forEach((post) => updatePost(post));
   localStorage.removeItem(BACKUP_KEY);
   return getStoredPosts();
 }

@@ -1,8 +1,12 @@
-// src/pages/Contact.tsx
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 
 export default function Contact() {
+  useEffect(() => {
+    document.title = "Contact – Creative Blog";
+  }, []);
+
   const emailUser = "richard.sterling.jackson";
   const emailDomain = "gmail.com";
 
