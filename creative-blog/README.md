@@ -37,6 +37,10 @@ A personal portfolio and technical journal built to showcase my work as a full-s
 
 ---
 
+👈 [Back to Portfolio Overview](../README.md)
+
+---
+
 ## Getting Started
 
 ```bash
@@ -66,3 +70,5 @@ Author
 Richard Sterling Jackson Full-stack engineer, systems thinker, and narrative designer. Building elegant, emotionally resonant technical solutions.
 
 ---
+
+👈 [Back to Portfolio Overview](../README.md)

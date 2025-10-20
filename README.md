@@ -28,6 +28,17 @@ A responsive Angular component designed to showcase personal branding, contact l
 
 ---
 
+### [Creative-Blog](./creative-blog)
+
+A modular blog platform built with React and Vite, designed for clarity, polish, and narrative coherence. It showcases technical writing, personal storytelling, and dynamic category browsing. Features include Markdown editing, excerpt formatting, automatic backup logic, and privacy-conscious link handling. Every detail reflects intentional design and engineering identity.
+
+- Framework: React + Vite
+- Styling: Tailwind + ShadCN UI
+- Key Features: Markdown editor, excerpt line breaks, dynamic category syncing, backup and restore logic, privacy-first link handling  
+- [View README](./creative-blog/README.md)
+
+---
+
 ### [Counter](./counter)
 
 A modular Angular component that tracks and displays dynamic counts with responsive styling and clean state management. Built to demonstrate CLI tooling, component architecture, and real-time UI updates.
