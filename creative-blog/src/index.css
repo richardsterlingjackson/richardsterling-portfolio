@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 30 25% 96%;
+    --foreground: 25 20% 25%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 25 20% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 25 20% 25%;
+
+    --primary: 15 35% 58%;
+    --primary-foreground: 30 25% 96%;
+
+    --secondary: 20 30% 85%;
+    --secondary-foreground: 25 20% 25%;
+
+    --muted: 30 20% 92%;
+    --muted-foreground: 25 15% 50%;
+
+    --accent: 15 40% 75%;
+    --accent-foreground: 25 20% 25%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 30 25% 96%;
+
+    --border: 30 15% 88%;
+    --input: 30 15% 88%;
+    --ring: 15 35% 58%;
+
+    --radius: 0.5rem;
+    
+    --elegant-primary: 15 35% 58%;
+    --elegant-secondary: 20 30% 75%;
+    --elegant-accent: 15 40% 85%;
+    --elegant-text: 25 20% 25%;
+    --elegant-text-light: 25 15% 50%;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 25 15% 12%;
+    --foreground: 30 25% 96%;
+
+    --card: 25 15% 15%;
+    --card-foreground: 30 25% 96%;
+
+    --popover: 25 15% 15%;
+    --popover-foreground: 30 25% 96%;
+
+    --primary: 15 35% 58%;
+    --primary-foreground: 25 15% 12%;
+
+    --secondary: 25 15% 25%;
+    --secondary-foreground: 30 25% 96%;
+
+    --muted: 25 15% 20%;
+    --muted-foreground: 30 20% 65%;
+
+    --accent: 15 40% 45%;
+    --accent-foreground: 30 25% 96%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 30 25% 96%;
+
+    --border: 25 15% 25%;
+    --input: 25 15% 25%;
+    --ring: 15 35% 58%;
+    
+    --elegant-primary: 15 35% 58%;
+    --elegant-secondary: 20 30% 45%;
+    --elegant-accent: 15 40% 35%;
+    --elegant-text: 30 25% 96%;
+    --elegant-text-light: 30 20% 65%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+}

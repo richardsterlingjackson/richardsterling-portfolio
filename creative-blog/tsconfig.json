@@ -1,0 +1,34 @@
+{
+  // Root-level tsconfig for project references and shared compiler options
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    // Module resolution and aliasing
+    "baseUrl": ".", // allows absolute imports from project root
+    "paths": {
+      "@/*": ["src/*"] // matches your Vite alias
+    },
+
+    // Type safety and strictness
+    "strict": true, // enables all strict type-checking options
+    "noImplicitAny": true, // disallow variables without explicit types
+    "strictNullChecks": true, // catch undefined/null errors
+    "noUnusedLocals": true, // warn on unused variables
+    "noUnusedParameters": true, // warn on unused function args
+
+    // Build performance and compatibility
+    "skipLibCheck": true, // skip type checking node_modules
+    "allowJs": true, // allow JS files in the project
+    "esModuleInterop": true, // allow default imports from CommonJS
+    "moduleResolution": "node", // standard Node-style resolution
+    "resolveJsonModule": true, // allow importing .json files
+    "isolatedModules": true, // required for SWC and Vite
+    "module": "ESNext", // modern module output
+    "target": "ESNext", // modern JS features
+    "jsx": "react-jsx", // use new JSX transform (React 17+)
+    "types": ["vite/client"] // include Vite's global types
+  }
+}
