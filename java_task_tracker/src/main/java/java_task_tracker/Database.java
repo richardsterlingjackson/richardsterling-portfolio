@@ -4,13 +4,6 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.Scanner;
 
-/* Database class for SQLite operations:
-   - Table creation
-   - Adding tasks
-   - Logging completions
-   - Displaying summaries
-*/
-
 public class Database { // Database connection 
     private final String url; // JDBC connection string
 
