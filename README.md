@@ -39,6 +39,17 @@ A modular blog platform built with React and Vite, designed for clarity, polish,
 
 ---
 
+### [Shared-Experiences](./shared-experiences)
+
+A modular blog platform built with React and Vite, designed for clarity, polish, and narrative coherence. It showcases technical writing, personal storytelling, and dynamic category browsing. This version has been tailor for my personal exploration and sharing. Features include Markdown editing, excerpt formatting, automatic backup logic, and privacy-conscious link handling. Every detail reflects intentional design and engineering identity.
+
+- Framework: React + Vite
+- Styling: Tailwind + ShadCN UI
+- Key Features: Markdown editor, excerpt line breaks, dynamic category syncing, backup and restore logic, privacy-first link handling  
+- [View README](./shared-experiences/README.md)
+
+---
+
 ### [People-Directory](./people-directory)
 An Angular-based employee directory app with a connected database backend, designed to help teams track bios, roles, and tenure across departments. Built with standalone components and Angular signals for reactive state management, it features a dynamic user grid, filterable views, and a form-driven editing workflow. The app uses HttpClient for backend communication, supports routing and animations, and is scaffolded with Angular CLI for clean modularity and testability.
 
