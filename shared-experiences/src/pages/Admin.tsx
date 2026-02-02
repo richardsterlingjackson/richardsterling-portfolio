@@ -36,17 +36,34 @@ import type { BlogPost } from "@/data/posts";
 import { categories } from "@/data/categories";
 
 //
-// 🔐 ENV PASSWORD (Next.js requires NEXT_PUBLIC_ prefix)
+// 🔐 VITE ENV PASSWORD
 //
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
 //
-// 🔐 LOGIN GATE (NO admin hooks here)
+// 🔐 LOGIN GATE (Vite version)
 //
 function AdminGate({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = React.useState("");
 
-  console.log("ADMIN_PASSWORD:", ADMIN_PASSWORD); // TEMPORARY DEBUG — remove later
+  const handleEnter = () => {
+    if (!ADMIN_PASSWORD) {
+      alert("Admin password not configured");
+      return;
+    }
+
+    if (!password) {
+      alert("Enter password");
+      return;
+    }
+
+    if (password === ADMIN_PASSWORD) {
+      sessionStorage.setItem("isAdmin", "true");
+      onSuccess();
+    } else {
+      alert("Wrong password");
+    }
+  };
 
   return (
     <div className="max-w-sm mx-auto py-24 space-y-4">
@@ -59,21 +76,7 @@ function AdminGate({ onSuccess }: { onSuccess: () => void }) {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <Button
-        className="w-full"
-        onClick={() => {
-          if (!ADMIN_PASSWORD) {
-            alert("Admin password not configured");
-            return;
-          }
-
-          if (password === ADMIN_PASSWORD) {
-            onSuccess();
-          } else {
-            alert("Wrong password");
-          }
-        }}
-      >
+      <Button className="w-full" onClick={handleEnter}>
         Enter
       </Button>
     </div>
@@ -86,6 +89,11 @@ function AdminGate({ onSuccess }: { onSuccess: () => void }) {
 export default function Admin() {
   const [authorized, setAuthorized] = React.useState(false);
 
+  React.useEffect(() => {
+    const isAdmin = sessionStorage.getItem("isAdmin");
+    if (isAdmin === "true") setAuthorized(true);
+  }, []);
+
   if (!authorized) {
     return <AdminGate onSuccess={() => setAuthorized(true)} />;
   }
@@ -94,7 +102,7 @@ export default function Admin() {
 }
 
 //
-// 🧠 ALL ADMIN HOOKS + LOGIC LIVE HERE
+// 🧠 FULL ADMIN CONTENT (your original code)
 //
 export function AdminContent() {
   React.useEffect(() => {
