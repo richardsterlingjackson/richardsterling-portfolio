@@ -46,7 +46,7 @@ const Header = () => {
             Shared Experiences
           </h1>
           <p className="font-inter text-3xl md:text-5xl font-extrabold italic text-white text-shadow-md text-outline">
-            turning thoughts into ideas and memories
+            thoughts, insights, ideas... into memories
           </p>
         </div>
       </div>
