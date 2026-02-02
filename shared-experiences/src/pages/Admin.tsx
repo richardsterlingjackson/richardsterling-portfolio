@@ -35,30 +35,94 @@ import {
 import type { BlogPost } from "@/data/posts";
 import { categories } from "@/data/categories";
 
-const blogSchema = z.object({
-  title: z.string().min(3),
-  date: z.string().min(4),
-  excerpt: z.string().min(10),
-  image: z.string().url(),
-  category: z.string().min(1),
-  featured: z.boolean().optional(),
-  content: z.string().min(20),
-  status: z.enum(["draft", "published"]),
-});
+//
+// 🔐 ENV PASSWORD (Next.js requires NEXT_PUBLIC_ prefix)
+//
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
-type BlogFormData = z.infer<typeof blogSchema>;
+//
+// 🔐 LOGIN GATE (NO admin hooks here)
+//
+function AdminGate({ onSuccess }: { onSuccess: () => void }) {
+  const [password, setPassword] = React.useState("");
 
-const slugify = (title: string) =>
-  encodeURIComponent(title.toLowerCase().replace(/\s+/g, "-"));
+  console.log("ADMIN_PASSWORD:", ADMIN_PASSWORD); // TEMPORARY DEBUG — remove later
 
-export default function AdminContent() {
+  return (
+    <div className="max-w-sm mx-auto py-24 space-y-4">
+      <h2 className="text-xl font-semibold text-center">Admin Login</h2>
+
+      <Input
+        type="password"
+        placeholder="Admin password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <Button
+        className="w-full"
+        onClick={() => {
+          if (!ADMIN_PASSWORD) {
+            alert("Admin password not configured");
+            return;
+          }
+
+          if (password === ADMIN_PASSWORD) {
+            onSuccess();
+          } else {
+            alert("Wrong password");
+          }
+        }}
+      >
+        Enter
+      </Button>
+    </div>
+  );
+}
+
+//
+// 🔧 DEFAULT EXPORT — decides what to render
+//
+export default function Admin() {
+  const [authorized, setAuthorized] = React.useState(false);
+
+  if (!authorized) {
+    return <AdminGate onSuccess={() => setAuthorized(true)} />;
+  }
+
+  return <AdminContent />;
+}
+
+//
+// 🧠 ALL ADMIN HOOKS + LOGIC LIVE HERE
+//
+export function AdminContent() {
+  React.useEffect(() => {
+    document.title = "Admin – Shared Experiences – Richard Sterling Jackson";
+  }, []);
+
   const { toast } = useToast();
-
   const [posts, setPosts] = React.useState<BlogPost[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState<"all" | "draft" | "published">("all");
   const [backupCount, setBackupCount] = React.useState<number>(0);
   const [backups, setBackups] = React.useState<BlogPost[]>([]);
+
+  const blogSchema = z.object({
+    title: z.string().min(3),
+    date: z.string().min(4),
+    excerpt: z.string().min(10),
+    image: z.string().url(),
+    category: z.string().min(1),
+    featured: z.boolean().optional(),
+    content: z.string().min(20),
+    status: z.enum(["draft", "published"]),
+  });
+
+  type BlogFormData = z.infer<typeof blogSchema>;
+
+  const slugify = (title: string) =>
+    encodeURIComponent(title.toLowerCase().replace(/\s+/g, "-"));
 
   const {
     register,
