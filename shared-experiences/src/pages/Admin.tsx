@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from "react-markdown";
+
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -18,6 +19,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+
 import {
   savePost,
   updatePost,
@@ -27,10 +29,9 @@ import {
   getBackups,
   restoreSingle,
 } from "@/lib/postStore";
+
 import type { BlogPost } from "@/data/posts";
 import { categories } from "@/data/categories";
-
-const MDEditor = React.lazy(() => import("@uiw/react-md-editor"));
 
 const blogSchema = z.object({
   title: z.string().min(3),
@@ -67,7 +68,7 @@ export default function Admin() {
     }
   };
 
-  // 🔐 SHOW LOGIN SCREEN IF NOT AUTHORIZED
+  // 🔐 LOGIN SCREEN
   if (!authorized) {
     return (
       <div className="max-w-sm mx-auto py-20">
@@ -85,7 +86,7 @@ export default function Admin() {
     );
   }
 
-  // 🔧 ORIGINAL ADMIN PANEL BELOW
+  // 🔧 ADMIN PANEL
   const { toast } = useToast();
   const [posts, setPosts] = React.useState<BlogPost[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -178,6 +179,7 @@ export default function Admin() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 space-y-10">
+
       {/* FORM */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input placeholder="Title" {...register("title")} />
@@ -189,16 +191,27 @@ export default function Admin() {
         <Textarea placeholder="Excerpt" rows={4} {...register("excerpt")} />
         {errors.excerpt && <p className="text-sm text-destructive">{errors.excerpt.message}</p>}
 
+        {/* MARKDOWN EDITOR */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-elegant-text">Content</label>
-          <Suspense fallback={<div>Loading editor…</div>}>
-            <MDEditor
-              value={watch("content")}
-              onChange={(val) => setValue("content", val || "")}
-              preview="edit"
-            />
-          </Suspense>
+
+          {/* Editor */}
+          <Textarea
+            placeholder="Write your markdown content here..."
+            rows={12}
+            value={watch("content")}
+            onChange={(e) => setValue("content", e.target.value)}
+          />
+
+          {/* Live Preview */}
+          <div className="border rounded p-4 bg-muted/30">
+            <h3 className="text-sm font-semibold mb-2">Preview</h3>
+            <div className="prose prose-sm max-w-none">
+              <ReactMarkdown>{watch("content")}</ReactMarkdown>
+            </div>
+          </div>
         </div>
+
         {errors.content && <p className="text-sm text-destructive">{errors.content.message}</p>}
 
         <Input placeholder="Image URL" {...register("image")} />
