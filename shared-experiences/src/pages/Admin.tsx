@@ -47,11 +47,45 @@ type BlogFormData = z.infer<typeof blogSchema>;
 
 const slugify = (title: string) =>
   encodeURIComponent(title.toLowerCase().replace(/\s+/g, "-"));
+
 export default function Admin() {
   React.useEffect(() => {
     document.title = "Admin – Shared Experiences – Richard Sterling Jackson";
   }, []);
 
+  // 🔐 AUTH STATE
+  const [authorized, setAuthorized] = React.useState(false);
+  const [passwordInput, setPasswordInput] = React.useState("");
+  const correctPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === correctPassword) {
+      setAuthorized(true);
+    } else {
+      alert("Incorrect password");
+    }
+  };
+
+  // 🔐 SHOW LOGIN SCREEN IF NOT AUTHORIZED
+  if (!authorized) {
+    return (
+      <div className="max-w-sm mx-auto py-20">
+        <h2 className="text-xl font-semibold mb-4 text-center">Admin Login</h2>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <Input
+            type="password"
+            placeholder="Enter admin password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+          />
+          <Button type="submit" className="w-full">Login</Button>
+        </form>
+      </div>
+    );
+  }
+
+  // 🔧 ORIGINAL ADMIN PANEL BELOW
   const { toast } = useToast();
   const [posts, setPosts] = React.useState<BlogPost[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -112,6 +146,7 @@ export default function Admin() {
     setBackupCount(getBackupCount());
     setBackups(getBackups());
   };
+
   const handleEdit = (post: BlogPost) => {
     reset(post);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -143,6 +178,7 @@ export default function Admin() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 space-y-10">
+      {/* FORM */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input placeholder="Title" {...register("title")} />
         {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
@@ -201,6 +237,8 @@ export default function Admin() {
           </Button>
         </div>
       </form>
+
+      {/* POSTS LIST */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-elegant-text">Saved Posts</h2>
         {filteredPosts.length === 0 ? (
@@ -247,6 +285,7 @@ export default function Admin() {
         )}
       </div>
 
+      {/* BACKUPS */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-elegant-text">Backups</h2>
         {backups.length === 0 ? (
