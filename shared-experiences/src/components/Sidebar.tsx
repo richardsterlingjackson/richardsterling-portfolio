@@ -8,7 +8,16 @@ export default function Sidebar() {
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
 
   useEffect(() => {
-    setAllPosts(getStoredPosts());
+    async function load() {
+      try {
+        const posts = await getStoredPosts();
+        setAllPosts(Array.isArray(posts) ? posts : []);
+      } catch (err) {
+        console.error("Failed to load posts in Sidebar:", err);
+        setAllPosts([]);
+      }
+    }
+    load();
   }, []);
 
   const recentPosts = allPosts
