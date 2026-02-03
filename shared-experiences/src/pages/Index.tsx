@@ -7,7 +7,6 @@ import type { BlogPost as BlogPostType } from "@/data/posts";
 
 const Index = () => {
   const [posts, setPosts] = useState<BlogPostType[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     document.title = "Home – Shared Experiences";
@@ -15,43 +14,21 @@ const Index = () => {
     async function loadPosts() {
       try {
         const storedPosts = await getStoredPosts();
-
-        // Debug log to see what we actually received
-        console.log("Loaded posts:", storedPosts);
-
-        // Ensure posts is always an array
         setPosts(Array.isArray(storedPosts) ? storedPosts : []);
       } catch (err) {
         console.error("Failed to load posts:", err);
         setPosts([]);
-      } finally {
-        setLoading(false);
       }
     }
 
     loadPosts();
   }, []);
 
-  const featured = useMemo(
-    () => (Array.isArray(posts) ? posts.find((p) => p.featured) : undefined),
-    [posts]
-  );
-
+  const featured = useMemo(() => posts.find((p) => p.featured), [posts]);
   const recentPosts = useMemo(
-    () =>
-      Array.isArray(posts)
-        ? posts.filter((p) => !p.featured && p.status === "published")
-        : [],
+    () => posts.filter((p) => !p.featured && p.status === "published"),
     [posts]
   );
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading posts...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -92,4 +69,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Index; 

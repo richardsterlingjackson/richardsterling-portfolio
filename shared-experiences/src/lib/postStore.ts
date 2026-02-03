@@ -2,6 +2,7 @@ import type { BlogPost } from "@/data/posts";
 
 const API = "/api/posts";
 
+// Always return an array, never undefined
 export async function getStoredPosts(): Promise<BlogPost[]> {
   try {
     const res = await fetch(API);
@@ -10,7 +11,6 @@ export async function getStoredPosts(): Promise<BlogPost[]> {
       return [];
     }
     const data = await res.json();
-    // Ensure it's an array
     return Array.isArray(data) ? data : [];
   } catch (err) {
     console.error("Error fetching posts:", err);
