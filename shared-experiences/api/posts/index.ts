@@ -1,4 +1,4 @@
-import { sql } from "../lib/db";
+import { sql } from "./db";
 import { v4 as uuid } from "uuid";
 
 export async function GET() {
