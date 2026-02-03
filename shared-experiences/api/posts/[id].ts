@@ -1,4 +1,4 @@
-import { sql } from "./db.js"; // keep .js for Vercel
+import { sql } from "./db.js"; // Use .js for Vercel
 
 export async function GET(req: Request) {
   try {
@@ -7,7 +7,7 @@ export async function GET(req: Request) {
     if (!id) return new Response("Missing post ID", { status: 400 });
 
     const rows = await sql`SELECT * FROM posts WHERE id = ${id}`;
-    return new Response(JSON.stringify(rows[0] || null), { status: 200 });
+    return new Response(JSON.stringify(Array.isArray(rows) ? rows[0] || null : null), { status: 200 });
   } catch (err) {
     console.error("GET /api/posts/:id failed:", err);
     return new Response("Server error", { status: 500 });

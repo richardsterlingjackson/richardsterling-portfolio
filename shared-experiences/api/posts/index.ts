@@ -1,11 +1,11 @@
-import { sql } from "./db.js"; // keep .js for Vercel serverless
+import { sql } from "./db.js"; // Important: use .js here for Vercel
 
 import { v4 as uuid } from "uuid";
 
 export async function GET() {
   try {
     const posts = await sql`SELECT * FROM posts ORDER BY created_at DESC`;
-    return new Response(JSON.stringify(posts || []), { status: 200 });
+    return new Response(JSON.stringify(Array.isArray(posts) ? posts : []), { status: 200 });
   } catch (err) {
     console.error("GET /api/posts failed:", err);
     return new Response(JSON.stringify([]), { status: 500 });
