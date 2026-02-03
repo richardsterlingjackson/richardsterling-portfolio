@@ -1,10 +1,9 @@
-import { sql } from "./db";
+import { sql } from "./db.js"; // <- add .js here for Vercel
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop();
-
     if (!id) return new Response("Missing post ID", { status: 400 });
 
     const rows = await sql`SELECT * FROM posts WHERE id = ${id}`;
@@ -19,7 +18,6 @@ export async function PUT(req: Request) {
   try {
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop();
-
     if (!id) return new Response("Missing post ID", { status: 400 });
 
     const body = await req.json();
@@ -52,7 +50,6 @@ export async function DELETE(req: Request) {
   try {
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop();
-
     if (!id) return new Response("Missing post ID", { status: 400 });
 
     await sql`DELETE FROM posts WHERE id = ${id}`;

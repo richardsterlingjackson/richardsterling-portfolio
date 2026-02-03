@@ -1,4 +1,5 @@
-import { sql } from "./db";
+import { sql } from "./db.js"; // <- add .js here for Vercel
+
 import { v4 as uuid } from "uuid";
 
 export async function GET() {
@@ -17,12 +18,9 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    // validate required fields
     const requiredFields = ["title", "date", "excerpt", "image", "category", "content", "status", "slug"];
     for (const field of requiredFields) {
-      if (!body[field]) {
-        return new Response(`Missing field: ${field}`, { status: 400 });
-      }
+      if (!body[field]) return new Response(`Missing field: ${field}`, { status: 400 });
     }
 
     const id = uuid();
@@ -37,7 +35,7 @@ export async function POST(req: Request) {
         ${body.excerpt},
         ${body.image},
         ${body.category},
-        ${body.featured ?? false}, -- default to false if undefined
+        ${body.featured ?? false},
         ${body.content},
         ${body.status},
         ${body.slug}

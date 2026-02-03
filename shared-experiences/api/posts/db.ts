@@ -1,6 +1,5 @@
 import { neon } from "@neondatabase/serverless";
 
-// Use the server-side DATABASE_URL directly
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is not set");
 }
