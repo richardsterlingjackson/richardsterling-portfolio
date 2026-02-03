@@ -4,7 +4,6 @@
   "compilerOptions": {
     "composite": true,          // required for project references
     "noEmit": false,            // must allow emit for composite projects
-    "emitDeclarationOnly": true, // avoids generating JS files
 
     "jsx": "react-jsx",
     "module": "esnext",
