@@ -1,17 +1,15 @@
-import { sql } from "../lib/db.js";
+import { sql } from "../lib/db";
 
-type Context = {
-  params: {
-    id: string;
-  };
-};
-
-export async function GET(req: Request, context: Context) {
-  const rows = await sql`SELECT * FROM posts WHERE id = ${context.params.id}`;
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const id = url.pathname.split("/").pop(); // get last segment as ID
+  const rows = await sql`SELECT * FROM posts WHERE id = ${id}`;
   return new Response(JSON.stringify(rows[0] || null), { status: 200 });
 }
 
-export async function PUT(req: Request, context: Context) {
+export async function PUT(req: Request) {
+  const url = new URL(req.url);
+  const id = url.pathname.split("/").pop(); // get last segment as ID
   const body = await req.json();
 
   await sql`
@@ -27,13 +25,15 @@ export async function PUT(req: Request, context: Context) {
       slug = ${body.slug},
       updated_at = NOW(),
       version = version + 1
-    WHERE id = ${context.params.id}
+    WHERE id = ${id}
   `;
 
   return new Response("Updated", { status: 200 });
 }
 
-export async function DELETE(req: Request, context: Context) {
-  await sql`DELETE FROM posts WHERE id = ${context.params.id}`;
+export async function DELETE(req: Request) {
+  const url = new URL(req.url);
+  const id = url.pathname.split("/").pop(); // get last segment as ID
+  await sql`DELETE FROM posts WHERE id = ${id}`;
   return new Response("Deleted", { status: 200 });
 }
