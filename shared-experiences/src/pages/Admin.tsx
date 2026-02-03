@@ -27,21 +27,18 @@ import {
   updatePost,
   getStoredPosts,
   deletePost,
-  getBackupCount,
-  getBackups,
-  restoreSingle,
 } from "@/lib/postStore";
 
 import type { BlogPost } from "@/data/posts";
 import { categories } from "@/data/categories";
 
 //
-// 🔐 VITE ENV PASSWORD
+// VITE ENV PASSWORD
 //
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
 //
-// 🔐 LOGIN GATE (Vite version)
+// LOGIN GATE
 //
 function AdminGate({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = React.useState("");
@@ -84,7 +81,7 @@ function AdminGate({ onSuccess }: { onSuccess: () => void }) {
 }
 
 //
-// 🔧 DEFAULT EXPORT — decides what to render
+// DEFAULT EXPORT
 //
 export default function Admin() {
   const [authorized, setAuthorized] = React.useState(false);
@@ -102,7 +99,7 @@ export default function Admin() {
 }
 
 //
-// 🧠 FULL ADMIN CONTENT (your original code)
+// FULL ADMIN CONTENT (DATABASE VERSION)
 //
 export function AdminContent() {
   React.useEffect(() => {
@@ -113,8 +110,6 @@ export function AdminContent() {
   const [posts, setPosts] = React.useState<BlogPost[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState<"all" | "draft" | "published">("all");
-  const [backupCount, setBackupCount] = React.useState<number>(0);
-  const [backups, setBackups] = React.useState<BlogPost[]>([]);
 
   const blogSchema = z.object({
     title: z.string().min(3),
@@ -143,13 +138,21 @@ export function AdminContent() {
     resolver: zodResolver(blogSchema),
   });
 
+  //
+  // LOAD POSTS FROM DATABASE
+  //
   React.useEffect(() => {
-    setPosts(getStoredPosts());
-    setBackupCount(getBackupCount());
-    setBackups(getBackups());
+    async function load() {
+      const data = await getStoredPosts();
+      setPosts(data);
+    }
+    load();
   }, []);
 
-  const onSubmit = (data: BlogFormData) => {
+  //
+  // SUBMIT HANDLER
+  //
+  const onSubmit = async (data: BlogFormData) => {
     const now = new Date().toISOString();
     const existing = posts.find(
       (p) => p.title.toLowerCase() === data.title.toLowerCase()
@@ -172,42 +175,43 @@ export function AdminContent() {
     };
 
     if (existing) {
-      updatePost(updatedPost);
+      await updatePost(updatedPost);
       toast({ title: "Post Updated", description: `"${data.title}" has been updated.` });
     } else {
       const { id, ...postWithoutId } = updatedPost;
-      savePost(postWithoutId);
+      await savePost(postWithoutId);
       toast({ title: "Post Created", description: `"${data.title}" has been saved.` });
     }
 
     reset();
-    setPosts(getStoredPosts());
-    setBackupCount(getBackupCount());
-    setBackups(getBackups());
+
+    const refreshed = await getStoredPosts();
+    setPosts(refreshed);
   };
 
+  //
+  // EDIT HANDLER
+  //
   const handleEdit = (post: BlogPost) => {
     reset(post);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDeleteConfirmed = (id: string) => {
-    deletePost(id);
+  //
+  // DELETE HANDLER
+  //
+  const handleDeleteConfirmed = async (id: string) => {
+    await deletePost(id);
     toast({ title: "Post Deleted", description: "The post has been removed." });
-    setPosts(getStoredPosts());
-    setBackupCount(getBackupCount());
-    setBackups(getBackups());
+
+    const refreshed = await getStoredPosts();
+    setPosts(refreshed);
     reset();
   };
 
-  const handleRestoreSingle = (post: BlogPost) => {
-    restoreSingle(post);
-    toast({ title: "Post Restored", description: `"${post.title}" has been recovered.` });
-    setPosts(getStoredPosts());
-    setBackupCount(getBackupCount());
-    setBackups(getBackups());
-  };
-
+  //
+  // FILTER POSTS
+  //
   const filteredPosts = posts
     .filter((p) =>
       p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -215,6 +219,9 @@ export function AdminContent() {
     )
     .filter((p) => filterStatus === "all" || p.status === filterStatus);
 
+  //
+  // RENDER
+  //
   return (
     <div className="max-w-2xl mx-auto py-10 space-y-10">
 
@@ -328,33 +335,6 @@ export function AdminContent() {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* BACKUPS */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-elegant-text">Backups</h2>
-        {backups.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No backed-up posts available.</p>
-        ) : (
-          <ul className="space-y-3">
-            {backups.map((post) => (
-              <li
-                key={post.id}
-                className="border border-border rounded p-4 flex justify-between items-center"
-              >
-                <div>
-                  <h4 className="font-medium text-elegant-text">{post.title}</h4>
-                  <p className="text-xs text-muted-foreground">
-                    {post.date} • {post.category}
-                  </p>
-                </div>
-                <Button variant="outline" onClick={() => handleRestoreSingle(post)}>
-                  Restore
-                </Button>
               </li>
             ))}
           </ul>

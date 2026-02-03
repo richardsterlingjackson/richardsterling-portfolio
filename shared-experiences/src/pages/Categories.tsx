@@ -1,9 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { getStoredPosts } from "@/lib/postStore";
-import { slugifyCategory } from "@/lib/postStore";
 
 type CategoryInfo = {
   name: string;
@@ -11,12 +10,23 @@ type CategoryInfo = {
   count: number;
 };
 
+// Simple slugify for categories
+const slugifyCategory = (category: string): string =>
+  encodeURIComponent(category.trim().toLowerCase().replace(/\s+/g, "-"));
+
 export default function Categories() {
+  const [posts, setPosts] = useState([]);
+
   useEffect(() => {
     document.title = "Categories – Shared Experiences";
-  }, []);
 
-  const posts = getStoredPosts().filter((p) => p.status === "published");
+    async function load() {
+      const data = await getStoredPosts();
+      setPosts(data.filter((p) => p.status === "published"));
+    }
+
+    load();
+  }, []);
 
   const categoryMap = new Map<string, number>();
   posts.forEach((post) => {
