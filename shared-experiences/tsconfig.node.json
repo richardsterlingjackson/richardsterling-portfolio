@@ -1,22 +1,26 @@
 {
+  // TS settings for Vite's server-side / tooling environment.
+
   "compilerOptions": {
+    "composite": true,          // required for project references
+    "noEmit": false,            // must allow emit for composite projects
+    "emitDeclarationOnly": true, // avoids generating JS files
+
     "target": "ES2022",
     "lib": ["ES2023"],
     "module": "ESNext",
     "skipLibCheck": true,
 
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
 
-    /* Linting */
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts"]
+
+  "include": ["vite.config.ts", "api"]
 }

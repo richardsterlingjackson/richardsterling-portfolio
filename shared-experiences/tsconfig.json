@@ -1,34 +1,49 @@
 {
-  // Root-level tsconfig for project references and shared compiler options
+  // Main TS config for the whole project.
+  // This ties together the app + node configs and sets shared rules.
+
   "files": [],
+
+  // Vite splits config into "app" and "node" builds.
+  // These references let both inherit the root settings.
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
+
   "compilerOptions": {
-    // Module resolution and aliasing
-    "baseUrl": ".", // allows absolute imports from project root
+    // Lets us import from the project root (e.g. "@/lib/db").
+    "baseUrl": ".",
+
+    // Matches the Vite alias.
     "paths": {
-      "@/*": ["src/*"] // matches your Vite alias
+      "@/*": ["src/*"]
     },
 
-    // Type safety and strictness
-    "strict": true, // enables all strict type-checking options
-    "noImplicitAny": true, // disallow variables without explicit types
-    "strictNullChecks": true, // catch undefined/null errors
-    "noUnusedLocals": true, // warn on unused variables
-    "noUnusedParameters": true, // warn on unused function args
+    // General strictness + cleanup.
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
 
-    // Build performance and compatibility
-    "skipLibCheck": true, // skip type checking node_modules
-    "allowJs": true, // allow JS files in the project
-    "esModuleInterop": true, // allow default imports from CommonJS
-    "moduleResolution": "node", // standard Node-style resolution
-    "resolveJsonModule": true, // allow importing .json files
-    "isolatedModules": true, // required for SWC and Vite
-    "module": "ESNext", // modern module output
-    "target": "ESNext", // modern JS features
-    "jsx": "react-jsx", // use new JSX transform (React 17+)
-    "types": ["vite/client"] // include Vite's global types
-  }
+    // Build behavior.
+    "skipLibCheck": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "target": "ESNext",
+
+    // React JSX transform.
+    "jsx": "react-jsx",
+
+    // Vite global types.
+    "types": ["vite/client"]
+  },
+
+  // Important: TS needs to see both the frontend code AND the API folder.
+  "include": ["src", "api"]
 }
