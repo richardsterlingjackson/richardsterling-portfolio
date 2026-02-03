@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { recentPosts } from "@/data/posts";
 import { getStoredPosts } from "@/lib/postStore";
@@ -9,8 +9,22 @@ import remarkBreaks from "remark-breaks";
 
 export default function PostPage() {
   const { postId } = useParams();
-  const allPosts = [...getStoredPosts(), ...recentPosts];
-  const post = allPosts.find((p) => p.slug === postId);
+  const [post, setPost] = useState(null);
+
+  useEffect(() => {
+    async function loadPost() {
+      try {
+        const storedPosts = await getStoredPosts();
+        const allPosts = [...storedPosts, ...recentPosts];
+        const foundPost = allPosts.find((p) => p.slug === postId);
+        setPost(foundPost || null);
+      } catch (err) {
+        console.error("Failed to load post:", err);
+        setPost(null);
+      }
+    }
+    loadPost();
+  }, [postId]);
 
   useEffect(() => {
     const baseTitle = "Shared Experiences";

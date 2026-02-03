@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { getStoredPosts } from "@/lib/postStore";
+import type { BlogPost } from "@/data/posts";
 
 type CategoryInfo = {
   name: string;
@@ -15,14 +16,19 @@ const slugifyCategory = (category: string): string =>
   encodeURIComponent(category.trim().toLowerCase().replace(/\s+/g, "-"));
 
 export default function Categories() {
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
 
   useEffect(() => {
     document.title = "Categories – Shared Experiences";
 
     async function load() {
-      const data = await getStoredPosts();
-      setPosts(data.filter((p) => p.status === "published"));
+      try {
+        const data = await getStoredPosts();
+        setPosts(data.filter((p) => p.status === "published"));
+      } catch (err) {
+        console.error("Failed to load posts:", err);
+        setPosts([]);
+      }
     }
 
     load();
@@ -30,7 +36,7 @@ export default function Categories() {
 
   const categoryMap = new Map<string, number>();
   posts.forEach((post) => {
-    const category = post.category?.trim();
+    const category = post?.category?.trim();
     if (category) {
       categoryMap.set(category, (categoryMap.get(category) || 0) + 1);
     }

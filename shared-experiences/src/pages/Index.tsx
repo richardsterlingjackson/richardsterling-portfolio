@@ -10,14 +10,26 @@ const Index = () => {
 
   useEffect(() => {
     document.title = "Home – Shared Experiences";
-    setPosts(getStoredPosts());
+
+    async function loadPosts() {
+      try {
+        const storedPosts = await getStoredPosts();
+        setPosts(storedPosts);
+      } catch (err) {
+        console.error("Failed to load posts:", err);
+        setPosts([]);
+      }
+    }
+
+    loadPosts();
   }, []);
 
   const featured = useMemo(() => posts.find((p) => p.featured), [posts]);
 
-  const recentPosts = useMemo(() => {
-    return posts.filter((p) => !p.featured && p.status === "published");
-  }, [posts]);
+  const recentPosts = useMemo(
+    () => posts.filter((p) => !p.featured && p.status === "published"),
+    [posts]
+  );
 
   return (
     <div className="min-h-screen bg-background">

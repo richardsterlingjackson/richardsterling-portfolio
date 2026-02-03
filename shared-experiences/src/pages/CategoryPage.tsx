@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BlogPost from "@/components/BlogPost";
@@ -9,18 +9,33 @@ import { categories } from "@/data/categories";
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
+  const [posts, setPosts] = useState<BlogPostType[]>([]);
 
+  // Resolve category label
   const label = useMemo(() => {
     const match = categories.find((c) => c.slug === categoryId);
     return match?.label || decodeURIComponent(categoryId || "");
   }, [categoryId]);
 
-  const posts = useMemo(() => {
-    return getStoredPosts().filter(
-      (p) => p.status === "published" && p.category?.toLowerCase() === label.toLowerCase()
-    );
+  // Load posts for this category
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        const allPosts = await getStoredPosts();
+        const filtered = allPosts.filter(
+          (p) => p.status === "published" && p.category?.toLowerCase() === label.toLowerCase()
+        );
+        setPosts(filtered);
+      } catch (err) {
+        console.error("Failed to load posts for category:", err);
+        setPosts([]);
+      }
+    }
+
+    loadPosts();
   }, [label]);
 
+  // Set page title
   useEffect(() => {
     document.title = `Category: ${label} – Shared Experiences`;
   }, [label]);

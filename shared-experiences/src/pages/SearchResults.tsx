@@ -8,23 +8,40 @@ import Header from "@/components/Header";
 
 export function SearchResults() {
   const { search } = useLocation();
-  const query = useMemo(() => new URLSearchParams(search).get("q")?.toLowerCase() || "", [search]);
+  const query = useMemo(
+    () => new URLSearchParams(search).get("q")?.toLowerCase() || "",
+    [search]
+  );
+
   const [posts, setPosts] = useState<BlogPostType[]>([]);
 
+  // Load posts asynchronously
   useEffect(() => {
-    setPosts(getStoredPosts());
+    async function loadPosts() {
+      try {
+        const storedPosts = await getStoredPosts();
+        setPosts(storedPosts);
+      } catch (err) {
+        console.error("Failed to load posts:", err);
+        setPosts([]);
+      }
+    }
+    loadPosts();
   }, []);
 
+  // Update document title
   useEffect(() => {
     document.title = query
       ? `Search: “${query}” – Shared Experiences`
       : "Search – Shared Experiences";
   }, [query]);
 
+  // Filter posts based on search query
   const filtered = useMemo(() => {
-    return posts.filter((post) =>
-      post.title.toLowerCase().includes(query) ||
-      post.content.toLowerCase().includes(query)
+    return posts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(query) ||
+        post.content.toLowerCase().includes(query)
     );
   }, [posts, query]);
 
