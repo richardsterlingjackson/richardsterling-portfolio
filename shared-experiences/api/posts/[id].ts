@@ -1,4 +1,4 @@
-import { sql } from "./db.js"; // <- add .js here for Vercel
+import { sql } from "./db.js"; // keep .js for Vercel
 
 export async function GET(req: Request) {
   try {

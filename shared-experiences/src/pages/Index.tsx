@@ -14,7 +14,8 @@ const Index = () => {
     async function loadPosts() {
       try {
         const storedPosts = await getStoredPosts();
-        setPosts(storedPosts);
+        // Ensure we always get an array
+        setPosts(Array.isArray(storedPosts) ? storedPosts : []);
       } catch (err) {
         console.error("Failed to load posts:", err);
         setPosts([]);
