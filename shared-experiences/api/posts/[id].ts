@@ -1,5 +1,4 @@
-// api/posts/[id].ts
-import { sql } from "./db.js";
+import { sql } from "./db";
 
 type DbRow = {
   id: string;
@@ -47,16 +46,17 @@ function mapRow(row: DbRow) {
   };
 }
 
+// GET /api/posts/:id
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop();
 
     if (!id) {
-      return new Response(
-        JSON.stringify({ error: "Missing post ID" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Missing post ID" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const rows = (await sql`
@@ -64,60 +64,40 @@ export async function GET(req: Request) {
     `) as DbRow[];
 
     if (!rows.length) {
-      return new Response(
-        JSON.stringify({ error: "Post not found" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Post not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    const post = mapRow(rows[0]);
-
-    return new Response(JSON.stringify(post), {
+    return new Response(JSON.stringify(mapRow(rows[0])), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
     console.error("GET /api/posts/:id failed:", err);
-    return new Response(
-      JSON.stringify({ error: "Server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
 
+// PUT /api/posts/:id
 export async function PUT(req: Request) {
   try {
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop();
 
     if (!id) {
-      return new Response(
-        JSON.stringify({ error: "Missing post ID" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Missing post ID" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const body = (await req.json()) as UpdateBody;
 
-    // Validate required fields
-    const requiredFields: (keyof UpdateBody)[] = [
-      "title",
-      "date",
-      "excerpt",
-      "image",
-      "category",
-      "content",
-      "status",
-      "slug",
-    ];
-
-    for (const field of requiredFields) {
-      if (!body[field]) {
-        return new Response(`Missing field: ${field}`, { status: 400 });
-      }
-    }
-
-    // Update and return updated row
     const result = (await sql`
       UPDATE posts SET
         title = ${body.title},
@@ -136,37 +116,36 @@ export async function PUT(req: Request) {
     `) as DbRow[];
 
     if (!result.length) {
-      return new Response(
-        JSON.stringify({ error: "Post not found" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Post not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    const post = mapRow(result[0]);
-
-    return new Response(JSON.stringify(post), {
+    return new Response(JSON.stringify(mapRow(result[0])), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
     console.error("PUT /api/posts/:id failed:", err);
-    return new Response(
-      JSON.stringify({ error: "Server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
 
+// DELETE /api/posts/:id
 export async function DELETE(req: Request) {
   try {
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop();
 
     if (!id) {
-      return new Response(
-        JSON.stringify({ error: "Missing post ID" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Missing post ID" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const result = (await sql`
@@ -174,18 +153,18 @@ export async function DELETE(req: Request) {
     `) as { id: string }[];
 
     if (!result.length) {
-      return new Response(
-        JSON.stringify({ error: "Post not found" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Post not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     return new Response(null, { status: 204 });
   } catch (err) {
     console.error("DELETE /api/posts/:id failed:", err);
-    return new Response(
-      JSON.stringify({ error: "Server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
