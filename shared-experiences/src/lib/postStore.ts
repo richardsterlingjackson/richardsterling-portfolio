@@ -7,6 +7,18 @@ export type NewPostInput = Pick<
   "title" | "date" | "excerpt" | "image" | "category" | "featured" | "content" | "status"
 >;
 
+export type UpdatePostInput = {
+  title: string;
+  date: string;
+  excerpt: string;
+  image: string;
+  category: string;
+  featured: boolean;
+  content: string;
+  status: "draft" | "published";
+  slug: string;
+};
+
 export async function getStoredPosts(): Promise<BlogPost[]> {
   try {
     const res = await fetch(API, {
@@ -51,10 +63,11 @@ export async function savePost(
 }
 
 export async function updatePost(
-  post: BlogPost
+  id: string,
+  post: UpdatePostInput
 ): Promise<BlogPost | null> {
   try {
-    const res = await fetch(`${API}/${post.id}`, {
+    const res = await fetch(`${API}/${id}`, {
       method: "PUT",
       body: JSON.stringify(post),
       headers: { "Content-Type": "application/json" },

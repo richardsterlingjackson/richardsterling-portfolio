@@ -28,19 +28,14 @@ import {
   getStoredPosts,
   deletePost,
   type NewPostInput,
+  type UpdatePostInput,
 } from "@/lib/postStore";
 
 import type { BlogPost } from "@/data/posts";
 import { categories } from "@/data/categories";
 
-//
-// VITE ENV PASSWORD
-//
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
-//
-// LOGIN GATE
-//
 function AdminGate({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = React.useState("");
 
@@ -81,9 +76,6 @@ function AdminGate({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-//
-// DEFAULT EXPORT
-//
 export default function Admin() {
   const [authorized, setAuthorized] = React.useState(false);
 
@@ -99,9 +91,6 @@ export default function Admin() {
   return <AdminContent />;
 }
 
-//
-// FULL ADMIN CONTENT
-//
 export function AdminContent() {
   React.useEffect(() => {
     document.title = "Admin – Shared Experiences – Richard Sterling Jackson";
@@ -137,9 +126,6 @@ export function AdminContent() {
     resolver: zodResolver(blogSchema),
   });
 
-  //
-  // LOAD POSTS
-  //
   React.useEffect(() => {
     async function load() {
       const data = await getStoredPosts();
@@ -148,16 +134,9 @@ export function AdminContent() {
     load();
   }, []);
 
-  //
-  // SUBMIT HANDLER
-  //
   const onSubmit = async (data: BlogFormData) => {
     if (editingPost) {
-      //
-      // UPDATE EXISTING POST
-      //
-      const updated: BlogPost = {
-        ...editingPost,
+      const payload: UpdatePostInput = {
         title: data.title,
         date: data.date,
         excerpt: data.excerpt,
@@ -166,14 +145,12 @@ export function AdminContent() {
         content: data.content,
         status: data.status,
         featured: !!data.featured,
+        slug: editingPost.slug, // keep existing slug (Option A)
       };
 
-      await updatePost(updated);
+      await updatePost(editingPost.id, payload);
       toast({ title: "Post Updated", description: `"${data.title}" has been updated.` });
     } else {
-      //
-      // CREATE NEW POST
-      //
       const payload: NewPostInput = {
         title: data.title,
         date: data.date,
@@ -198,9 +175,6 @@ export function AdminContent() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  //
-  // EDIT HANDLER
-  //
   const handleEdit = (post: BlogPost) => {
     setEditingPost(post);
     reset({
@@ -216,9 +190,6 @@ export function AdminContent() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  //
-  // DELETE HANDLER
-  //
   const handleDeleteConfirmed = async (id: string) => {
     await deletePost(id);
     toast({ title: "Post Deleted", description: "The post has been removed." });
@@ -230,9 +201,6 @@ export function AdminContent() {
     setEditingPost(null);
   };
 
-  //
-  // FILTER POSTS
-  //
   const filteredPosts = posts
     .filter((p) =>
       p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -240,9 +208,6 @@ export function AdminContent() {
     )
     .filter((p) => filterStatus === "all" || p.status === filterStatus);
 
-  //
-  // RENDER
-  //
   return (
     <div className="max-w-2xl mx-auto py-10 space-y-10">
       {/* FORM */}
