@@ -24,6 +24,7 @@ export async function getStoredPosts(): Promise<BlogPost[]> {
     const res = await fetch(API, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
+      cache: "no-store",
     });
 
     if (!res.ok) {
@@ -47,6 +48,7 @@ export async function savePost(
       method: "POST",
       body: JSON.stringify(post),
       headers: { "Content-Type": "application/json" },
+      cache: "no-store",
     });
 
     if (!res.ok) {
@@ -71,6 +73,7 @@ export async function updatePost(
       method: "PUT",
       body: JSON.stringify(post),
       headers: { "Content-Type": "application/json" },
+      cache: "no-store",
     });
 
     if (!res.ok) {
@@ -91,6 +94,7 @@ export async function deletePost(id: string): Promise<boolean> {
     const res = await fetch(`${API}/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
+      cache: "no-store",
     });
 
     if (!res.ok && res.status !== 204) {
