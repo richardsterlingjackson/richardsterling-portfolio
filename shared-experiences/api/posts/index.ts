@@ -1,4 +1,6 @@
 // api/posts/index.ts
+export const runtime = "nodejs";
+
 import { sql } from "./db.js";
 import { v4 as uuid } from "uuid";
 
