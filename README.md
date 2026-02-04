@@ -41,11 +41,21 @@ A modular blog platform built with React and Vite, designed for clarity, polish,
 
 ### [Shared-Experiences](./shared-experiences)
 
-A modular blog platform built with React and Vite, designed for clarity, polish, and narrative coherence. It showcases technical writing, personal storytelling, and dynamic category browsing. This version has been tailor for my personal exploration and sharing. Features include Markdown editing, excerpt formatting, automatic backup logic, and privacy-conscious link handling. Every detail reflects intentional design and engineering identity.
+A modular blog platform built with React and Vite, designed for clarity, polish, and narrative coherence. It blends technical writing, personal storytelling, and dynamic category browsing into a single, intentional experience. This version is tailored for my own exploration and sharing — a space where engineering decisions and creative expression meet.
 
-- Framework: React + Vite
-- Styling: Tailwind + ShadCN UI
-- Key Features: Markdown editor, excerpt line breaks, dynamic category syncing, backup and restore logic, privacy-first link handling  
+The platform now includes a full serverless backend powered by Neon Postgres, Vercel API routes, and a typed data pipeline. Features include Markdown editing, excerpt formatting, real database persistence, versioning, and privacy‑conscious link handling. Every detail reflects deliberate design and engineering identity.
+
+Framework: React + Vite
+Styling: Tailwind CSS + ShadCN UI
+Backend: Neon Postgres + Vercel Serverless Functions
+
+Key Features:
+- Markdown editor with live preview
+- Dynamic category syncing
+- Clean slug generation
+- Versioning and timestamps
+- Real database persistence (no localStorage)
+- Privacy‑first link handling
 - [View README](./shared-experiences/README.md)
 
 ---
