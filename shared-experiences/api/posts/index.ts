@@ -59,7 +59,9 @@ function slugify(input: string): string {
 
 export async function GET() {
   try {
-    const rows = (await sql`SELECT * FROM posts ORDER BY created_at DESC`) as DbRow[];
+    const rows = (await sql`
+      SELECT * FROM posts ORDER BY created_at DESC
+    `) as DbRow[];
 
     const posts = rows.map(mapRow);
 
@@ -97,9 +99,10 @@ export async function POST(req: Request) {
     }
 
     const id = uuid();
-    const slug = body.slug && typeof body.slug === "string"
-      ? body.slug
-      : slugify(body.title);
+    const slug =
+      body.slug && typeof body.slug === "string"
+        ? body.slug
+        : slugify(body.title);
 
     await sql`
       INSERT INTO posts (
@@ -112,7 +115,10 @@ export async function POST(req: Request) {
         featured,
         content,
         status,
-        slug
+        slug,
+        created_at,
+        updated_at,
+        version
       ) VALUES (
         ${id},
         ${body.title},
@@ -123,11 +129,17 @@ export async function POST(req: Request) {
         ${body.featured ?? false},
         ${body.content},
         ${body.status},
-        ${slug}
+        ${slug},
+        NOW(),
+        NOW(),
+        1
       )
     `;
 
-    const rows = (await sql`SELECT * FROM posts WHERE id = ${id}`) as DbRow[];
+    const rows = (await sql`
+      SELECT * FROM posts WHERE id = ${id}
+    `) as DbRow[];
+
     const post = rows.length ? mapRow(rows[0]) : null;
 
     return new Response(JSON.stringify(post), {
@@ -138,7 +150,10 @@ export async function POST(req: Request) {
     console.error("POST /api/posts failed:", err);
     return new Response(
       JSON.stringify({ error: "Server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
     );
   }
 }

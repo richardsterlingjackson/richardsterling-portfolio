@@ -59,7 +59,9 @@ export async function GET(req: Request) {
       );
     }
 
-    const rows = (await sql`SELECT * FROM posts WHERE id = ${id}`) as DbRow[];
+    const rows = (await sql`
+      SELECT * FROM posts WHERE id = ${id}
+    `) as DbRow[];
 
     if (!rows.length) {
       return new Response(
@@ -97,7 +99,26 @@ export async function PUT(req: Request) {
 
     const body = (await req.json()) as UpdateBody;
 
-    await sql`
+    // Validate required fields
+    const requiredFields: (keyof UpdateBody)[] = [
+      "title",
+      "date",
+      "excerpt",
+      "image",
+      "category",
+      "content",
+      "status",
+      "slug",
+    ];
+
+    for (const field of requiredFields) {
+      if (!body[field]) {
+        return new Response(`Missing field: ${field}`, { status: 400 });
+      }
+    }
+
+    // Update and return updated row
+    const result = (await sql`
       UPDATE posts SET
         title = ${body.title},
         date = ${body.date},
@@ -111,10 +132,17 @@ export async function PUT(req: Request) {
         updated_at = NOW(),
         version = COALESCE(version, 0) + 1
       WHERE id = ${id}
-    `;
+      RETURNING *
+    `) as DbRow[];
 
-    const rows = (await sql`SELECT * FROM posts WHERE id = ${id}`) as DbRow[];
-    const post = mapRow(rows[0]);
+    if (!result.length) {
+      return new Response(
+        JSON.stringify({ error: "Post not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const post = mapRow(result[0]);
 
     return new Response(JSON.stringify(post), {
       status: 200,
@@ -141,7 +169,16 @@ export async function DELETE(req: Request) {
       );
     }
 
-    await sql`DELETE FROM posts WHERE id = ${id}`;
+    const result = (await sql`
+      DELETE FROM posts WHERE id = ${id} RETURNING id
+    `) as { id: string }[];
+
+    if (!result.length) {
+      return new Response(
+        JSON.stringify({ error: "Post not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
     return new Response(null, { status: 204 });
   } catch (err) {
