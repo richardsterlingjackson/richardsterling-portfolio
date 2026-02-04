@@ -1,8 +1,8 @@
 # RichaShared Experiences – A Personal Blog by Richard Sterling Jackson
 
-A narrative‑driven technical journal built to explore ideas, document experiments, and share the stories behind the work. Shared Experiences blends engineering, reflection, and design into a single space. It's part memoir, part lab notebook, part creative outlet.
+A narrative‑driven technical journal built to explore ideas, thoughts,experiments, and shared experiences. There always lives a story behind the work. Shared Experiences blends engineering, creativity and design into a single space, my space, my voice.
 
-This project represents my approach to building software: intentional, elegant, and relatable to others.
+This project represents my approach to building software: intentional, elegant, and personal.
 
 ---
 
@@ -30,12 +30,33 @@ This project represents my approach to building software: intentional, elegant, 
 
 ## Tech Stack
 
-- React + Vite — Fast, modern frontend
-- TypeScript — Type-safe across components and forms
-- Zod + React Hook Form — Robust validation
-- Tailwind + ShadCN UI — Utility-first styling with accessible components
-- Node.js + Local Storage — Lightweight post persistence
-- React Router — Declarative routing
+Frontend
+- React + Vite — Fast, modern development environment
+- TypeScript — Type‑safe components, forms, and API interactions
+- Zod + React Hook Form — Schema‑driven validation and ergonomic form handling
+- Tailwind CSS + ShadCN UI — Utility‑first styling with accessible, composable components
+- React Router — Declarative routing for posts, categories, and admin views
+- Slugify Logic — Clean, predictable URLs for posts
+
+Backend
+- Neon Postgres — Serverless, scalable Postgres database
+- Vercel Serverless Functions — API routes for full CRUD operations
+- @neondatabase/serverless — Lightweight SQL client for serverless environments
+- UUID — Unique ID generation for posts
+- Versioning & Timestamps — Automatic version increments and audit-friendly metadata
+- Real Database Persistence — No localStorage; all posts stored in Postgres
+
+Deployment
+- Vercel — Hosting, serverless execution, environment variables
+- Neon — Cloud Postgres with pooling, SSL, and zero‑config scaling
+
+Data Flow
+Admin Panel → API Routes → Neon Postgres → API → Frontend
+- The admin panel sends JSON to /api/posts
+- Serverless functions validate, map, and persist data
+- Neon stores posts with timestamps and versioning
+- The frontend fetches live data from the API
+- Slugs ensure clean, stable URLs
 
 ---
 
@@ -58,18 +79,24 @@ npm run dev
 ## Folder Structure
 
 ```bash
+api/
+  posts/
+    db.ts        # Neon connection
+    index.ts     # GET all, POST create
+    id.ts        # GET one, PUT update, DELETE remove
+
 src/
-├── components/       # Reusable UI components (Header, Sidebar, etc.)
-├── pages/            # Route-based views (Home, Admin, Categories)
-├── styles/           # Global and scoped styles
-├── lib/              # Post store logic and helpers
-├── data/             # Shared category definitions
+  components/    # Reusable UI components
+  pages/         # Route-based views
+  data/          # Types and category definitions
+  lib/           # Post store and helpers
+  styles/        # Global Tailwind + design system
 ```
 
 ---
 
 Author
-Richard Sterling Jackson Full-stack engineer, systems thinker, and narrative designer. Building elegant, emotionally resonant technical solutions.
+Richard Sterling Jackson Full-stack engineer, Scada & Controls engineer, and narrative designer. Building elegant, emotionally resonant technical solutions.
 
 ---
 
