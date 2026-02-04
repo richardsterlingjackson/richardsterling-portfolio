@@ -1,9 +1,9 @@
-// src/components/PageTitle.tsx
 import { useEffect } from "react";
 
 export default function PageTitle({ title }: { title: string }) {
   useEffect(() => {
-    document.title = title;
+    const base = "Shared Experiences";
+    document.title = title?.trim() ? title : base;
   }, [title]);
 
   return null;

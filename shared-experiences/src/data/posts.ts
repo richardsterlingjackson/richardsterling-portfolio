@@ -1,3 +1,8 @@
+// src/data/posts.ts
+
+// The canonical BlogPost type used across the entire app.
+// Matches your Neon database schema and your API response shape exactly.
+
 export type BlogPost = {
   id: string;
   slug: string;
@@ -6,15 +11,16 @@ export type BlogPost = {
   excerpt: string;
   image: string;
   category: string;
-  featured?: boolean;
+  featured: boolean; // always boolean, never optional
   content: string;
   status: "draft" | "published";
-  createdAt?: string;
-  updatedAt?: string;
-  version?: number;
+  createdAt: string | null; // DB returns null when empty
+  updatedAt: string | null;
+  version: number | null;
 };
 
-
+// Legacy placeholder array — kept empty on purpose.
+// You no longer use localStorage or static posts.
 
 export const recentPosts: BlogPost[] = [ /**
   {

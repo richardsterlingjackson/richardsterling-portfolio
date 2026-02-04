@@ -5,7 +5,7 @@ import BlogPost from "@/components/BlogPost";
 import { getStoredPosts } from "@/lib/postStore";
 import type { BlogPost as BlogPostType } from "@/data/posts";
 
-const Index = () => {
+export default function Index() {
   const [posts, setPosts] = useState<BlogPostType[]>([]);
 
   useEffect(() => {
@@ -25,6 +25,7 @@ const Index = () => {
   }, []);
 
   const featured = useMemo(() => posts.find((p) => p.featured), [posts]);
+
   const recentPosts = useMemo(
     () => posts.filter((p) => !p.featured && p.status === "published"),
     [posts]
@@ -38,6 +39,7 @@ const Index = () => {
           <div className="lg:col-span-3">
             <Sidebar />
           </div>
+
           <div className="lg:col-span-9 space-y-12">
             {featured && <BlogPost post={featured} />}
 
@@ -45,6 +47,7 @@ const Index = () => {
               <h2 className="font-playfair text-2xl font-semibold mb-6 text-elegant-text uppercase tracking-wide">
                 Recent Posts
               </h2>
+
               {recentPosts.length === 0 ? (
                 <p className="text-muted-foreground">No recent posts found.</p>
               ) : (
@@ -58,6 +61,7 @@ const Index = () => {
           </div>
         </div>
       </main>
+
       <footer className="bg-card border-t border-border mt-16">
         <div className="container mx-auto px-4 py-8">
           <p className="text-center text-sm text-muted-foreground">
@@ -67,6 +71,4 @@ const Index = () => {
       </footer>
     </div>
   );
-};
-
-export default Index; 
+}

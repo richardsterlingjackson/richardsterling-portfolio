@@ -1,23 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { getStoredPosts } from "@/lib/postStore";
 import type { BlogPost } from "@/data/posts";
+import { categories as categoryList } from "@/data/categories";
 
 type CategoryInfo = {
-  name: string;
+  label: string;
   slug: string;
   count: number;
 };
 
-// Simple slugify for categories
-const slugifyCategory = (category: string): string =>
-  encodeURIComponent(category.trim().toLowerCase().replace(/\s+/g, "-"));
-
 export default function Categories() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  //
+  // LOAD POSTS
+  //
   useEffect(() => {
     document.title = "Categories – Shared Experiences";
 
@@ -28,36 +29,47 @@ export default function Categories() {
       } catch (err) {
         console.error("Failed to load posts:", err);
         setPosts([]);
+      } finally {
+        setLoading(false);
       }
     }
 
     load();
   }, []);
 
-  const categoryMap = new Map<string, number>();
-  posts.forEach((post) => {
-    const category = post?.category?.trim();
-    if (category) {
-      categoryMap.set(category, (categoryMap.get(category) || 0) + 1);
-    }
-  });
+  //
+  // BUILD CATEGORY COUNTS (memoized)
+  //
+  const categoryData = useMemo<CategoryInfo[]>(() => {
+    const map = new Map<string, number>();
 
-  const categories: CategoryInfo[] = Array.from(categoryMap.entries()).map(
-    ([name, count]) => ({
-      name,
-      slug: slugifyCategory(name),
-      count,
-    })
-  );
+    posts.forEach((post) => {
+      const category = post.category?.trim();
+      if (category) {
+        map.set(category, (map.get(category) || 0) + 1);
+      }
+    });
+
+    // Convert to array using official category list
+    return categoryList
+      .map(({ label, slug }) => ({
+        label,
+        slug,
+        count: map.get(label) || 0,
+      }))
+      .filter((c) => c.count > 0); // Only show categories that actually have posts
+  }, [posts]);
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
+
       <main className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-3">
             <Sidebar />
           </div>
+
           <div className="lg:col-span-9 space-y-10">
             <section className="space-y-4">
               <h1 className="text-4xl font-playfair font-bold text-elegant-text tracking-tight">
@@ -68,21 +80,23 @@ export default function Categories() {
               </p>
             </section>
 
-            {categories.length === 0 ? (
+            {loading ? (
+              <p className="text-muted-foreground text-md">Loading…</p>
+            ) : categoryData.length === 0 ? (
               <p className="text-muted-foreground text-md">No categories found.</p>
             ) : (
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {categories.map(({ name, slug, count }) => (
+                {categoryData.map(({ label, slug, count }) => (
                   <li
                     key={slug}
                     className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
                   >
                     <Link to={`/category/${slug}`} className="block space-y-2">
                       <h3 className="text-xl font-semibold text-elegant-text hover:text-elegant-primary transition-colors">
-                        {name}
+                        {label}
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        {count} post{count > 1 ? "s" : ""} in this category
+                        {count} post{count > 1 ? "s" : ""}
                       </p>
                     </Link>
                   </li>
@@ -92,6 +106,7 @@ export default function Categories() {
           </div>
         </div>
       </main>
+
       <footer className="bg-card border-t border-border mt-16">
         <div className="container mx-auto px-4 py-8">
           <p className="text-center text-sm text-muted-foreground">

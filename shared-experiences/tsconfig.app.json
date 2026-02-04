@@ -1,13 +1,11 @@
 {
-  // TS settings for the frontend (React app).
-
   "compilerOptions": {
-    "composite": true,          // required for project references
-    "noEmit": false,            // must allow emit for composite projects
+    "composite": true,
+    "noEmit": true,
 
     "jsx": "react-jsx",
-    "module": "esnext",
-    "target": "es6",
+    "module": "ESNext",
+    "target": "ESNext",
 
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -15,7 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
 
-    "lib": ["dom", "esnext"],
+    "lib": ["DOM", "ESNext"],
 
     "baseUrl": ".",
     "paths": {
@@ -23,5 +21,5 @@
     }
   },
 
-  "include": ["src", "api"]
+  "include": ["src"]
 }

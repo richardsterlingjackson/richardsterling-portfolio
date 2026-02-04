@@ -1,9 +1,7 @@
 {
-  // TS settings for Vite's server-side / tooling environment.
-
   "compilerOptions": {
-    "composite": true,          // required for project references
-    "noEmit": false,            // must allow emit for composite projects
+    "composite": true,
+    "noEmit": false,
 
     "target": "ES2022",
     "lib": ["ES2023"],
@@ -11,7 +9,6 @@
     "skipLibCheck": true,
 
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
 

@@ -9,5 +9,5 @@ export const categories = [
   { slug: "tools-and-systems", label: "Tools and Systems" },
   { slug: "stillness-and-storms", label: "Stillness and Storms" },
   { slug: "designs-and-details", label: "Design and Detail" },
-  { slug: "shared-experiences", label: "Shared Experiences" },
+  { slug: "shared-experiences", label: "Shared Experiences" }
 ];
