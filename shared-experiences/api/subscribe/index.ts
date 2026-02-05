@@ -1,4 +1,4 @@
-import { sql } from "../posts/db";
+import { sql } from "../posts/db.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { sendWelcomeEmail } from "../_helpers/sendEmails";
 
