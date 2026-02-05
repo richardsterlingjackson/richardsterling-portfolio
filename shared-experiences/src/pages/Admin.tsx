@@ -457,8 +457,187 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             <div className="space-y-2">
               <label className="text-sm font-medium text-elegant-text">Content</label>
 
+              {/* Formatting Toolbar */}
+              <div className="flex flex-wrap gap-2 p-3 bg-muted/50 border rounded">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const selected = watch("content").substring(start, end);
+                      const before = watch("content").substring(0, start);
+                      const after = watch("content").substring(end);
+                      setValue("content", `${before}**${selected || "bold text"}**${after}`);
+                    }
+                  }}
+                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted font-semibold"
+                  title="Bold"
+                >
+                  B
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const selected = watch("content").substring(start, end);
+                      const before = watch("content").substring(0, start);
+                      const after = watch("content").substring(end);
+                      setValue("content", `${before}*${selected || "italic text"}*${after}`);
+                    }
+                  }}
+                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted italic"
+                  title="Italic"
+                >
+                  I
+                </button>
+
+                <div className="border-l border-border"></div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const selected = watch("content").substring(start, end);
+                      const before = watch("content").substring(0, start);
+                      const after = watch("content").substring(end);
+                      setValue("content", `${before}# ${selected || "Heading"}${after}`);
+                    }
+                  }}
+                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted text-lg font-bold"
+                  title="Heading 1"
+                >
+                  H1
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const selected = watch("content").substring(start, end);
+                      const before = watch("content").substring(0, start);
+                      const after = watch("content").substring(end);
+                      setValue("content", `${before}## ${selected || "Heading"}${after}`);
+                    }
+                  }}
+                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted text-base font-bold"
+                  title="Heading 2"
+                >
+                  H2
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const selected = watch("content").substring(start, end);
+                      const before = watch("content").substring(0, start);
+                      const after = watch("content").substring(end);
+                      setValue("content", `${before}### ${selected || "Heading"}${after}`);
+                    }
+                  }}
+                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted font-bold"
+                  title="Heading 3"
+                >
+                  H3
+                </button>
+
+                <div className="border-l border-border"></div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const selected = watch("content").substring(start, end);
+                      const before = watch("content").substring(0, start);
+                      const after = watch("content").substring(end);
+                      setValue("content", `${before}- ${selected || "List item"}\n${after}`);
+                    }
+                  }}
+                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted"
+                  title="Bullet List"
+                >
+                  • List
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const selected = watch("content").substring(start, end);
+                      const before = watch("content").substring(0, start);
+                      const after = watch("content").substring(end);
+                      setValue("content", `${before}\`\`\`\n${selected || "code"}\n\`\`\`\n${after}`);
+                    }
+                  }}
+                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted font-mono"
+                  title="Code Block"
+                >
+                  Code
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const selected = watch("content").substring(start, end);
+                      const before = watch("content").substring(0, start);
+                      const after = watch("content").substring(end);
+                      setValue("content", `${before}[${selected || "link text"}](https://example.com)${after}`);
+                    }
+                  }}
+                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted text-blue-600 underline"
+                  title="Link"
+                >
+                  Link
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const selected = watch("content").substring(start, end);
+                      const before = watch("content").substring(0, start);
+                      const after = watch("content").substring(end);
+                      setValue("content", `${before}> ${selected || "Quote"}${after}`);
+                    }
+                  }}
+                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted border-l-4 border-l-muted-foreground pl-2"
+                  title="Quote"
+                >
+                  Quote
+                </button>
+              </div>
+
               <Textarea
-                placeholder="Write your markdown content here..."
+                id="content-textarea"
+                placeholder="Write your markdown content here... Use the toolbar above for formatting"
                 rows={12}
                 value={watch("content")}
                 onChange={(e) => setValue("content", e.target.value)}
