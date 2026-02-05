@@ -2,7 +2,9 @@ import { sql } from "../posts/db.js";
 import { Resend } from "resend";
 import type { BlogPost } from "../../src/data/posts";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 /**
  * Send emails to all subscribers of a category when a new post is published
@@ -13,7 +15,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendEmailsToSubscribers(post: BlogPost) {
   try {
     // Check if Resend API key is available
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
       console.log("RESEND_API_KEY not set. Skipping email sending.");
       return;
     }
@@ -79,7 +81,7 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
  */
 export async function sendWelcomeEmail(email: string, category: string) {
   try {
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
       console.log("RESEND_API_KEY not set. Skipping welcome email.");
       return;
     }
