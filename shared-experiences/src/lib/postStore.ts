@@ -2,6 +2,12 @@ import type { BlogPost } from "@/data/posts";
 
 const API = "/api/posts";
 
+// Helper to get the admin token from sessionStorage (set when user logs in)
+function getAdminToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return sessionStorage.getItem("adminToken");
+}
+
 export type NewPostInput = Pick<
   BlogPost,
   "title" | "date" | "excerpt" | "image" | "category" | "featured" | "content" | "status"
@@ -44,10 +50,14 @@ export async function savePost(
   post: NewPostInput
 ): Promise<BlogPost | null> {
   try {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const token = getAdminToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
     const res = await fetch(API, {
       method: "POST",
       body: JSON.stringify(post),
-      headers: { "Content-Type": "application/json" },
+      headers,
       cache: "no-store",
     });
 
@@ -69,10 +79,14 @@ export async function updatePost(
   post: UpdatePostInput
 ): Promise<BlogPost | null> {
   try {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const token = getAdminToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
     const res = await fetch(`${API}/${id}`, {
       method: "PUT",
       body: JSON.stringify(post),
-      headers: { "Content-Type": "application/json" },
+      headers,
       cache: "no-store",
     });
 
@@ -91,14 +105,27 @@ export async function updatePost(
 
 export async function deletePost(id: string): Promise<boolean> {
   try {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const token = getAdminToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
     const res = await fetch(`${API}/${id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers,
       cache: "no-store",
     });
 
-    if (!res.ok && res.status !== 204) {
-      console.error("Failed to delete post:", res.status, res.statusText);
+    // Treat 204 No Content and other 2xx as success. Log body/text for failures.
+    if (res.status === 204) return true;
+
+    if (!res.ok) {
+      let body = "";
+      try {
+        body = await res.text();
+      } catch (e) {
+        body = String(e);
+      }
+      console.error("Failed to delete post:", res.status, res.statusText, body);
       return false;
     }
 

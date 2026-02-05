@@ -2,6 +2,7 @@
 export const runtime = "nodejs";
 
 import { sql } from "./db.js";
+import { checkAdmin } from "../_helpers/auth.js";
 import { v4 as uuid } from "uuid";
 
 type DbRow = {
@@ -81,6 +82,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const authErr = checkAdmin(req);
+  if (authErr) return authErr;
+
   try {
     const body = (await req.json()) as CreateBody;
 

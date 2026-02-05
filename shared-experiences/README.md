@@ -60,6 +60,80 @@ Admin Panel → API Routes → Neon Postgres → API → Frontend
 
 ---
 
+## Security & Admin Authentication
+
+### Token-Based Access Control (Runtime Entry)
+
+The Admin Panel uses **runtime token entry** for maximum security:
+
+**How it works:**
+1. User navigates to `/admin` and sees a login gate
+2. User enters the admin token (stored in server `ADMIN_TOKEN` env var)
+3. Token is stored in `sessionStorage` after entry
+4. For each request (POST, PUT, DELETE), token is sent in `Authorization: Bearer <token>` header
+5. Server validates token against `ADMIN_TOKEN` environment variable
+
+**Why this approach?**
+- Token is **never embedded in source code or build bundles** — not visible to dev tools observers or source inspection
+- Token is **only stored in sessionStorage** after user enters it — requires someone to have the password in the first place
+- Even if someone opens dev tools, they won't see a pre-configured token, only what they (the user) entered
+- Works seamlessly with Vercel's stateless serverless architecture
+- Session expires on browser close (sessionStorage cleared)
+
+### Local Development
+
+1. **Edit `.env`** (created from `.env.example`):
+   ```
+   ADMIN_TOKEN=bluesky7
+   ```
+
+2. **Run the dev server**:
+   ```bash
+   npm run dev
+   ```
+
+3. **Access `/admin`**:
+   - Vite serves the app at `http://localhost:8080/admin`
+   - Enter the token from `.env` at the login gate
+   - Admin panel loads, token stored in sessionStorage
+
+### Production (Vercel)
+
+1. **Go to Vercel Dashboard** → Your Project → Settings → Environment Variables
+
+2. **Add one secret:**
+   - **Name:** `ADMIN_TOKEN`  
+     **Value:** (your memorable password, e.g., `bluesky7`, `SecurePass123!`)  
+     **Environments:** Production, Preview (or all)
+
+3. **Redeploy**  
+   Vercel will use this secret for your serverless functions.
+
+4. **Users access `/admin`:**
+   - Enter the `ADMIN_TOKEN` value you set in Vercel
+   - Token stays in their sessionStorage for the session
+
+### Token Best Practices
+
+- **Length:** Any length; focus on strength (memorable but not guessable)
+- **Rotation:** Change tokens periodically or when someone leaves the project
+- **Storage:** Keep in Vercel secrets, `.env` locally, never in code/bundles
+- **Sharing:** If sharing access, use separate tokens per collaborator
+- **Audit:** Log token usage in your serverless functions if needed
+
+### Security Layers
+
+| Layer | What | Where Checked |
+|-------|------|---------------|
+| **Runtime entry** | Token entered at login, not pre-configured | `src/pages/Admin.tsx` login gate |
+| **SessionStorage** | Token stored client-side only after entry | Browser sessionStorage (auto-cleared on close) |
+| **HTTPS** | Encryption in transit | Vercel (automatic) |
+| **Token validation** | `ADMIN_TOKEN` == header `Authorization` | `api/_helpers/auth.ts` |
+| **Request origin** | CORS (optional, recommended) | Vercel serverless |
+| **Database auth** | Neon connection string with SSL | `api/posts/db.ts` |
+
+---
+
 👈 [Back to Portfolio Overview](../README.md)
 
 ---

@@ -9,6 +9,14 @@ export default defineConfig({
     port: 8080,
     fs: { strict: false },
     watch: { usePolling: true },
+    proxy: {
+      // Proxy `/api` requests to local dev API (scripts/dev-api.js)
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   plugins: [react()],
   resolve: {

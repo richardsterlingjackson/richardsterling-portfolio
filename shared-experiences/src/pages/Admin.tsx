@@ -34,43 +34,48 @@ import {
 import type { BlogPost } from "@/data/posts";
 import { categories } from "@/data/categories";
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
+// Token-based auth: User enters token at login gate, stored in sessionStorage.
+// Token is sent in Authorization header for each request and validated by server.
+// This way, the token is never embedded in source code or visible to dev tools observers.
 
 function AdminGate({ onSuccess }: { onSuccess: () => void }) {
-  const [password, setPassword] = React.useState("");
+  const [token, setToken] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const handleEnter = () => {
-    if (!ADMIN_PASSWORD) {
-      alert("Admin password not configured");
+    if (!token.trim()) {
+      setError("Please enter the admin token");
       return;
     }
 
-    if (!password) {
-      alert("Enter password");
-      return;
-    }
-
-    if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem("isAdmin", "true");
-      onSuccess();
-    } else {
-      alert("Wrong password");
-    }
+    // Store token in sessionStorage; postStore will use it for requests
+    sessionStorage.setItem("adminToken", token);
+    setError("");
+    onSuccess();
   };
 
   return (
     <div className="max-w-sm mx-auto py-24 space-y-4">
-      <h2 className="text-xl font-semibold text-center">Admin Login</h2>
+      <h2 className="text-xl font-semibold text-center">Admin Access</h2>
+      <p className="text-sm text-center text-muted-foreground">
+        Enter the admin token to manage posts.
+      </p>
 
       <Input
         type="password"
-        placeholder="Admin password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Enter admin token"
+        value={token}
+        onChange={(e) => {
+          setToken(e.target.value);
+          setError("");
+        }}
+        onKeyDown={(e) => e.key === "Enter" && handleEnter()}
       />
 
+      {error && <p className="text-sm text-destructive text-center">{error}</p>}
+
       <Button className="w-full" onClick={handleEnter}>
-        Enter
+        Access Admin Panel
       </Button>
     </div>
   );
@@ -80,8 +85,8 @@ export default function Admin() {
   const [authorized, setAuthorized] = React.useState(false);
 
   React.useEffect(() => {
-    const isAdmin = sessionStorage.getItem("isAdmin");
-    if (isAdmin === "true") setAuthorized(true);
+    const token = sessionStorage.getItem("adminToken");
+    if (token) setAuthorized(true);
   }, []);
 
   if (!authorized) {
@@ -89,7 +94,6 @@ export default function Admin() {
   }
 
   return <AdminContent />;
-}
 
 export function AdminContent() {
   React.useEffect(() => {
@@ -135,44 +139,59 @@ export function AdminContent() {
   }, []);
 
   const onSubmit = async (data: BlogFormData) => {
-    if (editingPost) {
-      const payload: UpdatePostInput = {
-        title: data.title,
-        date: data.date,
-        excerpt: data.excerpt,
-        image: data.image,
-        category: data.category,
-        content: data.content,
-        status: data.status,
-        featured: !!data.featured,
-        slug: editingPost.slug, // keep existing slug (Option A)
-      };
+    try {
+      if (editingPost) {
+        const payload: UpdatePostInput = {
+          title: data.title,
+          date: data.date,
+          excerpt: data.excerpt,
+          image: data.image,
+          category: data.category,
+          content: data.content,
+          status: data.status,
+          featured: !!data.featured,
+          slug: editingPost.slug ?? data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""), // fallback slug
+        };
 
-      await updatePost(editingPost.id, payload);
-      toast({ title: "Post Updated", description: `"${data.title}" has been updated.` });
-    } else {
-      const payload: NewPostInput = {
-        title: data.title,
-        date: data.date,
-        excerpt: data.excerpt,
-        image: data.image,
-        category: data.category,
-        content: data.content,
-        status: data.status,
-        featured: !!data.featured,
-      };
+        const updated = await updatePost(editingPost.id, payload);
+        if (!updated) {
+          toast({ title: "Update Failed", description: "Unable to update post. Check console for details.", variant: "destructive" });
+          return;
+        }
 
-      await savePost(payload);
-      toast({ title: "Post Created", description: `"${data.title}" has been saved.` });
+        toast({ title: "Post Updated", description: `"${data.title}" has been updated.` });
+      } else {
+        const payload: NewPostInput = {
+          title: data.title,
+          date: data.date,
+          excerpt: data.excerpt,
+          image: data.image,
+          category: data.category,
+          content: data.content,
+          status: data.status,
+          featured: !!data.featured,
+        };
+
+        const created = await savePost(payload);
+        if (!created) {
+          toast({ title: "Create Failed", description: "Unable to create post. Check console for details.", variant: "destructive" });
+          return;
+        }
+
+        toast({ title: "Post Created", description: `"${data.title}" has been saved.` });
+      }
+
+      reset();
+      setEditingPost(null);
+
+      const refreshed = await getStoredPosts();
+      setPosts(refreshed);
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error("onSubmit error:", err);
+      toast({ title: "Save Failed", description: "An unexpected error occurred.", variant: "destructive" });
     }
-
-    reset();
-    setEditingPost(null);
-
-    const refreshed = await getStoredPosts();
-    setPosts(refreshed);
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleEdit = (post: BlogPost) => {
@@ -191,14 +210,24 @@ export function AdminContent() {
   };
 
   const handleDeleteConfirmed = async (id: string) => {
-    await deletePost(id);
-    toast({ title: "Post Deleted", description: "The post has been removed." });
+    try {
+      const ok = await deletePost(id);
+      if (!ok) {
+        toast({ title: "Delete Failed", description: "Unable to delete post. Check console for details.", variant: "destructive" });
+        return;
+      }
 
-    const refreshed = await getStoredPosts();
-    setPosts(refreshed);
+      toast({ title: "Post Deleted", description: "The post has been removed." });
 
-    reset();
-    setEditingPost(null);
+      const refreshed = await getStoredPosts();
+      setPosts(refreshed);
+
+      reset();
+      setEditingPost(null);
+    } catch (err) {
+      console.error("handleDeleteConfirmed error:", err);
+      toast({ title: "Delete Failed", description: "An unexpected error occurred.", variant: "destructive" });
+    }
   };
 
   const filteredPosts = posts

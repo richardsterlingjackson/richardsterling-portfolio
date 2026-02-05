@@ -1,6 +1,7 @@
 export const runtime = "nodejs";
 
-import { sql } from "./db";
+import { sql } from "./db.js";
+import { checkAdmin } from "../_helpers/auth.js";
 
 type DbRow = {
   id: string;
@@ -87,6 +88,9 @@ export async function GET(req: Request) {
 
 // PUT /api/posts/:id
 export async function PUT(req: Request) {
+  const authErr = checkAdmin(req);
+  if (authErr) return authErr;
+
   try {
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop();
@@ -139,6 +143,9 @@ export async function PUT(req: Request) {
 
 // DELETE /api/posts/:id
 export async function DELETE(req: Request) {
+  const authErr = checkAdmin(req);
+  if (authErr) return authErr;
+
   try {
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop();
