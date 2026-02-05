@@ -91,7 +91,10 @@ export default function Sidebar() {
       });
 
       if (response.ok) {
-        toast({ title: "Subscribed!", description: `You'll receive new "${selectedCategory}" posts via email.` });
+        const description = selectedCategory === "All Categories"
+          ? "You'll receive new posts from all categories via email."
+          : `You'll receive new "${selectedCategory}" posts via email.`;
+        toast({ title: "Subscribed!", description });
         setEmail("");
         setSelectedCategory("");
       } else {
@@ -131,6 +134,7 @@ export default function Sidebar() {
             className="w-full border rounded px-3 py-2 text-sm bg-background"
           >
             <option value="">Select a category</option>
+            <option value="All Categories">All Categories</option>
             {categories.map(({ label }) => (
               <option key={label} value={label}>
                 {label}

@@ -26,10 +26,13 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
       return;
     }
 
-    // Get all subscribers for this category
+    const allCategory = "All Categories";
+
+    // Get all subscribers for this category (or all-categories subscribers)
     const subscribers = await sql`
       SELECT email, category FROM subscribers 
-      WHERE category = ${post.category} AND created_at IS NOT NULL
+      WHERE (category = ${post.category} OR category = ${allCategory})
+        AND created_at IS NOT NULL
     `;
 
     if (subscribers.length === 0) {
