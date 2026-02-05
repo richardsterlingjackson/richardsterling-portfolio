@@ -1,0 +1,56 @@
+import { sql } from "@neondatabase/serverless";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Only accept POST requests
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  try {
+    const { email } = req.body;
+
+    // Validate email
+    if (!email || typeof email !== "string") {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    // Check if DATABASE_URL is available
+    if (!process.env.DATABASE_URL) {
+      console.warn("DATABASE_URL not set. Subscription not saved to database.");
+      // Still return success for UX, but log warning
+      return res.status(200).json({ message: "Subscription received (database offline)" });
+    }
+
+    // Insert subscriber into database
+    try {
+      const result = await sql`
+        INSERT INTO subscribers (email, created_at)
+        VALUES (${email}, NOW())
+        ON CONFLICT (email) DO UPDATE SET updated_at = NOW()
+        RETURNING id, email, created_at
+      `;
+
+      return res.status(200).json({
+        message: "Successfully subscribed",
+        subscriber: result[0],
+      });
+    } catch (dbErr: any) {
+      // If table doesn't exist, still return success but log the error
+      if (dbErr?.message?.includes("does not exist")) {
+        console.warn("Subscribers table does not exist. Create it with:", dbErr.message);
+        return res.status(200).json({ message: "Subscription received (table setup needed)" });
+      }
+
+      throw dbErr;
+    }
+  } catch (err: any) {
+    console.error("Subscribe error:", err);
+    return res.status(500).json({ error: "Failed to subscribe", details: err.message });
+  }
+}

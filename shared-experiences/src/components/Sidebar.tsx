@@ -1,12 +1,18 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getStoredPosts } from "@/lib/postStore";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import type { BlogPost } from "@/data/posts";
 import { categories } from "@/data/categories";
 
 export default function Sidebar() {
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
+  const { toast } = useToast();
 
   //
   // LOAD POSTS
@@ -37,26 +43,138 @@ export default function Sidebar() {
       .slice(0, 5);
   }, [allPosts]);
 
+  //
+  // POPULAR POSTS (featured posts first, then recent)
+  //
+  const popularPosts = useMemo(() => {
+    const featured = allPosts.filter((p) => p.featured && p.status === "published");
+    const recent = allPosts
+      .filter((p) => !p.featured && p.status === "published")
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5 - featured.length);
+    return [...featured, ...recent].slice(0, 5);
+  }, [allPosts]);
+
+  //
+  // CATEGORY COUNTS
+  //
+  const categoryWithCounts = useMemo(() => {
+    return categories.map(({ slug, label }) => {
+      const count = allPosts.filter((p) => p.category === label && p.status === "published").length;
+      return { slug, label, count };
+    });
+  }, [allPosts]);
+
+  //
+  // HANDLE NEWSLETTER SUBSCRIBE
+  //
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email.trim()) {
+      toast({ title: "Email required", description: "Please enter your email address.", variant: "destructive" });
+      return;
+    }
+
+    setSubscribing(true);
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        toast({ title: "Subscribed!", description: "You'll receive new posts via email." });
+        setEmail("");
+      } else {
+        toast({ title: "Subscription failed", description: "Please try again later.", variant: "destructive" });
+      }
+    } catch (err) {
+      console.error("Subscribe error:", err);
+      toast({ title: "Error", description: "Failed to subscribe. Please try again.", variant: "destructive" });
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
   return (
     <aside className="space-y-10">
-      {/* Categories */}
+      {/* Newsletter Signup */}
+      <section className="bg-gradient-to-br from-elegant-primary/10 to-elegant-secondary/10 border border-elegant-primary/20 rounded-lg p-5 space-y-3">
+        <h3 className="font-playfair text-lg font-semibold text-elegant-text">
+          Get New Posts
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Subscribe to receive the latest posts directly in your inbox.
+        </p>
+        <form onSubmit={handleSubscribe} className="space-y-2">
+          <Input
+            type="email"
+            placeholder="Your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={subscribing}
+            className="text-sm"
+          />
+          <Button
+            type="submit"
+            disabled={subscribing}
+            className="w-full text-sm"
+          >
+            {subscribing ? "Subscribing…" : "Subscribe"}
+          </Button>
+        </form>
+      </section>
+
+      {/* Categories with Post Count */}
       <section>
         <h3 className="font-playfair text-lg font-semibold mb-4 text-elegant-text">
           Categories
         </h3>
 
         <ul className="space-y-2 text-sm text-muted-foreground">
-          {categories.map(({ slug, label }) => (
+          {categoryWithCounts.map(({ slug, label, count }) => (
             <li key={slug}>
               <Link
                 to={`/category/${slug}`}
-                className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary"
+                className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary flex items-center justify-between"
               >
-                {label}
+                <span>{label}</span>
+                <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium text-foreground">
+                  {count}
+                </span>
               </Link>
             </li>
           ))}
         </ul>
+      </section>
+
+      {/* Popular Posts */}
+      <section>
+        <h3 className="font-playfair text-lg font-semibold mb-4 text-elegant-text">
+          Popular Posts
+        </h3>
+
+        {loading ? (
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        ) : popularPosts.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No popular posts yet.</p>
+        ) : (
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {popularPosts.map((post) => (
+              <li key={post.id}>
+                <Link
+                  to={`/posts/${post.slug}`}
+                  className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary flex items-center gap-2 line-clamp-2"
+                >
+                  {post.featured && <span className="text-xs shrink-0">⭐</span>}
+                  {post.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       {/* Recent Posts */}
@@ -75,9 +193,9 @@ export default function Sidebar() {
               <li key={post.id}>
                 <Link
                   to={`/posts/${post.slug}`}
-                  className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary flex items-center gap-2"
+                  className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary flex items-center gap-2 line-clamp-2"
                 >
-                  {post.featured && <span className="text-xs">⭐</span>}
+                  {post.featured && <span className="text-xs shrink-0">⭐</span>}
                   {post.title}
                 </Link>
               </li>
