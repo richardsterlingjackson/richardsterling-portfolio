@@ -245,7 +245,7 @@ export default function PostPage() {
                   liked
                     ? "bg-elegant-primary text-white border-elegant-primary"
                     : "bg-elegant-primary/90 text-white border-elegant-primary hover:bg-elegant-primary"
-                }`}
+                } px-2 py-1`}
               >
                 {liked ? "♥ Liked" : "♡ Like"} · {likesCount}
               </Button>
