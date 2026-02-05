@@ -166,14 +166,16 @@ export default function Sidebar() {
               ))}
             </div>
           </div>
-          <Button
-            type="submit"
-            size="sm"
-            disabled={subscribing}
-            className="text-xs px-2 py-0.5 h-auto"
-          >
-            {subscribing ? "Subscribing…" : "Subscribe"}
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              size="sm"
+              disabled={subscribing}
+              className="text-xs px-3 py-1 h-auto rounded-full border border-elegant-primary/40 bg-white/70 text-elegant-primary hover:bg-elegant-primary/10"
+            >
+              {subscribing ? "Subscribing…" : "Subscribe"}
+            </Button>
+          </div>
         </form>
       </section>
 
