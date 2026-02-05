@@ -171,7 +171,7 @@ export default function Sidebar() {
               type="submit"
               size="sm"
               disabled={subscribing}
-              className="text-xs px-2 py-0.5 h-auto rounded-full bg-elegant-primary text-white hover:bg-elegant-primary/90"
+              className="text-xs px-2 py-0.5 h-auto rounded-md bg-elegant-primary text-white hover:bg-elegant-primary/90"
             >
               {subscribing ? "Subscribing…" : "Subscribe"}
             </Button>
