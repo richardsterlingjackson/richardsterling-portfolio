@@ -106,10 +106,19 @@ export async function POST(req: Request) {
     }
 
     const id = uuid();
-    const slug =
+    const baseSlug =
       body.slug && typeof body.slug === "string"
         ? body.slug
         : slugify(body.title);
+
+    let slug = baseSlug;
+    const existing = (await sql`
+      SELECT slug FROM posts WHERE slug = ${slug} LIMIT 1
+    `) as DbRow[];
+
+    if (existing.length) {
+      slug = `${baseSlug}-${id.slice(0, 6)}`;
+    }
 
     await sql`
       INSERT INTO posts (
@@ -172,10 +181,11 @@ export async function POST(req: Request) {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err) {
+  } catch (err: any) {
+    const message = err?.message || "Server error";
     console.error("POST /api/posts failed:", err);
     return new Response(
-      JSON.stringify({ error: "Server error" }),
+      JSON.stringify({ error: message }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
