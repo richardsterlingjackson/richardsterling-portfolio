@@ -1,6 +1,6 @@
 import { sql } from "@neondatabase/serverless";
 import { Resend } from "resend";
-import type { BlogPost } from "@/data/posts";
+import type { BlogPost } from "../../src/data/posts";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

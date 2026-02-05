@@ -1,6 +1,6 @@
 import { sql } from "@neondatabase/serverless";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { sendWelcomeEmail } from "@/_helpers/sendEmails";
+import { sendWelcomeEmail } from "../_helpers/sendEmails";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only accept POST requests
