@@ -85,6 +85,77 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
 }
 
 /**
+ * Send emails to subscribers when a post is updated
+ */
+export async function sendUpdateEmailToSubscribers(post: BlogPost) {
+  try {
+    if (!resend) {
+      console.log("RESEND_API_KEY not set. Skipping update email sending.");
+      return;
+    }
+
+    if (!process.env.DATABASE_URL) {
+      console.log("DATABASE_URL not set. Skipping update email sending.");
+      return;
+    }
+
+    const allCategory = "All Categories";
+
+    const subscribers = await sql`
+      SELECT email, category FROM subscribers
+      WHERE (category = ${post.category} OR category = ${allCategory})
+        AND created_at IS NOT NULL
+    `;
+
+    if (subscribers.length === 0) {
+      console.log(`No subscribers for category: ${post.category}`);
+      return;
+    }
+
+    console.log(`Sending update emails to ${subscribers.length} subscribers for ${post.category}...`);
+
+    const emailPromises = subscribers.map((sub: any) =>
+      resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL || "posts@yourdomain.com",
+        to: sub.email,
+        subject: `Updated post: ${post.title}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">${post.title} (Updated)</h2>
+            <p style="color: #666; font-size: 14px;">
+              <strong>${post.category}</strong> • ${post.date}
+            </p>
+            <img
+              src="${post.image}"
+              alt="${post.title}"
+              style="width: 100%; max-width: 600px; height: auto; border-radius: 6px; margin: 12px 0;"
+            />
+            <p style="color: #555; line-height: 1.6;">
+              ${post.excerpt}
+            </p>
+            <a href="${process.env.VERCEL_URL || "https://shared-experiences.com"}/posts/${post.slug}"
+               style="display: inline-block; background-color: #8b7355; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 16px;">
+              Read Updated Post
+            </a>
+            <hr style="margin-top: 32px; border: none; border-top: 1px solid #eee;">
+            <p style="font-size: 12px; color: #999;">
+              You received this email because you subscribed to "${post.category}" posts.
+            </p>
+          </div>
+        `,
+      })
+    );
+
+    const results = await Promise.all(emailPromises);
+    console.log(`Sent ${results.length} update emails for post: ${post.title}`);
+    return results;
+  } catch (err) {
+    console.error("Error sending update emails to subscribers:", err);
+    throw err;
+  }
+}
+
+/**
  * Send a welcome email to a new subscriber
  */
 export async function sendWelcomeEmail(email: string, category: string) {

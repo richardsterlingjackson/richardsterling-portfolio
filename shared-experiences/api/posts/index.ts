@@ -3,7 +3,7 @@ export const runtime = "nodejs";
 
 import { sql } from "./db.js";
 import { checkAdmin } from "../_helpers/auth.js";
-import { sendEmailsToSubscribers } from "../_helpers/sendEmails.js";
+import { sendEmailsToSubscribers, sendUpdateEmailToSubscribers } from "../_helpers/sendEmails.js";
 import { v4 as uuid } from "uuid";
 
 type DbRow = {
@@ -173,7 +173,15 @@ export async function PUT(req: Request) {
       });
     }
 
-    return new Response(JSON.stringify(mapRow(result[0])), {
+    const updatedPost = mapRow(result[0]);
+
+    if (updatedPost.status === "published") {
+      sendUpdateEmailToSubscribers(updatedPost as any).catch((err) =>
+        console.error("Failed to send subscriber update emails:", err)
+      );
+    }
+
+    return new Response(JSON.stringify(updatedPost), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
