@@ -32,7 +32,7 @@ export default function Sidebar() {
   //
   const recentPosts = useMemo(() => {
     return allPosts
-      .filter((p) => p.status === "published" && !p.featured)
+      .filter((p) => p.status === "published")
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 5);
   }, [allPosts]);
@@ -75,8 +75,9 @@ export default function Sidebar() {
               <li key={post.id}>
                 <Link
                   to={`/posts/${post.slug}`}
-                  className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary"
+                  className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary flex items-center gap-2"
                 >
+                  {post.featured && <span className="text-xs">⭐</span>}
                   {post.title}
                 </Link>
               </li>
