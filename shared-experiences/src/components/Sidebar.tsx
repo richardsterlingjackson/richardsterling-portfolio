@@ -170,7 +170,7 @@ export default function Sidebar() {
             type="submit"
             size="sm"
             disabled={subscribing}
-            className="w-full text-sm"
+            className="w-full text-xs h-8"
           >
             {subscribing ? "Subscribing…" : "Subscribe"}
           </Button>
