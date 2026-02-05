@@ -1,5 +1,6 @@
 import { sql } from "@neondatabase/serverless";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { sendWelcomeEmail } from "@/_helpers/sendEmails";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only accept POST requests
@@ -40,6 +41,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ON CONFLICT (email, category) DO UPDATE SET updated_at = NOW()
         RETURNING id, email, category, created_at
       `;
+
+      // Send welcome email asynchronously (don't wait for it to complete)
+      sendWelcomeEmail(email, category).catch((err) =>
+        console.error("Failed to send welcome email:", err)
+      );
 
       return res.status(200).json({
         message: "Successfully subscribed",
