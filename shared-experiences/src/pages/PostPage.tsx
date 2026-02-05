@@ -185,6 +185,17 @@ export default function PostPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-12">
+        <Helmet>
+          <title>{`${post.title} | Shared Experiences`}</title>
+          <meta name="description" content={post.excerpt} />
+          <meta property="og:title" content={post.title} />
+          <meta property="og:description" content={post.excerpt} />
+          <meta property="og:type" content="article" />
+          {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+          {pageUrl && <meta property="og:url" content={pageUrl} />}
+          <meta name="twitter:card" content="summary_large_image" />
+          {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+        </Helmet>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-3">
             <Sidebar />
@@ -230,20 +241,11 @@ export default function PostPage() {
                 variant={liked ? "secondary" : "outline"}
                 size="sm"
                 onClick={handleLike}
-                className="text-xs"
-                  {post && (
-                    <Helmet>
-                      <title>{`${post.title} | Shared Experiences`}</title>
-                      <meta name="description" content={post.excerpt} />
-                      <meta property="og:title" content={post.title} />
-                      <meta property="og:description" content={post.excerpt} />
-                      <meta property="og:type" content="article" />
-                      {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-                      {pageUrl && <meta property="og:url" content={pageUrl} />}
-                      <meta name="twitter:card" content="summary_large_image" />
-                      {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
-                    </Helmet>
-                  )}
+                className={`text-xs font-semibold border-2 ${
+                  liked
+                    ? "bg-elegant-primary text-white border-elegant-primary"
+                    : "bg-elegant-primary/90 text-white border-elegant-primary hover:bg-elegant-primary"
+                }`}
               >
                 {liked ? "♥ Liked" : "♡ Like"} · {likesCount}
               </Button>
