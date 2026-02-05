@@ -87,7 +87,9 @@ export default function PostPage() {
 
   // Handle copy link to clipboard
   const handleCopyLink = () => {
-    const url = window.location.href;
+    const url = post
+      ? `${window.location.origin}/posts/${encodeURIComponent(post.slug)}`
+      : window.location.href;
     navigator.clipboard.writeText(url).then(() => {
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
@@ -96,7 +98,9 @@ export default function PostPage() {
 
   // Share to social media
   const shareToTwitter = () => {
-    const url = window.location.href;
+    const url = post
+      ? `${window.location.origin}/posts/${encodeURIComponent(post.slug)}`
+      : window.location.href;
     const text = `Check out: "${post?.title}" by @richardsterling`;
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
@@ -105,7 +109,9 @@ export default function PostPage() {
   };
 
   const shareToLinkedIn = () => {
-    const url = window.location.href;
+    const url = post
+      ? `${window.location.origin}/posts/${encodeURIComponent(post.slug)}`
+      : window.location.href;
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
       "_blank"
@@ -113,7 +119,9 @@ export default function PostPage() {
   };
 
   const shareToFacebook = () => {
-    const url = window.location.href;
+    const url = post
+      ? `${window.location.origin}/posts/${encodeURIComponent(post.slug)}`
+      : window.location.href;
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
       "_blank"
