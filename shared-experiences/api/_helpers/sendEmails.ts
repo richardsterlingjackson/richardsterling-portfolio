@@ -54,6 +54,11 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
             <p style="color: #666; font-size: 14px;">
               <strong>${post.category}</strong> • ${post.date}
             </p>
+            <img
+              src="${post.image}"
+              alt="${post.title}"
+              style="width: 100%; max-width: 600px; height: auto; border-radius: 6px; margin: 12px 0;"
+            />
             <p style="color: #555; line-height: 1.6;">
               ${post.excerpt}
             </p>
