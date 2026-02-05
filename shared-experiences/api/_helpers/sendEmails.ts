@@ -1,4 +1,4 @@
-import { sql } from "../posts/db";
+import { sql } from "../posts/db.js";
 import { Resend } from "resend";
 import type { BlogPost } from "../../src/data/posts";
 
