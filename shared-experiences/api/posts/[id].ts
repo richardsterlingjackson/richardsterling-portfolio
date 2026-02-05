@@ -31,6 +31,15 @@ type UpdateBody = {
   slug: string;
 };
 
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
 function mapRow(row: DbRow) {
   return {
     id: row.id,
@@ -53,7 +62,7 @@ function mapRow(row: DbRow) {
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const id = url.pathname.split("/").pop();
+    const id = url.searchParams.get("id") || url.pathname.split("/").pop();
 
     if (!id) {
       return new Response(JSON.stringify({ error: "Missing post ID" }), {
@@ -93,7 +102,7 @@ export async function PUT(req: Request) {
 
   try {
     const url = new URL(req.url);
-    const id = url.pathname.split("/").pop();
+    const id = url.searchParams.get("id") || url.pathname.split("/").pop();
 
     if (!id) {
       return new Response(JSON.stringify({ error: "Missing post ID" }), {
@@ -103,6 +112,40 @@ export async function PUT(req: Request) {
     }
 
     const body = (await req.json()) as UpdateBody;
+
+    const requiredFields: (keyof UpdateBody)[] = [
+      "title",
+      "date",
+      "excerpt",
+      "image",
+      "category",
+      "content",
+      "status",
+    ];
+
+    for (const field of requiredFields) {
+      if (!body[field]) {
+        return new Response(JSON.stringify({ error: `Missing field: ${field}` }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    const slug = body.slug && typeof body.slug === "string"
+      ? body.slug
+      : slugify(body.title);
+
+    const existing = (await sql`
+      SELECT id FROM posts WHERE slug = ${slug} AND id != ${id} LIMIT 1
+    `) as { id: string }[];
+
+    if (existing.length) {
+      return new Response(JSON.stringify({ error: "Slug already exists" }), {
+        status: 409,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const result = (await sql`
       UPDATE posts SET
@@ -114,7 +157,7 @@ export async function PUT(req: Request) {
         featured = ${body.featured ?? false},
         content = ${body.content},
         status = ${body.status},
-        slug = ${body.slug},
+        slug = ${slug},
         updated_at = NOW(),
         version = COALESCE(version, 0) + 1
       WHERE id = ${id}
@@ -132,9 +175,10 @@ export async function PUT(req: Request) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err) {
+  } catch (err: any) {
+    const message = err?.message || "Server error";
     console.error("PUT /api/posts/:id failed:", err);
-    return new Response(JSON.stringify({ error: "Server error" }), {
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
@@ -148,7 +192,7 @@ export async function DELETE(req: Request) {
 
   try {
     const url = new URL(req.url);
-    const id = url.pathname.split("/").pop();
+    const id = url.searchParams.get("id") || url.pathname.split("/").pop();
 
     if (!id) {
       return new Response(JSON.stringify({ error: "Missing post ID" }), {
@@ -169,9 +213,10 @@ export async function DELETE(req: Request) {
     }
 
     return new Response(null, { status: 204 });
-  } catch (err) {
+  } catch (err: any) {
+    const message = err?.message || "Server error";
     console.error("DELETE /api/posts/:id failed:", err);
-    return new Response(JSON.stringify({ error: "Server error" }), {
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
