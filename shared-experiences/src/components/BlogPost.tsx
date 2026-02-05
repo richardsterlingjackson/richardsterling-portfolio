@@ -61,6 +61,14 @@ export default function BlogPost({ post }: BlogPostProps) {
           <span className="uppercase tracking-wide text-xs text-elegant-primary">
             {category}
           </span>
+          {featured && (
+            <>
+              <span>•</span>
+              <span className="inline-block bg-elegant-primary text-white px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+                ⭐ Featured
+              </span>
+            </>
+          )}
         </div>
 
         <Link to={`/posts/${slug}`}>
