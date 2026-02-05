@@ -158,23 +158,49 @@ export async function PUT(req: Request) {
       });
     }
 
-    const result = (await sql`
-      UPDATE posts SET
-        title = ${body.title},
-        date = ${body.date},
-        excerpt = ${body.excerpt},
-        image = ${body.image},
-        category = ${body.category},
-        featured = ${body.featured ?? false},
-        content = ${body.content},
-        status = ${shouldSchedule ? "draft" : body.status},
-        slug = ${slug},
-        scheduled_at = ${shouldSchedule ? scheduledAt : null},
-        updated_at = NOW(),
-        version = COALESCE(version, 0) + 1
-      WHERE id = ${id}
-      RETURNING *
-    `) as DbRow[];
+    let result: DbRow[] = [];
+    try {
+      result = (await sql`
+        UPDATE posts SET
+          title = ${body.title},
+          date = ${body.date},
+          excerpt = ${body.excerpt},
+          image = ${body.image},
+          category = ${body.category},
+          featured = ${body.featured ?? false},
+          content = ${body.content},
+          status = ${shouldSchedule ? "draft" : body.status},
+          slug = ${slug},
+          scheduled_at = ${shouldSchedule ? scheduledAt : null},
+          updated_at = NOW(),
+          version = COALESCE(version, 0) + 1
+        WHERE id = ${id}
+        RETURNING *
+      `) as DbRow[];
+    } catch (err: any) {
+      const message = err?.message || "";
+      if (message.includes("scheduled_at")) {
+        console.warn("scheduled_at column missing; updating without scheduling.");
+        result = (await sql`
+          UPDATE posts SET
+            title = ${body.title},
+            date = ${body.date},
+            excerpt = ${body.excerpt},
+            image = ${body.image},
+            category = ${body.category},
+            featured = ${body.featured ?? false},
+            content = ${body.content},
+            status = ${body.status},
+            slug = ${slug},
+            updated_at = NOW(),
+            version = COALESCE(version, 0) + 1
+          WHERE id = ${id}
+          RETURNING *
+        `) as DbRow[];
+      } else {
+        throw err;
+      }
+    }
 
     if (!result.length) {
       return new Response(JSON.stringify({ error: "Post not found" }), {
@@ -282,41 +308,81 @@ export async function POST(req: Request) {
       slug = `${baseSlug}-${id.slice(0, 6)}`;
     }
 
-    await sql`
-      INSERT INTO posts (
-        id,
-        title,
-        date,
-        excerpt,
-        image,
-        category,
-        featured,
-        content,
-        status,
-        slug,
-        created_at,
-        updated_at,
-        version,
-        scheduled_at,
-        likes_count
-      ) VALUES (
-        ${id},
-        ${body.title},
-        ${body.date},
-        ${body.excerpt},
-        ${body.image},
-        ${body.category},
-        ${body.featured ?? false},
-        ${body.content},
-        ${shouldSchedule ? "draft" : body.status},
-        ${slug},
-        NOW(),
-        NOW(),
-        1,
-        ${shouldSchedule ? scheduledAt : null},
-        0
-      )
-    `;
+    try {
+      await sql`
+        INSERT INTO posts (
+          id,
+          title,
+          date,
+          excerpt,
+          image,
+          category,
+          featured,
+          content,
+          status,
+          slug,
+          created_at,
+          updated_at,
+          version,
+          scheduled_at,
+          likes_count
+        ) VALUES (
+          ${id},
+          ${body.title},
+          ${body.date},
+          ${body.excerpt},
+          ${body.image},
+          ${body.category},
+          ${body.featured ?? false},
+          ${body.content},
+          ${shouldSchedule ? "draft" : body.status},
+          ${slug},
+          NOW(),
+          NOW(),
+          1,
+          ${shouldSchedule ? scheduledAt : null},
+          0
+        )
+      `;
+    } catch (err: any) {
+      const message = err?.message || "";
+      if (message.includes("scheduled_at") || message.includes("likes_count")) {
+        console.warn("Missing posts columns; inserting without scheduling/likes.");
+        await sql`
+          INSERT INTO posts (
+            id,
+            title,
+            date,
+            excerpt,
+            image,
+            category,
+            featured,
+            content,
+            status,
+            slug,
+            created_at,
+            updated_at,
+            version
+          ) VALUES (
+            ${id},
+            ${body.title},
+            ${body.date},
+            ${body.excerpt},
+            ${body.image},
+            ${body.category},
+            ${body.featured ?? false},
+            ${body.content},
+            ${body.status},
+            ${slug},
+            NOW(),
+            NOW(),
+            1
+          )
+        `;
+      } else {
+        throw err;
+      }
+    }
 
     const rows = (await sql`
       SELECT * FROM posts WHERE id = ${id}
