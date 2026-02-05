@@ -35,22 +35,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Insert subscriber into database with category
     try {
-      const result = await sql`
+      const inserted = await sql`
         INSERT INTO subscribers (email, category, created_at)
         VALUES (${email}, ${category}, NOW())
-        ON CONFLICT (email, category) DO UPDATE SET updated_at = NOW()
+        ON CONFLICT DO NOTHING
         RETURNING id, email, category, created_at
       `;
 
-      // Send welcome email asynchronously (don't wait for it to complete)
-      sendWelcomeEmail(email, category).catch((err) =>
-        console.error("Failed to send welcome email:", err)
-      );
+      if (inserted.length) {
+        // Send welcome email asynchronously (don't wait for it to complete)
+        sendWelcomeEmail(email, category).catch((err) =>
+          console.error("Failed to send welcome email:", err)
+        );
 
-      return res.status(200).json({
-        message: "Successfully subscribed",
-        subscriber: result[0],
-      });
+        return res.status(200).json({
+          message: "Successfully subscribed",
+          subscriber: inserted[0],
+        });
+      }
+
+      const updatedSame = await sql`
+        UPDATE subscribers
+        SET updated_at = NOW()
+        WHERE email = ${email} AND category = ${category}
+        RETURNING id, email, category, created_at
+      `;
+
+      if (updatedSame.length) {
+        return res.status(200).json({
+          message: "Already subscribed",
+          subscriber: updatedSame[0],
+        });
+      }
+
+      const updatedEmail = await sql`
+        UPDATE subscribers
+        SET category = ${category}, updated_at = NOW()
+        WHERE email = ${email}
+        RETURNING id, email, category, created_at
+      `;
+
+      if (updatedEmail.length) {
+        // Treat category change as a new subscription for messaging.
+        sendWelcomeEmail(email, category).catch((err) =>
+          console.error("Failed to send welcome email:", err)
+        );
+
+        return res.status(200).json({
+          message: "Subscription updated",
+          subscriber: updatedEmail[0],
+        });
+      }
+
+      return res.status(500).json({ error: "Failed to subscribe" });
     } catch (dbErr: any) {
       // If table doesn't exist, still return success but log the error
       if (dbErr?.message?.includes("does not exist")) {
