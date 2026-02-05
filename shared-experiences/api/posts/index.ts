@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 
 import { sql } from "./db.js";
 import { checkAdmin } from "../_helpers/auth.js";
+import { sendEmailsToSubscribers } from "../_helpers/sendEmails.js";
 import { v4 as uuid } from "uuid";
 
 type DbRow = {
@@ -147,6 +148,25 @@ export async function POST(req: Request) {
     `) as DbRow[];
 
     const post = rows.length ? mapRow(rows[0]) : null;
+
+    // Send emails to subscribers if post is published
+    if (post && body.status === "published") {
+      sendEmailsToSubscribers({
+        id: post.id,
+        slug: post.slug,
+        title: post.title,
+        date: post.date,
+        excerpt: post.excerpt,
+        image: post.image,
+        category: post.category,
+        featured: post.featured,
+        content: post.content,
+        status: post.status,
+      } as any).catch((err) => {
+        console.error("Failed to send subscriber emails for new post:", err);
+        // Don't fail the request if email sending fails
+      });
+    }
 
     return new Response(JSON.stringify(post), {
       status: 201,
