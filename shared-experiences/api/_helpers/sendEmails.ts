@@ -1,4 +1,4 @@
-import { sql } from "@neondatabase/serverless";
+import { sql } from "../posts/db";
 import { Resend } from "resend";
 import type { BlogPost } from "../../src/data/posts";
 

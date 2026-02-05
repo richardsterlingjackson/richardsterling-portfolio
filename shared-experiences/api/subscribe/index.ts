@@ -1,4 +1,4 @@
-import { sql } from "@neondatabase/serverless";
+import { sql } from "../posts/db";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { sendWelcomeEmail } from "../_helpers/sendEmails";
 
