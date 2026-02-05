@@ -168,6 +168,7 @@ export default function Sidebar() {
           </div>
           <Button
             type="submit"
+            size="sm"
             disabled={subscribing}
             className="w-full text-sm"
           >
