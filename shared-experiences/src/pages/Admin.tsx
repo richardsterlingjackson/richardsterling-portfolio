@@ -94,6 +94,7 @@ export default function Admin() {
   }
 
   return <AdminContent />;
+}
 
 export function AdminContent() {
   React.useEffect(() => {
