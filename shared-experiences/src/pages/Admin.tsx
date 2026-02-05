@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
-import heroBannerBg from "@/assets/hero-banner.jpg";
+import adminBgImage from "@/assets/blog-post-2.jpg";
 
 import {
   AlertDialog,
@@ -401,7 +401,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     <div
       className="min-h-screen py-10 px-4 relative"
       style={{
-        backgroundImage: `url(${heroBannerBg})`,
+        backgroundImage: `url(${adminBgImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
