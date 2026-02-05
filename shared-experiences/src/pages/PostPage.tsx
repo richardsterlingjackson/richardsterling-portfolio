@@ -7,6 +7,7 @@ import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { Button } from "@/components/ui/button";
 import type { BlogPost } from "@/data/posts";
+import { Helmet } from "react-helmet-async";
 
 // Helper: Calculate reading time (avg 200 words per minute)
 function calculateReadingTime(text: string): number {
@@ -20,6 +21,8 @@ export default function PostPage() {
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [liked, setLiked] = useState(false);
 
   //
   // LOAD POST BY SLUG
@@ -33,6 +36,11 @@ export default function PostPage() {
         const found = storedPosts.find((p) => p.slug === postId) || null;
 
         setPost(found);
+        if (found) {
+          setLikesCount(found.likesCount || 0);
+          const storedLiked = localStorage.getItem(`liked_${found.id}`) === "1";
+          setLiked(storedLiked);
+        }
 
         // Find related posts (same category, exclude current post, published only)
         if (found) {
@@ -88,6 +96,28 @@ export default function PostPage() {
 
   // Share to social media
   const shareToTwitter = () => {
+      const handleLike = async () => {
+        if (!post) return;
+        const action = liked ? "unlike" : "like";
+
+        try {
+          const res = await fetch("/api/likes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ postId: post.id, action }),
+          });
+
+          if (!res.ok) return;
+
+          const data = await res.json();
+          setLikesCount(data.likesCount ?? 0);
+          const nextLiked = !liked;
+          setLiked(nextLiked);
+          localStorage.setItem(`liked_${post.id}`, nextLiked ? "1" : "0");
+        } catch (err) {
+          console.error("Like failed:", err);
+        }
+      };
     const url = window.location.href;
     const text = `Check out: "${post?.title}" by @richardsterling`;
     window.open(
@@ -97,6 +127,19 @@ export default function PostPage() {
   };
 
   const shareToLinkedIn = () => {
+        {post && (
+          <Helmet>
+            <title>{`${post.title} | Shared Experiences`}</title>
+            <meta name="description" content={post.excerpt} />
+            <meta property="og:title" content={post.title} />
+            <meta property="og:description" content={post.excerpt} />
+            <meta property="og:type" content="article" />
+            <meta property="og:image" content={`${window.location.origin}/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category)}`} />
+            <meta property="og:url" content={window.location.href} />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:image" content={`${window.location.origin}/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category)}`} />
+          </Helmet>
+        )}
     const url = window.location.href;
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
@@ -188,8 +231,16 @@ export default function PostPage() {
               </p>
             </div>
 
-            {/* Share & Copy Buttons */}
-            <div className="flex flex-wrap gap-2 py-4 border-y border-border">
+            {/* Share, Like & Copy Buttons */}
+            <div className="flex flex-wrap items-center gap-2 py-4 border-y border-border">
+              <Button
+                variant={liked ? "secondary" : "outline"}
+                size="sm"
+                onClick={handleLike}
+                className="text-xs"
+              >
+                {liked ? "♥ Liked" : "♡ Like"} · {likesCount}
+              </Button>
               <Button
                 variant="outline"
                 size="sm"

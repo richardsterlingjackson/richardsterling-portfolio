@@ -13,6 +13,10 @@ export type NewPostInput = Pick<
   "title" | "date" | "excerpt" | "image" | "category" | "featured" | "content" | "status"
 >;
 
+export type NewPostPayload = NewPostInput & {
+  scheduledAt?: string | null;
+};
+
 export type UpdatePostInput = {
   title: string;
   date: string;
@@ -23,6 +27,7 @@ export type UpdatePostInput = {
   content: string;
   status: "draft" | "published";
   slug: string;
+  scheduledAt?: string | null;
 };
 
 export async function getStoredPosts(): Promise<BlogPost[]> {
@@ -47,7 +52,7 @@ export async function getStoredPosts(): Promise<BlogPost[]> {
 }
 
 export async function savePost(
-  post: NewPostInput
+  post: NewPostPayload
 ): Promise<BlogPost | null> {
   try {
     const headers: Record<string, string> = { "Content-Type": "application/json" };

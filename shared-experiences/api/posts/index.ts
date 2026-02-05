@@ -20,6 +20,8 @@ type DbRow = {
   created_at: string | null;
   updated_at: string | null;
   version: number | null;
+  scheduled_at: string | null;
+  likes_count: number | null;
 };
 
 type CreateBody = {
@@ -32,6 +34,7 @@ type CreateBody = {
   content: string;
   status: "draft" | "published";
   slug?: string;
+  scheduledAt?: string | null;
 };
 
 type UpdateBody = {
@@ -44,6 +47,7 @@ type UpdateBody = {
   content: string;
   status: "draft" | "published";
   slug?: string;
+  scheduledAt?: string | null;
 };
 
 function mapRow(row: DbRow) {
@@ -61,6 +65,8 @@ function mapRow(row: DbRow) {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     version: row.version,
+    scheduledAt: row.scheduled_at,
+    likesCount: row.likes_count ?? 0,
   };
 }
 
@@ -115,6 +121,9 @@ export async function PUT(req: Request) {
 
     const body = (await req.json()) as UpdateBody;
 
+    const scheduledAt = body.scheduledAt ? new Date(body.scheduledAt) : null;
+    const shouldSchedule = scheduledAt ? scheduledAt.getTime() > Date.now() : false;
+
     const requiredFields: (keyof UpdateBody)[] = [
       "title",
       "date",
@@ -158,8 +167,9 @@ export async function PUT(req: Request) {
         category = ${body.category},
         featured = ${body.featured ?? false},
         content = ${body.content},
-        status = ${body.status},
+        status = ${shouldSchedule ? "draft" : body.status},
         slug = ${slug},
+        scheduled_at = ${shouldSchedule ? scheduledAt : null},
         updated_at = NOW(),
         version = COALESCE(version, 0) + 1
       WHERE id = ${id}
@@ -238,6 +248,9 @@ export async function POST(req: Request) {
   try {
     const body = (await req.json()) as CreateBody;
 
+    const scheduledAt = body.scheduledAt ? new Date(body.scheduledAt) : null;
+    const shouldSchedule = scheduledAt ? scheduledAt.getTime() > Date.now() : false;
+
     const requiredFields: (keyof CreateBody)[] = [
       "title",
       "date",
@@ -283,7 +296,9 @@ export async function POST(req: Request) {
         slug,
         created_at,
         updated_at,
-        version
+        version,
+        scheduled_at,
+        likes_count
       ) VALUES (
         ${id},
         ${body.title},
@@ -293,11 +308,13 @@ export async function POST(req: Request) {
         ${body.category},
         ${body.featured ?? false},
         ${body.content},
-        ${body.status},
+        ${shouldSchedule ? "draft" : body.status},
         ${slug},
         NOW(),
         NOW(),
-        1
+        1,
+        ${shouldSchedule ? scheduledAt : null},
+        0
       )
     `;
 
@@ -308,7 +325,7 @@ export async function POST(req: Request) {
     const post = rows.length ? mapRow(rows[0]) : null;
 
     // Send emails to subscribers if post is published
-    if (post && body.status === "published") {
+    if (post && body.status === "published" && !shouldSchedule) {
       sendEmailsToSubscribers({
         id: post.id,
         slug: post.slug,

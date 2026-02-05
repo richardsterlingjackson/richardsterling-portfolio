@@ -17,6 +17,8 @@ export type BlogPost = {
   createdAt: string | null; // DB returns null when empty
   updatedAt: string | null;
   version: number | null;
+  scheduledAt: string | null;
+  likesCount: number;
 };
 
 // Legacy placeholder array — kept empty on purpose.

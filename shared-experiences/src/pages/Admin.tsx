@@ -129,6 +129,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [filterStatus, setFilterStatus] = React.useState<"all" | "draft" | "published">("all");
   const [selectedPostIds, setSelectedPostIds] = React.useState<Set<string>>(new Set());
   const [timeoutWarning, setTimeoutWarning] = React.useState(false);
+  const [imageMode, setImageMode] = React.useState<"url" | "upload">("url");
+  const [uploadingImage, setUploadingImage] = React.useState(false);
+  const [uploadError, setUploadError] = React.useState("");
 
   // Session timeout: 30 minutes (1800 seconds)
   const SESSION_TIMEOUT = 30 * 60 * 1000;
@@ -188,6 +191,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     featured: z.boolean().optional(),
     content: z.string().min(20),
     status: z.enum(["draft", "published"]),
+    scheduledAt: z.string().optional(),
   });
 
   type BlogFormData = z.infer<typeof blogSchema>;
@@ -202,6 +206,44 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   } = useForm<BlogFormData>({
     resolver: zodResolver(blogSchema),
   });
+
+  const handleImageUpload = async (file: File) => {
+    setUploadError("");
+    setUploadingImage(true);
+    try {
+      const signRes = await fetch("/api/cloudinary/sign");
+      if (!signRes.ok) {
+        throw new Error("Failed to get upload signature");
+      }
+
+      const { cloudName, apiKey, timestamp, signature, folder } = await signRes.json();
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", apiKey);
+      formData.append("timestamp", String(timestamp));
+      formData.append("signature", signature);
+      formData.append("folder", folder);
+
+      const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const uploadData = await uploadRes.json();
+      if (uploadData.secure_url) {
+        setValue("image", uploadData.secure_url, { shouldValidate: true });
+      }
+    } catch (err: any) {
+      setUploadError(err?.message || "Upload failed");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   React.useEffect(() => {
     async function load() {
@@ -224,6 +266,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           status: data.status,
           featured: !!data.featured,
           slug: editingPost.slug ?? data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+          scheduledAt: data.scheduledAt || null,
         };
 
         const updated = await updatePost(editingPost.id, payload);
@@ -245,7 +288,10 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           featured: !!data.featured,
         };
 
-        const created = await savePost(payload);
+        const created = await savePost({
+          ...payload,
+          scheduledAt: data.scheduledAt || null,
+        });
         if (!created) {
           toast({ title: "Create Failed", description: "Unable to create post. Check console for details.", variant: "destructive" });
           return;
@@ -279,6 +325,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       featured: post.featured ?? false,
       content: post.content,
       status: post.status,
+      scheduledAt: post.scheduledAt ?? "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -653,7 +700,43 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
 
             {errors.content && <p className="text-sm text-destructive">{errors.content.message}</p>}
 
-            <Input placeholder="Image URL" {...register("image")} />
+            <div className="flex items-center gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => setImageMode("url")}
+                className={`px-2 py-1 rounded border ${imageMode === "url" ? "border-elegant-primary text-elegant-primary" : "border-border text-muted-foreground"}`}
+              >
+                Use URL
+              </button>
+              <button
+                type="button"
+                onClick={() => setImageMode("upload")}
+                className={`px-2 py-1 rounded border ${imageMode === "upload" ? "border-elegant-primary text-elegant-primary" : "border-border text-muted-foreground"}`}
+              >
+                Upload Image
+              </button>
+            </div>
+
+            {imageMode === "url" ? (
+              <Input placeholder="Image URL" {...register("image")} />
+            ) : (
+              <div className="flex items-center gap-3">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                  }}
+                  disabled={uploadingImage}
+                />
+                <span className="text-xs text-muted-foreground">
+                  {uploadingImage ? "Uploading…" : "JPG/PNG"}
+                </span>
+              </div>
+            )}
+
+            {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}
             {errors.image && <p className="text-sm text-destructive">{errors.image.message}</p>}
 
             <select {...register("category")} className="w-full border rounded px-3 py-2 text-sm">
@@ -671,6 +754,11 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               <option value="published">Published</option>
             </select>
             {errors.status && <p className="text-sm text-destructive">{errors.status.message}</p>}
+
+            <div className="space-y-1">
+              <label className="text-sm text-muted-foreground">Schedule publish (optional)</label>
+              <Input type="datetime-local" {...register("scheduledAt")} />
+            </div>
 
             <div className="bg-muted/50 border rounded px-3 py-2 text-sm flex items-center gap-3">
               <input
