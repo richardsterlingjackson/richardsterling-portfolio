@@ -292,7 +292,7 @@ export default function PostPage() {
                   {relatedPosts.map((relPost) => (
                     <a
                       key={relPost.id}
-                      href={`/post/${relPost.slug}`}
+                      href={`/posts/${relPost.slug}`}
                       className="group border border-border rounded-lg overflow-hidden hover:border-elegant-primary transition"
                     >
                       <img
