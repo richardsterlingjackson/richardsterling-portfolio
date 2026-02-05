@@ -96,28 +96,6 @@ export default function PostPage() {
 
   // Share to social media
   const shareToTwitter = () => {
-      const handleLike = async () => {
-        if (!post) return;
-        const action = liked ? "unlike" : "like";
-
-        try {
-          const res = await fetch("/api/likes", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ postId: post.id, action }),
-          });
-
-          if (!res.ok) return;
-
-          const data = await res.json();
-          setLikesCount(data.likesCount ?? 0);
-          const nextLiked = !liked;
-          setLiked(nextLiked);
-          localStorage.setItem(`liked_${post.id}`, nextLiked ? "1" : "0");
-        } catch (err) {
-          console.error("Like failed:", err);
-        }
-      };
     const url = window.location.href;
     const text = `Check out: "${post?.title}" by @richardsterling`;
     window.open(
@@ -127,19 +105,6 @@ export default function PostPage() {
   };
 
   const shareToLinkedIn = () => {
-        {post && (
-          <Helmet>
-            <title>{`${post.title} | Shared Experiences`}</title>
-            <meta name="description" content={post.excerpt} />
-            <meta property="og:title" content={post.title} />
-            <meta property="og:description" content={post.excerpt} />
-            <meta property="og:type" content="article" />
-            <meta property="og:image" content={`${window.location.origin}/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category)}`} />
-            <meta property="og:url" content={window.location.href} />
-            <meta name="twitter:card" content="summary_large_image" />
-            <meta name="twitter:image" content={`${window.location.origin}/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category)}`} />
-          </Helmet>
-        )}
     const url = window.location.href;
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
@@ -154,6 +119,34 @@ export default function PostPage() {
       "_blank"
     );
   };
+
+  const handleLike = async () => {
+    if (!post) return;
+    const action = liked ? "unlike" : "like";
+
+    try {
+      const res = await fetch("/api/likes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId: post.id, action }),
+      });
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+      setLikesCount(data.likesCount ?? 0);
+      const nextLiked = !liked;
+      setLiked(nextLiked);
+      localStorage.setItem(`liked_${post.id}`, nextLiked ? "1" : "0");
+    } catch (err) {
+      console.error("Like failed:", err);
+    }
+  };
+
+  const pageUrl = typeof window !== "undefined" ? window.location.href : "";
+  const ogImageUrl = post
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category)}`
+    : "";
 
   //
   // LOADING STATE
@@ -238,6 +231,19 @@ export default function PostPage() {
                 size="sm"
                 onClick={handleLike}
                 className="text-xs"
+                  {post && (
+                    <Helmet>
+                      <title>{`${post.title} | Shared Experiences`}</title>
+                      <meta name="description" content={post.excerpt} />
+                      <meta property="og:title" content={post.title} />
+                      <meta property="og:description" content={post.excerpt} />
+                      <meta property="og:type" content="article" />
+                      {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+                      {pageUrl && <meta property="og:url" content={pageUrl} />}
+                      <meta name="twitter:card" content="summary_large_image" />
+                      {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+                    </Helmet>
+                  )}
               >
                 {liked ? "♥ Liked" : "♡ Like"} · {likesCount}
               </Button>
