@@ -254,6 +254,24 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   }, []);
 
   const onSubmit = async (data: BlogFormData) => {
+    if (uploadingImage) {
+      toast({
+        title: "Image Uploading",
+        description: "Please wait for the upload to finish before publishing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (imageMode === "upload" && !data.image) {
+      toast({
+        title: "Image Missing",
+        description: "Please upload an image before publishing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       if (editingPost) {
         const payload: UpdatePostInput = {
@@ -720,19 +738,34 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             {imageMode === "url" ? (
               <Input placeholder="Image URL" {...register("image")} />
             ) : (
-              <div className="flex items-center gap-3">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleImageUpload(file);
-                  }}
-                  disabled={uploadingImage}
-                />
-                <span className="text-xs text-muted-foreground">
-                  {uploadingImage ? "Uploading…" : "JPG/PNG"}
-                </span>
+              <div className="space-y-2">
+                <input type="hidden" {...register("image")} />
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(file);
+                    }}
+                    disabled={uploadingImage}
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {uploadingImage ? "Uploading…" : "JPG/PNG"}
+                  </span>
+                </div>
+                {watch("image") ? (
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={watch("image")}
+                      alt="Uploaded preview"
+                      className="h-16 w-16 rounded object-cover border"
+                    />
+                    <span className="text-xs text-muted-foreground">Image ready</span>
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground">No image uploaded yet</span>
+                )}
               </div>
             )}
 
@@ -773,7 +806,13 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             </div>
 
             <div className="flex justify-between items-center">
-              <Button type="submit">
+              <Button
+                type="submit"
+                disabled={
+                  uploadingImage ||
+                  (imageMode === "upload" && !watch("image"))
+                }
+              >
                 {editingPost ? "Update Post" : "Publish"}
               </Button>
               <Button
