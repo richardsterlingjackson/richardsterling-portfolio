@@ -8,7 +8,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { email } = req.body;
+    const { email, category } = req.body;
 
     // Validate email
     if (!email || typeof email !== "string") {
@@ -20,6 +20,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Invalid email format" });
     }
 
+    // Validate category
+    if (!category || typeof category !== "string") {
+      return res.status(400).json({ error: "Category is required" });
+    }
+
     // Check if DATABASE_URL is available
     if (!process.env.DATABASE_URL) {
       console.warn("DATABASE_URL not set. Subscription not saved to database.");
@@ -27,13 +32,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ message: "Subscription received (database offline)" });
     }
 
-    // Insert subscriber into database
+    // Insert subscriber into database with category
     try {
       const result = await sql`
-        INSERT INTO subscribers (email, created_at)
-        VALUES (${email}, NOW())
-        ON CONFLICT (email) DO UPDATE SET updated_at = NOW()
-        RETURNING id, email, created_at
+        INSERT INTO subscribers (email, category, created_at)
+        VALUES (${email}, ${category}, NOW())
+        ON CONFLICT (email, category) DO UPDATE SET updated_at = NOW()
+        RETURNING id, email, category, created_at
       `;
 
       return res.status(200).json({

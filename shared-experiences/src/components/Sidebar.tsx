@@ -11,6 +11,7 @@ export default function Sidebar() {
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [subscribing, setSubscribing] = useState(false);
   const { toast } = useToast();
 
@@ -76,17 +77,23 @@ export default function Sidebar() {
       return;
     }
 
+    if (!selectedCategory) {
+      toast({ title: "Category required", description: "Please select a category to subscribe to.", variant: "destructive" });
+      return;
+    }
+
     setSubscribing(true);
     try {
       const response = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, category: selectedCategory }),
       });
 
       if (response.ok) {
-        toast({ title: "Subscribed!", description: "You'll receive new posts via email." });
+        toast({ title: "Subscribed!", description: `You'll receive new "${selectedCategory}" posts via email.` });
         setEmail("");
+        setSelectedCategory("");
       } else {
         toast({ title: "Subscription failed", description: "Please try again later.", variant: "destructive" });
       }
@@ -106,9 +113,9 @@ export default function Sidebar() {
           Get New Posts
         </h3>
         <p className="text-sm text-muted-foreground">
-          Subscribe to receive the latest posts directly in your inbox.
+          Subscribe to a category and receive new posts via email.
         </p>
-        <form onSubmit={handleSubscribe} className="space-y-2">
+        <form onSubmit={handleSubscribe} className="space-y-3">
           <Input
             type="email"
             placeholder="Your email"
@@ -117,6 +124,19 @@ export default function Sidebar() {
             disabled={subscribing}
             className="text-sm"
           />
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            disabled={subscribing}
+            className="w-full border rounded px-3 py-2 text-sm bg-background"
+          >
+            <option value="">Select a category</option>
+            {categories.map(({ label }) => (
+              <option key={label} value={label}>
+                {label}
+              </option>
+            ))}
+          </select>
           <Button
             type="submit"
             disabled={subscribing}
