@@ -9,7 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { email, category } = req.body;
+    const { email, category, categories } = req.body;
 
     // Validate email
     if (!email || typeof email !== "string") {
@@ -21,10 +21,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Invalid email format" });
     }
 
-    // Validate category
-    if (!category || typeof category !== "string") {
-      return res.status(400).json({ error: "Category is required" });
+    const allCategory = "All Categories";
+    const inputCategories = Array.isArray(categories)
+      ? categories.filter((c) => typeof c === "string")
+      : typeof category === "string"
+        ? [category]
+        : [];
+
+    const uniqueCategories = Array.from(new Set(inputCategories)).filter(Boolean);
+
+    // Validate categories
+    if (uniqueCategories.length === 0) {
+      return res.status(400).json({ error: "At least one category is required" });
     }
+
+    const useAll = uniqueCategories.includes(allCategory);
+    const targetCategories = useAll ? [allCategory] : uniqueCategories;
 
     // Check if DATABASE_URL is available
     if (!process.env.DATABASE_URL) {
@@ -35,55 +47,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Insert subscriber into database with category
     try {
-      const inserted = await sql`
-        INSERT INTO subscribers (email, category, created_at)
-        VALUES (${email}, ${category}, NOW())
-        ON CONFLICT DO NOTHING
-        RETURNING id, email, category, created_at
-      `;
-
-      if (inserted.length) {
-        // Send welcome email asynchronously (don't wait for it to complete)
-        sendWelcomeEmail(email, category).catch((err) =>
-          console.error("Failed to send welcome email:", err)
-        );
-
-        return res.status(200).json({
-          message: "Successfully subscribed",
-          subscriber: inserted[0],
-        });
+      if (useAll) {
+        await sql`
+          DELETE FROM subscribers WHERE email = ${email} AND category != ${allCategory}
+        `;
+      } else {
+        await sql`
+          DELETE FROM subscribers WHERE email = ${email} AND category = ${allCategory}
+        `;
       }
 
-      const updatedSame = await sql`
-        UPDATE subscribers
-        SET updated_at = NOW()
-        WHERE email = ${email} AND category = ${category}
-        RETURNING id, email, category, created_at
-      `;
+      const results: any[] = [];
 
-      if (updatedSame.length) {
-        return res.status(200).json({
-          message: "Already subscribed",
-          subscriber: updatedSame[0],
-        });
+      for (const cat of targetCategories) {
+        const inserted = await sql`
+          INSERT INTO subscribers (email, category, created_at)
+          VALUES (${email}, ${cat}, NOW())
+          ON CONFLICT DO NOTHING
+          RETURNING id, email, category, created_at
+        `;
+
+        if (inserted.length) {
+          results.push(inserted[0]);
+          sendWelcomeEmail(email, cat).catch((err) =>
+            console.error("Failed to send welcome email:", err)
+          );
+          continue;
+        }
+
+        const updatedSame = await sql`
+          UPDATE subscribers
+          SET updated_at = NOW()
+          WHERE email = ${email} AND category = ${cat}
+          RETURNING id, email, category, created_at
+        `;
+
+        if (updatedSame.length) {
+          results.push(updatedSame[0]);
+          continue;
+        }
       }
 
-      const updatedEmail = await sql`
-        UPDATE subscribers
-        SET category = ${category}, updated_at = NOW()
-        WHERE email = ${email}
-        RETURNING id, email, category, created_at
-      `;
-
-      if (updatedEmail.length) {
-        // Treat category change as a new subscription for messaging.
-        sendWelcomeEmail(email, category).catch((err) =>
-          console.error("Failed to send welcome email:", err)
-        );
-
+      if (results.length) {
         return res.status(200).json({
-          message: "Subscription updated",
-          subscriber: updatedEmail[0],
+          message: useAll ? "Subscribed to all categories" : "Successfully subscribed",
+          subscribers: results,
         });
       }
 

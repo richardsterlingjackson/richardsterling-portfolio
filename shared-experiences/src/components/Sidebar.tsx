@@ -11,7 +11,7 @@ export default function Sidebar() {
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [subscribing, setSubscribing] = useState(false);
   const { toast } = useToast();
 
@@ -77,8 +77,8 @@ export default function Sidebar() {
       return;
     }
 
-    if (!selectedCategory) {
-      toast({ title: "Category required", description: "Please select a category to subscribe to.", variant: "destructive" });
+    if (selectedCategories.length === 0) {
+      toast({ title: "Category required", description: "Please select at least one category to subscribe to.", variant: "destructive" });
       return;
     }
 
@@ -87,16 +87,17 @@ export default function Sidebar() {
       const response = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, category: selectedCategory }),
+        body: JSON.stringify({ email, categories: selectedCategories }),
       });
 
       if (response.ok) {
-        const description = selectedCategory === "All Categories"
+        const hasAll = selectedCategories.includes("All Categories");
+        const description = hasAll
           ? "You'll receive new posts from all categories via email."
-          : `You'll receive new "${selectedCategory}" posts via email.`;
+          : `You'll receive new posts from ${selectedCategories.length} category${selectedCategories.length === 1 ? "" : "ies"} via email.`;
         toast({ title: "Subscribed!", description });
         setEmail("");
-        setSelectedCategory("");
+        setSelectedCategories([]);
       } else {
         toast({ title: "Subscription failed", description: "Please try again later.", variant: "destructive" });
       }
@@ -127,20 +128,44 @@ export default function Sidebar() {
             disabled={subscribing}
             className="text-sm"
           />
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            disabled={subscribing}
-            className="w-full border rounded px-3 py-2 text-sm bg-background"
-          >
-            <option value="">Select a category</option>
-            <option value="All Categories">All Categories</option>
-            {categories.map(({ label }) => (
-              <option key={label} value={label}>
-                {label}
-              </option>
-            ))}
-          </select>
+          <div className="space-y-2 text-sm">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={selectedCategories.includes("All Categories")}
+                onChange={(e) =>
+                  setSelectedCategories(
+                    e.target.checked ? ["All Categories"] : []
+                  )
+                }
+                disabled={subscribing}
+              />
+              <span>All Categories</span>
+            </label>
+            <div className="space-y-2 pl-4">
+              {categories.map(({ label }) => (
+                <label key={label} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(label)}
+                    onChange={(e) => {
+                      setSelectedCategories((prev) => {
+                        const next = new Set(prev.filter((c) => c !== "All Categories"));
+                        if (e.target.checked) {
+                          next.add(label);
+                        } else {
+                          next.delete(label);
+                        }
+                        return Array.from(next);
+                      });
+                    }}
+                    disabled={subscribing || selectedCategories.includes("All Categories")}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
           <Button
             type="submit"
             disabled={subscribing}
