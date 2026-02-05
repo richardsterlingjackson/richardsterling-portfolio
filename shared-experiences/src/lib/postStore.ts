@@ -83,7 +83,7 @@ export async function updatePost(
     const token = getAdminToken();
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${API}/${id}`, {
+    const res = await fetch(`${API}?id=${encodeURIComponent(id)}`, {
       method: "PUT",
       body: JSON.stringify(post),
       headers,
@@ -109,7 +109,7 @@ export async function deletePost(id: string): Promise<boolean> {
     const token = getAdminToken();
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${API}/${id}`, {
+    const res = await fetch(`${API}?id=${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers,
       cache: "no-store",
