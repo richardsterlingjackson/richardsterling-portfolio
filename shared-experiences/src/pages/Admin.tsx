@@ -135,6 +135,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [uploadError, setUploadError] = React.useState("");
   const uploadInputRef = React.useRef<HTMLInputElement | null>(null);
   const [mainFeaturedId, setMainFeaturedId] = React.useState<string | null>(null);
+  const [restoreFile, setRestoreFile] = React.useState<File | null>(null);
+  const [restoring, setRestoring] = React.useState(false);
+  const [backupError, setBackupError] = React.useState("");
 
   const slugifyTitle = React.useCallback((value: string) => {
     return value
@@ -302,6 +305,149 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     const stored = localStorage.getItem("mainFeaturedPostId");
     setMainFeaturedId(stored);
   }, []);
+
+  const handleBackupDownload = async () => {
+    setBackupError("");
+    try {
+      const data = await getStoredPosts();
+      const mainFeaturedSlug = data.find((post) => post.id === mainFeaturedId)?.slug ?? null;
+      const payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        mainFeaturedSlug,
+        posts: data,
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `shared-experiences-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Backup download failed:", err);
+      setBackupError("Unable to download backup. Try again.");
+    }
+  };
+
+  const parseBackup = (raw: string) => {
+    const parsed: unknown = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return { posts: parsed as BlogPost[], mainFeaturedSlug: null };
+    }
+
+    const parsedObj = parsed as { posts?: BlogPost[]; mainFeaturedSlug?: string } | null;
+    const posts = Array.isArray(parsedObj?.posts) ? parsedObj?.posts ?? [] : [];
+    const mainFeaturedSlug = typeof parsedObj?.mainFeaturedSlug === "string" ? parsedObj.mainFeaturedSlug : null;
+    return { posts, mainFeaturedSlug };
+  };
+
+  const normalizeRestorePost = (
+    post: unknown
+  ): NewPostInput & { slug?: string; scheduledAt?: string | null } | null => {
+    if (!post || typeof post !== "object") return null;
+
+    const data = post as Record<string, unknown>;
+    const required = ["title", "date", "excerpt", "image", "category", "content", "status"];
+    for (const field of required) {
+      if (typeof data[field] !== "string" || !data[field]) return null;
+    }
+
+    const status = data.status === "published" ? "published" : "draft";
+
+    return {
+      title: data.title as string,
+      date: data.date as string,
+      excerpt: data.excerpt as string,
+      image: data.image as string,
+      category: data.category as string,
+      content: data.content as string,
+      status,
+      featured: Boolean(data.featured),
+      scheduledAt: typeof data.scheduledAt === "string" ? data.scheduledAt : null,
+      slug: typeof data.slug === "string" ? data.slug : undefined,
+    };
+  };
+
+  const handleRestoreBackup = async () => {
+    setBackupError("");
+    if (!restoreFile) {
+      setBackupError("Select a backup file first.");
+      return;
+    }
+
+    if (!confirm("This will overwrite all existing posts. Continue?")) return;
+
+    setRestoring(true);
+    try {
+      const raw = await restoreFile.text();
+      const { posts: backupPosts, mainFeaturedSlug } = parseBackup(raw);
+
+      if (!backupPosts.length) {
+        setBackupError("Backup file contains no posts.");
+        setRestoring(false);
+        return;
+      }
+
+      const existing = await getStoredPosts();
+      let deleteFailures = 0;
+      for (const post of existing) {
+        const ok = await deletePost(post.id);
+        if (!ok) deleteFailures++;
+      }
+
+      let createFailures = 0;
+      let skipped = 0;
+      for (const post of backupPosts) {
+        const payload = normalizeRestorePost(post);
+        if (!payload) {
+          skipped++;
+          continue;
+        }
+
+        const created = await savePost(payload);
+        if (!created) createFailures++;
+      }
+
+      const refreshed = await getStoredPosts();
+      setPosts(refreshed);
+      setSelectedPostIds(new Set());
+
+      if (mainFeaturedSlug) {
+        const nextMain = refreshed.find((post) => post.slug === mainFeaturedSlug);
+        const nextId = nextMain?.id ?? null;
+        if (typeof window !== "undefined") {
+          if (nextId) {
+            localStorage.setItem("mainFeaturedPostId", nextId);
+          } else {
+            localStorage.removeItem("mainFeaturedPostId");
+          }
+        }
+        setMainFeaturedId(nextId);
+      } else if (typeof window !== "undefined") {
+        localStorage.removeItem("mainFeaturedPostId");
+        setMainFeaturedId(null);
+      }
+
+      if (deleteFailures || createFailures || skipped) {
+        toast({
+          title: "Restore completed with issues",
+          description: `Delete failures: ${deleteFailures}. Create failures: ${createFailures}. Skipped: ${skipped}.`,
+          variant: "destructive",
+        });
+      } else {
+        toast({ title: "Restore complete", description: "Backup has been restored." });
+      }
+    } catch (err) {
+      console.error("Restore failed:", err);
+      setBackupError("Restore failed. Check the file and try again.");
+    } finally {
+      setRestoring(false);
+    }
+  };
 
   const onSubmit = async (data: BlogFormData) => {
     if (uploadingImage) {
@@ -903,6 +1049,39 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             </div>
           </form>
 
+          {/* BACKUP & RESTORE */}
+          <div className="space-y-3 bg-background/95 p-6 rounded-lg border">
+            <h2 className="text-xl font-semibold text-elegant-text">Backup & Restore</h2>
+            <p className="text-sm text-muted-foreground">
+              Download a JSON backup of all posts. Restore will overwrite all existing posts.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+              <Button type="button" variant="outline" onClick={handleBackupDownload}>
+                Download Backup
+              </Button>
+
+              <div className="flex flex-1 flex-col sm:flex-row gap-2">
+                <Input
+                  type="file"
+                  accept="application/json"
+                  onChange={(event) => {
+                    setBackupError("");
+                    setRestoreFile(event.target.files?.[0] ?? null);
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleRestoreBackup}
+                  disabled={restoring || !restoreFile}
+                >
+                  {restoring ? "Restoring…" : "Restore Backup"}
+                </Button>
+              </div>
+            </div>
+            {backupError && <p className="text-sm text-destructive">{backupError}</p>}
+          </div>
+
           {/* POSTS LIST CONTROLS */}
           <div className="space-y-3 bg-background/95 p-6 rounded-lg border">
             <h2 className="text-xl font-semibold text-elegant-text">Saved Posts</h2>
@@ -1013,14 +1192,21 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     </div>
 
                     <div className="flex gap-2">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => handleSetMainFeatured(post)}
-                        disabled={!post.featured || post.status !== "published"}
-                      >
-                        {post.id === mainFeaturedId ? "⭐ Main Feature" : "⭐ Set Main"}
-                      </Button>
+                      {post.featured && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleSetMainFeatured(post)}
+                          disabled={post.status !== "published"}
+                          className={
+                            post.status !== "published"
+                              ? "bg-muted text-muted-foreground hover:bg-muted"
+                              : ""
+                          }
+                        >
+                          {post.id === mainFeaturedId ? "⭐ Main Feature" : "⭐ Set Main"}
+                        </Button>
+                      )}
 
                       <Button variant="ghost" size="sm" onClick={() => handleEdit(post)}>
                         Edit

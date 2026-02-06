@@ -14,6 +14,7 @@ export type NewPostInput = Pick<
 >;
 
 export type NewPostPayload = NewPostInput & {
+  slug?: string;
   scheduledAt?: string | null;
 };
 
