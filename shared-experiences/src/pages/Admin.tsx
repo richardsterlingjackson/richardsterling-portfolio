@@ -134,6 +134,14 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [uploadingImage, setUploadingImage] = React.useState(false);
   const [uploadError, setUploadError] = React.useState("");
   const uploadInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [mainFeaturedId, setMainFeaturedId] = React.useState<string | null>(null);
+
+  const slugifyTitle = React.useCallback((value: string) => {
+    return value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }, []);
 
   // Session timeout: 60 minutes (3600 seconds)
   const SESSION_TIMEOUT = 60 * 60 * 1000;
@@ -289,6 +297,12 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     load();
   }, []);
 
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("mainFeaturedPostId");
+    setMainFeaturedId(stored);
+  }, []);
+
   const onSubmit = async (data: BlogFormData) => {
     if (uploadingImage) {
       toast({
@@ -319,7 +333,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           content: data.content,
           status: data.status,
           featured: !!data.featured,
-          slug: editingPost.slug ?? data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+          slug: editingPost.slug ?? slugifyTitle(data.title),
           scheduledAt: data.scheduledAt || null,
         };
 
@@ -496,6 +510,19 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const publishedPosts = posts.filter((p) => p.status === "published").length;
   const draftPosts = posts.filter((p) => p.status === "draft").length;
 
+  const handleSetMainFeatured = (post: BlogPost) => {
+    if (!post.featured || post.status !== "published") {
+      toast({ title: "Make it featured", description: "Only featured, published posts can be the main feature.", variant: "destructive" });
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("mainFeaturedPostId", post.id);
+    }
+    setMainFeaturedId(post.id);
+    toast({ title: "Main feature set", description: `"${post.title}" will show on the home page.` });
+  };
+
   return (
     <div
       className="min-h-screen py-10 px-4 relative"
@@ -532,11 +559,11 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 </div>
                 <div>
                   <p className="text-muted-foreground">Published</p>
-                  <p className="text-2xl font-semibold text-elegant-primary">{publishedPosts}</p>
+                  <p className="text-2xl font-semibold text-orange-500">{publishedPosts}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Drafts</p>
-                  <p className="text-2xl font-semibold text-orange-500">{draftPosts}</p>
+                  <p className="text-2xl font-semibold text-elegant-primary">{draftPosts}</p>
                 </div>
               </div>
             </div>
@@ -969,7 +996,14 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       className="h-4 w-4 mt-1"
                     />
                     <div className="flex-1">
-                      <h4 className="font-medium text-elegant-text">{post.title}</h4>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium text-elegant-text">{post.title}</h4>
+                        {post.id === mainFeaturedId && (
+                          <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-full">
+                            Main Feature
+                          </span>
+                        )}
+                      </div>
                       <p className="whitespace-pre-line text-xs text-muted-foreground">
                         {post.excerpt}
                       </p>
@@ -979,6 +1013,15 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     </div>
 
                     <div className="flex gap-2">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleSetMainFeatured(post)}
+                        disabled={!post.featured || post.status !== "published"}
+                      >
+                        {post.id === mainFeaturedId ? "⭐ Main Feature" : "⭐ Set Main"}
+                      </Button>
+
                       <Button variant="ghost" size="sm" onClick={() => handleEdit(post)}>
                         Edit
                       </Button>

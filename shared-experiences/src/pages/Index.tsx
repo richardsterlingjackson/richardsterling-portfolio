@@ -7,9 +7,14 @@ import type { BlogPost as BlogPostType } from "@/data/posts";
 
 export default function Index() {
   const [posts, setPosts] = useState<BlogPostType[]>([]);
+  const [mainFeaturedId, setMainFeaturedId] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = "Home – Shared Experiences";
+
+    if (typeof window !== "undefined") {
+      setMainFeaturedId(localStorage.getItem("mainFeaturedPostId"));
+    }
 
     async function loadPosts() {
       try {
@@ -24,7 +29,13 @@ export default function Index() {
     loadPosts();
   }, []);
 
-  const featured = useMemo(() => posts.find((p) => p.featured), [posts]);
+  const featured = useMemo(() => {
+    const featuredPosts = posts.filter(
+      (post) => post.featured && post.status === "published"
+    );
+    const main = featuredPosts.find((post) => post.id === mainFeaturedId);
+    return main ?? featuredPosts[0];
+  }, [posts, mainFeaturedId]);
 
   const recentPosts = useMemo(
     () =>
