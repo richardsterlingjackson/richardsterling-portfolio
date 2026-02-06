@@ -23,7 +23,7 @@ export default function About() {
               </h1>
               <div className="relative">
                 <div
-                  className="md:float-left w-full md:w-[220px] max-w-[220px] border border-border bg-white md:mr-6 mb-4"
+                  className="md:float-left w-full md:max-w-xs border border-border bg-white md:mr-6 mb-4"
                   style={{ boxShadow: "0 6px 8px rgba(0, 0, 0, 0.7)" }}
                 >
                   <img
