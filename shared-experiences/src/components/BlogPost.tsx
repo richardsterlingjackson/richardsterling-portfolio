@@ -41,8 +41,8 @@ export default function BlogPost({ post }: BlogPostProps) {
   const PostTitle = featured ? "h2" : "h3";
 
   const titleClass = featured
-    ? "font-playfair text-3xl font-bold mb-4 text-elegant-text hover:text-elegant-primary transition-colors cursor-pointer"
-    : "font-playfair text-xl font-semibold mb-3 text-elegant-text hover:text-elegant-primary transition-colors cursor-pointer";
+    ? "font-playfair text-2xl sm:text-3xl font-bold mb-4 text-elegant-text hover:text-elegant-primary transition-colors cursor-pointer"
+    : "font-playfair text-lg sm:text-xl font-semibold mb-3 text-elegant-text hover:text-elegant-primary transition-colors cursor-pointer";
 
   return (
     <article className="bg-card rounded-lg overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow">
@@ -50,10 +50,14 @@ export default function BlogPost({ post }: BlogPostProps) {
         src={image || fallbackImage}
         alt={title}
         onError={handleImageError}
-        className={featured ? "w-full h-[400px] object-cover" : "w-full h-64 object-cover"}
+        className={
+          featured
+            ? "w-full h-[240px] sm:h-[320px] md:h-[400px] object-cover"
+            : "w-full h-48 sm:h-56 object-cover"
+        }
       />
 
-      <div className={featured ? "p-8" : "p-6"}>
+      <div className={featured ? "p-6 sm:p-8" : "p-5 sm:p-6"}>
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
           <Calendar className="h-4 w-4" />
           <time dateTime={date}>{formattedDate}</time>

@@ -113,10 +113,25 @@ export default function PostPage() {
     const url = post
       ? `${window.location.origin}/posts/${encodeURIComponent(post.slug)}`
       : window.location.href;
-    navigator.clipboard.writeText(url).then(() => {
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    });
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      });
+      return;
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = url;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "absolute";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
   };
 
   // Share to social media
@@ -215,7 +230,7 @@ export default function PostPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-8 sm:py-12">
         <Helmet>
           <title>{`${post.title} | Shared Experiences`}</title>
           <meta name="description" content={post.excerpt} />
@@ -236,7 +251,7 @@ export default function PostPage() {
             <img
               src={post.image}
               alt={post.title}
-              className="w-full h-[400px] object-cover rounded-lg border border-border"
+              className="w-full h-[240px] sm:h-[320px] lg:h-[400px] object-cover rounded-lg border border-border"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src =
                   "https://via.placeholder.com/800x400?text=Image+Unavailable";
@@ -272,7 +287,7 @@ export default function PostPage() {
                 variant={liked ? "secondary" : "outline"}
                 size="sm"
                 onClick={handleLike}
-                className={`text-xs font-semibold border-2 ${
+                className={`text-xs sm:text-sm font-semibold border-2 ${
                   liked
                     ? "bg-elegant-primary text-white border-elegant-primary"
                     : "bg-elegant-primary/90 text-white border-elegant-primary hover:bg-elegant-primary"
@@ -284,7 +299,7 @@ export default function PostPage() {
                 variant="outline"
                 size="sm"
                 onClick={shareToTwitter}
-                className="text-xs"
+                className="text-xs sm:text-sm"
               >
                 Share on 𝕏
               </Button>
@@ -292,7 +307,7 @@ export default function PostPage() {
                 variant="outline"
                 size="sm"
                 onClick={shareToLinkedIn}
-                className="text-xs"
+                className="text-xs sm:text-sm"
               >
                 Share on LinkedIn
               </Button>
@@ -300,7 +315,7 @@ export default function PostPage() {
                 variant="outline"
                 size="sm"
                 onClick={shareToFacebook}
-                className="text-xs"
+                className="text-xs sm:text-sm"
               >
                 Share on Facebook
               </Button>
@@ -308,11 +323,11 @@ export default function PostPage() {
                 variant="outline"
                 size="sm"
                 onClick={handleCopyLink}
-                className="text-xs"
+                className="text-xs sm:text-sm"
               >
                 {copySuccess ? "✓ Copied!" : "Copy Link"}
               </Button>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs sm:text-sm text-muted-foreground">
                 {readsCount} reads
               </span>
             </div>

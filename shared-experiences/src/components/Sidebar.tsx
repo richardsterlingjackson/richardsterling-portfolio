@@ -112,9 +112,9 @@ export default function Sidebar() {
   return (
     <aside className="space-y-10">
       {/* Newsletter Signup */}
-      <section className="bg-gradient-to-br from-elegant-primary/10 to-elegant-secondary/10 border border-elegant-primary/20 rounded-lg p-5 space-y-3">
+      <section className="bg-gradient-to-br from-elegant-primary/10 to-elegant-secondary/10 border border-elegant-primary/20 rounded-lg p-4 sm:p-5 space-y-3">
         <h3 className="font-playfair text-lg font-semibold text-elegant-text">
-          Get New Posts
+          Get new posts in your email...
         </h3>
         <p className="text-sm text-muted-foreground">
           Subscribe to a category and receive new posts via email.
@@ -166,12 +166,12 @@ export default function Sidebar() {
               ))}
             </div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end sm:justify-end">
             <Button
               type="submit"
               size="sm"
               disabled={subscribing}
-              className="text-xs px-2 py-0.5 h-auto rounded-md bg-elegant-primary text-white hover:bg-elegant-primary/90"
+              className="text-xs px-2 py-0.5 h-auto rounded-md bg-elegant-primary text-white hover:bg-elegant-primary/90 w-full sm:w-auto"
             >
               {subscribing ? "Subscribing…" : "Subscribe"}
             </Button>
@@ -182,7 +182,7 @@ export default function Sidebar() {
       {/* Categories with Post Count */}
       <section>
         <h3 className="font-playfair text-lg font-semibold mb-4 text-elegant-text">
-          Categories
+          Total in Categories
         </h3>
 
         <ul className="space-y-2 text-sm text-muted-foreground">
@@ -231,7 +231,7 @@ export default function Sidebar() {
       {/* Recent Posts */}
       <section>
         <h3 className="font-playfair text-lg font-semibold mb-4 text-elegant-text">
-          Recent Posts
+          Recent Posts list
         </h3>
 
         {loading ? (

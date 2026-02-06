@@ -37,7 +37,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-3">
             <Sidebar />
@@ -47,7 +47,7 @@ export default function Index() {
             {featured && <BlogPost post={featured} />}
 
             <div>
-              <h2 className="font-playfair text-2xl font-semibold mb-6 text-elegant-text uppercase tracking-wide">
+              <h2 className="font-playfair text-xl sm:text-2xl font-semibold mb-6 text-elegant-text uppercase tracking-wide">
                 Recent Posts
               </h2>
 

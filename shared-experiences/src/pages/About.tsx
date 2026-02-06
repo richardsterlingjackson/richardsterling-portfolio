@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import aboutPortrait from "@/assets/about-portrait.webp";
 
 export default function About() {
   useEffect(() => {
@@ -17,18 +18,33 @@ export default function About() {
           </div>
           <div className="lg:col-span-9 space-y-12">
             <section className="space-y-6">
-              <h1 className="text-5xl font-playfair font-bold text-elegant-text tracking-tight">
+              <h1 className="text-3xl sm:text-5xl font-playfair font-bold text-elegant-text tracking-tight">
                 About This Blog
               </h1>
-              <p className="text-lg text-elegant-text-light leading-relaxed max-w-3xl">
-                Welcome to <span className="font-semibold text-elegant-text">Shared Experiences</span> — a personal portfolio and technical journal built to showcase my work as a full-stack developer and machine learning enthusiast. This space is where I explore ideas, document experiments, and share insights from the projects I build.
-              </p>
-              <p className="text-md text-muted-foreground max-w-2xl">
-                The blog itself is part of a larger portfolio ecosystem, including projects like <span className="font-semibold text-elegant-text">profile-card</span>, a modular identity component with resume integration, and <span className="font-semibold text-elegant-text">Connect</span>, a region-based dating platform built with React and Vite. All of these live in the same GitHub repo and reflect my commitment to emotionally resonant design, robust architecture, and thoughtful engineering.
-              </p>
-              <p className="text-md text-muted-foreground max-w-2xl">
-                Every page here is crafted to feel cohesive — from the hero banner to the search results — with a focus on clarity, storytelling, and visual impact. I believe technical work should be expressive, accessible, and memorable.
-              </p>
+              <div className="grid gap-6 md:grid-cols-[220px_1fr] md:items-start">
+                <div
+                  className="w-full max-w-[220px] border border-border bg-white"
+                  style={{ boxShadow: "0 6px 8px rgba(0, 0, 0, 0.7)" }}
+                >
+                  <img
+                    src={aboutPortrait}
+                    alt="Portrait"
+                    className="w-full rounded-none object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <p className="text-lg text-elegant-text-light leading-relaxed max-w-3xl">
+                    Welcome to <span className="font-semibold text-elegant-text">Shared Experiences</span> — a personal portfolio and technical journal built to showcase my work as a full-stack developer and machine learning enthusiast. This space is where I explore ideas, document experiments, and share insights from the projects I build.
+                  </p>
+                  <p className="text-md text-muted-foreground max-w-2xl">
+                    The blog itself is part of a larger portfolio ecosystem, including projects like <span className="font-semibold text-elegant-text">profile-card</span>, a modular identity component with resume integration, and <span className="font-semibold text-elegant-text">Connect</span>, a region-based dating platform built with React and Vite. All of these live in the same GitHub repo and reflect my commitment to emotionally resonant design, robust architecture, and thoughtful engineering.
+                  </p>
+                  <p className="text-md text-muted-foreground max-w-2xl">
+                    Every page here is crafted to feel cohesive — from the hero banner to the search results — with a focus on clarity, storytelling, and visual impact. I believe technical work should be expressive, accessible, and memorable.
+                  </p>
+                </div>
+              </div>
             </section>
 
             <section className="space-y-4 text-muted-foreground">

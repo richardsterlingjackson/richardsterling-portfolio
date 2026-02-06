@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
-import adminBgImage from "@/assets/blog-post-2.jpg";
+import adminBgImage from "@/assets/blog-post-2.webp";
 
 import {
   AlertDialog,
