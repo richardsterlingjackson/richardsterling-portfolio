@@ -21,9 +21,9 @@ export default function About() {
               <h1 className="text-3xl sm:text-5xl font-playfair font-bold text-elegant-text tracking-tight">
                 About This Blog
               </h1>
-              <div className="grid gap-6 md:grid-cols-[220px_1fr] md:items-start">
+              <div className="relative">
                 <div
-                  className="w-full max-w-[220px] border border-border bg-white"
+                  className="md:float-left w-full md:w-[220px] max-w-[220px] border border-border bg-white md:mr-6 mb-4"
                   style={{ boxShadow: "0 6px 8px rgba(0, 0, 0, 0.7)" }}
                 >
                   <img
@@ -56,6 +56,7 @@ export default function About() {
                     In growth, I’ve learned that connection doesn’t require grand gestures or perfect timing. It requires honesty and the willingness to say: this is what I went through, and maybe you did too. If my words can give someone a moment of recognition, a breath of relief, or even a quiet laugh at how universal our struggles really are, then this space is doing exactly what I hoped it would. This blog isn’t just storytelling, it’s about the threads in life that tie us together.
                   </p>
                 </div>
+                <div className="clear-both" />
               </div>
             </section>
 
