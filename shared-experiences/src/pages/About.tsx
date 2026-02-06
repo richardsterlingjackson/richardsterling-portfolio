@@ -37,6 +37,9 @@ export default function About() {
                   <p className="text-lg text-elegant-text-light leading-relaxed max-w-3xl">
                     Welcome to <span className="font-semibold text-elegant-text">Shared Experiences</span> — a personal portfolio and technical journal built to showcase my work as a full-stack developer and machine learning enthusiast. This space is where I explore ideas, document experiments, and share insights from the projects I build.
                   </p>
+                  <h2 className="text-xl sm:text-2xl font-playfair font-semibold text-elegant-text">
+                    About This Space
+                  </h2>
                   <p className="text-md text-muted-foreground max-w-2xl">
                     The blog itself is part of a larger portfolio ecosystem, including projects like <span className="font-semibold text-elegant-text">profile-card</span>, a modular identity component with resume integration, and <span className="font-semibold text-elegant-text">Connect</span>, a region-based dating platform built with React and Vite. All of these live in the same GitHub repo and reflect my commitment to emotionally resonant design, robust architecture, and thoughtful engineering.
                   </p>
@@ -44,7 +47,7 @@ export default function About() {
                     Every page here is crafted to feel cohesive, from the hero banner to the search results. There is a focus on relatability, clarity, storytelling, and emotional impact. I believe technical work should be expressive, easily accessible, and memorable.
                   </p>
                   <p className="text-md text-muted-foreground max-w-2xl">
-                    College taught me a lot about stress, deadlines, and discipline... but reflecting deeper, I find it's the most human parts of us show up in the cracks between our responsibilities. The late‑night conversations, the shared frustrations, the collective confusion, those were the moments that shaped me just as much as any lecture or exam. They made me realize how deeply we rely on each other, even when we pretend we’re doing everything on our own.
+                    College taught me a lot about stress, deadlines, and discipline... but reflecting deeper, I find it's the most <span className="font-semibold text-elegant-text">human</span> parts of us show up in the cracks between our responsibilities. The late‑night conversations, the shared frustrations, the collective confusion, those were the moments that shaped me just as much as any lecture or exam. They made me realize how deeply we rely on each other, even when we pretend we’re doing everything on our own.
                   </p>
                   <p className="text-md text-muted-foreground max-w-2xl">
                     That’s partly of why I created Shared Experiences. I’ve always believed that storytelling is a bridge that connects people who may never cross paths but somehow understand each other anyway. Whether I’m writing about college chaos, emotional growth, or the small everyday glitches we all stumble through, my goal is the same... to make someone out there feel a little less alone in whatever season they’re navigating.
