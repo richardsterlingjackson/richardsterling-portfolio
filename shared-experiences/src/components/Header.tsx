@@ -10,6 +10,8 @@ export default function Header() {
   const navigate = useNavigate();
 
   const isHome = location.pathname === "/";
+  const isSearchPage = location.pathname === "/search";
+  const showSearch = isHome || isSearchPage;
 
   //
   // PAGE TITLES
@@ -29,6 +31,12 @@ export default function Header() {
   useEffect(() => {
     document.title = pageTitle;
   }, [pageTitle]);
+
+  useEffect(() => {
+    if (!isSearchPage) return;
+    const value = new URLSearchParams(location.search).get("q") || "";
+    setQuery(value);
+  }, [isSearchPage, location.search]);
 
   //
   // SEARCH HANDLER
@@ -71,7 +79,7 @@ export default function Header() {
             </div>
 
             {/* SEARCH BAR (HOME ONLY) */}
-            {isHome && (
+            {showSearch && (
               <form onSubmit={handleSearch} className="relative w-full md:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input

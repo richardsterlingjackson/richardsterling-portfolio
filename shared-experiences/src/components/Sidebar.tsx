@@ -45,15 +45,17 @@ export default function Sidebar() {
   }, [allPosts]);
 
   //
-  // POPULAR POSTS (featured posts first, then recent)
+  // POPULAR POSTS (most reads, then likes)
   //
   const popularPosts = useMemo(() => {
-    const featured = allPosts.filter((p) => p.featured && p.status === "published");
-    const recent = allPosts
-      .filter((p) => !p.featured && p.status === "published")
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 5 - featured.length);
-    return [...featured, ...recent].slice(0, 5);
+    return allPosts
+      .filter((p) => p.status === "published")
+      .sort((a, b) => {
+        const readsDiff = (b.readsCount || 0) - (a.readsCount || 0);
+        if (readsDiff !== 0) return readsDiff;
+        return (b.likesCount || 0) - (a.likesCount || 0);
+      })
+      .slice(0, 5);
   }, [allPosts]);
 
   //
@@ -179,29 +181,6 @@ export default function Sidebar() {
         </form>
       </section>
 
-      {/* Categories with Post Count */}
-      <section>
-        <h3 className="font-playfair text-lg font-semibold mb-4 text-elegant-text">
-          Total in Categories
-        </h3>
-
-        <ul className="space-y-2 text-sm text-muted-foreground">
-          {categoryWithCounts.map(({ slug, label, count }) => (
-            <li key={slug}>
-              <Link
-                to={`/category/${slug}`}
-                className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary flex items-center justify-between"
-              >
-                <span>{label}</span>
-                <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium text-foreground">
-                  {count}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
       {/* Popular Posts */}
       <section>
         <h3 className="font-playfair text-lg font-semibold mb-4 text-elegant-text">
@@ -226,6 +205,29 @@ export default function Sidebar() {
             ))}
           </ul>
         )}
+      </section>
+
+      {/* Categories with Post Count */}
+      <section>
+        <h3 className="font-playfair text-lg font-semibold mb-4 text-elegant-text">
+          Total in Categories
+        </h3>
+
+        <ul className="space-y-2 text-sm text-muted-foreground">
+          {categoryWithCounts.map(({ slug, label, count }) => (
+            <li key={slug}>
+              <Link
+                to={`/category/${slug}`}
+                className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary flex items-center justify-between"
+              >
+                <span>{label}</span>
+                <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium text-foreground">
+                  {count}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Recent Posts */}

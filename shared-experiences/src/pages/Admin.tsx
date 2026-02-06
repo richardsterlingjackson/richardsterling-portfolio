@@ -684,6 +684,14 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
 
       {/* Content container with relative positioning */}
       <div className="relative z-10">
+        <div className="max-w-2xl mx-auto mb-4">
+          <a
+            href="/"
+            className="text-sm font-medium text-elegant-primary hover:text-elegant-secondary transition-colors"
+          >
+            ← Back to Home
+          </a>
+        </div>
         {/* Session timeout warning */}
         {timeoutWarning && (
           <div className="mb-6 max-w-2xl mx-auto p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
