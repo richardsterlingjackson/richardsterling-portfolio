@@ -39,7 +39,6 @@ export default function Header() {
     if (!trimmed) return;
 
     navigate(`/search?q=${encodeURIComponent(trimmed)}`);
-    setQuery("");
   };
 
   return (

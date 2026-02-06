@@ -56,15 +56,7 @@ export function SearchResults() {
 
     return posts.filter((post) => {
       const title = post.title?.toLowerCase() || "";
-      const content = post.content?.toLowerCase() || "";
-      const excerpt = post.excerpt?.toLowerCase() || "";
-      const category = post.category?.toLowerCase() || "";
-      return (
-        title.includes(query) ||
-        excerpt.includes(query) ||
-        content.includes(query) ||
-        category.includes(query)
-      );
+      return title.includes(query);
     });
   }, [posts, query]);
 
