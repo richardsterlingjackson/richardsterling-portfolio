@@ -135,9 +135,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [uploadError, setUploadError] = React.useState("");
   const uploadInputRef = React.useRef<HTMLInputElement | null>(null);
 
-  // Session timeout: 30 minutes (1800 seconds)
-  const SESSION_TIMEOUT = 30 * 60 * 1000;
-  const WARNING_TIME = 27 * 60 * 1000; // Warn at 27 minutes
+  // Session timeout: 60 minutes (3600 seconds)
+  const SESSION_TIMEOUT = 60 * 60 * 1000;
+  const WARNING_TIME = 57 * 60 * 1000; // Warn at 57 minutes
 
   const resetTimeout = React.useCallback(() => {
     sessionStorage.setItem("lastActivity", Date.now().toString());
@@ -198,6 +198,21 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
 
   type BlogFormData = z.infer<typeof blogSchema>;
 
+  const defaultValues = React.useMemo<BlogFormData>(
+    () => ({
+      title: "",
+      date: "",
+      excerpt: "",
+      image: "",
+      category: "",
+      featured: false,
+      content: "",
+      status: "draft",
+      scheduledAt: "",
+    }),
+    []
+  );
+
   const {
     register,
     handleSubmit,
@@ -207,7 +222,19 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     formState: { errors },
   } = useForm<BlogFormData>({
     resolver: zodResolver(blogSchema),
+    defaultValues,
   });
+
+  const resetForm = React.useCallback(() => {
+    reset(defaultValues);
+    setEditingPost(null);
+    setImageMode("url");
+    setUploadError("");
+    setUploadingImage(false);
+    if (uploadInputRef.current) {
+      uploadInputRef.current.value = "";
+    }
+  }, [defaultValues, reset, setEditingPost, setImageMode, setUploadError, setUploadingImage]);
 
   const handleImageUpload = async (file: File) => {
     setUploadError("");
@@ -327,8 +354,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
         toast({ title: "Post Created", description: `"${data.title}" has been saved.` });
       }
 
-      reset();
-      setEditingPost(null);
+      resetForm();
 
       const refreshed = await getStoredPosts();
       setPosts(refreshed);
@@ -370,8 +396,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       const refreshed = await getStoredPosts();
       setPosts(refreshed);
 
-      reset();
-      setEditingPost(null);
+      resetForm();
       setSelectedPostIds(new Set());
     } catch (err) {
       console.error("handleDeleteConfirmed error:", err);
@@ -396,8 +421,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       const refreshed = await getStoredPosts();
       setPosts(refreshed);
       setSelectedPostIds(new Set());
-      reset();
-      setEditingPost(null);
+      resetForm();
     } catch (err) {
       console.error("handleBulkDelete error:", err);
       toast({ title: "Bulk Delete Failed", description: "An unexpected error occurred.", variant: "destructive" });
@@ -470,6 +494,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
 
   const totalPosts = posts.length;
   const publishedPosts = posts.filter((p) => p.status === "published").length;
+  const draftPosts = posts.filter((p) => p.status === "draft").length;
 
   return (
     <div
@@ -508,6 +533,10 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 <div>
                   <p className="text-muted-foreground">Published</p>
                   <p className="text-2xl font-semibold text-elegant-primary">{publishedPosts}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Drafts</p>
+                  <p className="text-2xl font-semibold text-orange-500">{draftPosts}</p>
                 </div>
               </div>
             </div>
@@ -839,8 +868,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  reset();
-                  setEditingPost(null);
+                  resetForm();
                 }}
               >
                 Clear Form
