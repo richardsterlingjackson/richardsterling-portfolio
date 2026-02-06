@@ -132,6 +132,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [imageMode, setImageMode] = React.useState<"url" | "upload">("url");
   const [uploadingImage, setUploadingImage] = React.useState(false);
   const [uploadError, setUploadError] = React.useState("");
+  const uploadInputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Session timeout: 30 minutes (1800 seconds)
   const SESSION_TIMEOUT = 30 * 60 * 1000;
@@ -244,6 +245,13 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       setUploadingImage(false);
     }
   };
+
+  const handleSelectUploadMode = React.useCallback(() => {
+    setImageMode("upload");
+    requestAnimationFrame(() => {
+      uploadInputRef.current?.click();
+    });
+  }, []);
 
   React.useEffect(() => {
     async function load() {
@@ -728,7 +736,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               </button>
               <button
                 type="button"
-                onClick={() => setImageMode("upload")}
+                onClick={handleSelectUploadMode}
                 className={`px-2 py-1 rounded border ${imageMode === "upload" ? "border-elegant-primary text-elegant-primary" : "border-border text-muted-foreground"}`}
               >
                 Upload Image
@@ -742,6 +750,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 <input type="hidden" {...register("image")} />
                 <div className="flex items-center gap-3">
                   <Input
+                    ref={uploadInputRef}
                     type="file"
                     accept="image/*"
                     onChange={(e) => {
