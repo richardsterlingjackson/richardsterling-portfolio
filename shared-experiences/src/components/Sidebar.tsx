@@ -220,7 +220,6 @@ export default function Sidebar() {
                   to={`/posts/${post.slug}`}
                   className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary flex items-center gap-2 line-clamp-2"
                 >
-                  {post.featured && <span className="text-xs shrink-0">⭐</span>}
                   {post.title}
                 </Link>
               </li>
@@ -247,7 +246,6 @@ export default function Sidebar() {
                   to={`/posts/${post.slug}`}
                   className="hover:underline focus:outline-none focus:ring-2 focus:ring-elegant-primary flex items-center gap-2 line-clamp-2"
                 >
-                  {post.featured && <span className="text-xs shrink-0">⭐</span>}
                   {post.title}
                 </Link>
               </li>
