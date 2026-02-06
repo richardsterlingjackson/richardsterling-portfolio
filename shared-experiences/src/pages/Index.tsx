@@ -27,8 +27,11 @@ export default function Index() {
   const featured = useMemo(() => posts.find((p) => p.featured), [posts]);
 
   const recentPosts = useMemo(
-    () => posts.filter((p) => p.status === "published"),
-    [posts]
+    () =>
+      posts.filter(
+        (p) => p.status === "published" && (!featured || p.id !== featured.id)
+      ),
+    [posts, featured]
   );
 
   return (
