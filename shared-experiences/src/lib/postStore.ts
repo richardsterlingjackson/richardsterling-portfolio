@@ -10,7 +10,7 @@ function getAdminToken(): string | null {
 
 export type NewPostInput = Pick<
   BlogPost,
-  "title" | "date" | "excerpt" | "image" | "category" | "featured" | "content" | "status"
+  "title" | "date" | "excerpt" | "image" | "category" | "featured" | "mainFeatured" | "content" | "status"
 >;
 
 export type NewPostPayload = NewPostInput & {
@@ -25,6 +25,7 @@ export type UpdatePostInput = {
   image: string;
   category: string;
   featured: boolean;
+  mainFeatured: boolean;
   content: string;
   status: "draft" | "published";
   slug: string;

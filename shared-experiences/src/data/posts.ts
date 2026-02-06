@@ -12,6 +12,7 @@ export type BlogPost = {
   image: string;
   category: string;
   featured: boolean; // always boolean, never optional
+  mainFeatured: boolean; // marks the primary featured post
   content: string;
   status: "draft" | "published";
   createdAt: string | null; // DB returns null when empty

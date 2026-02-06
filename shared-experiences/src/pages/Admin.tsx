@@ -134,7 +134,6 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [uploadingImage, setUploadingImage] = React.useState(false);
   const [uploadError, setUploadError] = React.useState("");
   const uploadInputRef = React.useRef<HTMLInputElement | null>(null);
-  const [mainFeaturedId, setMainFeaturedId] = React.useState<string | null>(null);
   const [restoreFile, setRestoreFile] = React.useState<File | null>(null);
   const [restoring, setRestoring] = React.useState(false);
   const [backupError, setBackupError] = React.useState("");
@@ -300,17 +299,11 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     load();
   }, []);
 
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = localStorage.getItem("mainFeaturedPostId");
-    setMainFeaturedId(stored);
-  }, []);
-
   const handleBackupDownload = async () => {
     setBackupError("");
     try {
       const data = await getStoredPosts();
-      const mainFeaturedSlug = data.find((post) => post.id === mainFeaturedId)?.slug ?? null;
+      const mainFeaturedSlug = data.find((post) => post.mainFeatured)?.slug ?? null;
       const payload = {
         version: 1,
         exportedAt: new Date().toISOString(),
@@ -367,6 +360,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       content: data.content as string,
       status,
       featured: Boolean(data.featured),
+      mainFeatured: Boolean(data.mainFeatured),
       scheduledAt: typeof data.scheduledAt === "string" ? data.scheduledAt : null,
       slug: typeof data.slug === "string" ? data.slug : undefined,
     };
@@ -416,22 +410,6 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       setPosts(refreshed);
       setSelectedPostIds(new Set());
 
-      if (mainFeaturedSlug) {
-        const nextMain = refreshed.find((post) => post.slug === mainFeaturedSlug);
-        const nextId = nextMain?.id ?? null;
-        if (typeof window !== "undefined") {
-          if (nextId) {
-            localStorage.setItem("mainFeaturedPostId", nextId);
-          } else {
-            localStorage.removeItem("mainFeaturedPostId");
-          }
-        }
-        setMainFeaturedId(nextId);
-      } else if (typeof window !== "undefined") {
-        localStorage.removeItem("mainFeaturedPostId");
-        setMainFeaturedId(null);
-      }
-
       if (deleteFailures || createFailures || skipped) {
         toast({
           title: "Restore completed with issues",
@@ -479,6 +457,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           content: data.content,
           status: data.status,
           featured: !!data.featured,
+          mainFeatured: !!(editingPost.mainFeatured && data.featured && data.status === "published"),
           slug: editingPost.slug ?? slugifyTitle(data.title),
           scheduledAt: data.scheduledAt || null,
         };
@@ -500,6 +479,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           content: data.content,
           status: data.status,
           featured: !!data.featured,
+          mainFeatured: false,
         };
 
         const created = await savePost({
@@ -536,6 +516,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       image: post.image,
       category: post.category,
       featured: post.featured ?? false,
+      mainFeatured: post.mainFeatured ?? false,
       content: post.content,
       status: post.status,
       scheduledAt: post.scheduledAt ?? "",
@@ -604,6 +585,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           content: post.content,
           status: newStatus,
           featured: post.featured ?? false,
+          mainFeatured: newStatus === "published" ? post.mainFeatured ?? false : false,
           slug: post.slug,
         };
 
@@ -656,17 +638,52 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const publishedPosts = posts.filter((p) => p.status === "published").length;
   const draftPosts = posts.filter((p) => p.status === "draft").length;
 
+  const setMainFeatured = async (targetId: string) => {
+    let failCount = 0;
+    for (const post of posts) {
+      const nextMain = post.id === targetId;
+      if (post.mainFeatured === nextMain) continue;
+
+      const payload: UpdatePostInput = {
+        title: post.title,
+        date: post.date,
+        excerpt: post.excerpt,
+        image: post.image,
+        category: post.category,
+        content: post.content,
+        status: post.status,
+        featured: post.featured ?? false,
+        mainFeatured: nextMain,
+        slug: post.slug || slugifyTitle(post.title),
+        scheduledAt: post.scheduledAt ?? null,
+      };
+
+      const ok = await updatePost(post.id, payload);
+      if (!ok) failCount++;
+    }
+
+    if (failCount > 0) {
+      toast({
+        title: "Feature update failed",
+        description: "Some posts did not update.",
+        variant: "destructive",
+      });
+    } else {
+      const selected = posts.find((post) => post.id === targetId);
+      toast({ title: "Main feature set", description: `"${selected?.title}" will show on the home page.` });
+    }
+
+    const refreshed = await getStoredPosts();
+    setPosts(refreshed);
+  };
+
   const handleSetMainFeatured = (post: BlogPost) => {
     if (!post.featured || post.status !== "published") {
       toast({ title: "Make it featured", description: "Only featured, published posts can be the main feature.", variant: "destructive" });
       return;
     }
 
-    if (typeof window !== "undefined") {
-      localStorage.setItem("mainFeaturedPostId", post.id);
-    }
-    setMainFeaturedId(post.id);
-    toast({ title: "Main feature set", description: `"${post.title}" will show on the home page.` });
+    setMainFeatured(post.id);
   };
 
   return (
@@ -1185,7 +1202,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="font-medium text-elegant-text">{post.title}</h4>
-                        {post.id === mainFeaturedId && (
+                        {post.mainFeatured && (
                           <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-full">
                             Main Feature
                           </span>
@@ -1212,7 +1229,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                               : ""
                           }
                         >
-                          {post.id === mainFeaturedId ? "⭐ Main Feature" : "⭐ Set Main"}
+                          {post.mainFeatured ? "⭐ Main Feature" : "⭐ Set Main"}
                         </Button>
                       )}
 

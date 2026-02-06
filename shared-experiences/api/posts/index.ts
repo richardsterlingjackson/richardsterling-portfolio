@@ -15,6 +15,7 @@ type DbRow = {
   image: string;
   category: string;
   featured: boolean;
+  main_featured: boolean | null;
   content: string;
   status: "draft" | "published";
   created_at: string | null;
@@ -32,6 +33,7 @@ type CreateBody = {
   image: string;
   category: string;
   featured: boolean;
+  mainFeatured?: boolean;
   content: string;
   status: "draft" | "published";
   slug?: string;
@@ -45,6 +47,7 @@ type UpdateBody = {
   image: string;
   category: string;
   featured: boolean;
+  mainFeatured?: boolean;
   content: string;
   status: "draft" | "published";
   slug?: string;
@@ -61,6 +64,7 @@ function mapRow(row: DbRow) {
     image: row.image,
     category: row.category,
     featured: row.featured,
+    mainFeatured: row.main_featured ?? false,
     content: row.content,
     status: row.status,
     createdAt: row.created_at,
@@ -170,6 +174,7 @@ export async function PUT(req: Request) {
           image = ${body.image},
           category = ${body.category},
           featured = ${body.featured ?? false},
+          main_featured = ${body.mainFeatured ?? false},
           content = ${body.content},
           status = ${shouldSchedule ? "draft" : body.status},
           slug = ${slug},
@@ -181,8 +186,8 @@ export async function PUT(req: Request) {
       `) as DbRow[];
     } catch (err: any) {
       const message = err?.message || "";
-      if (message.includes("scheduled_at")) {
-        console.warn("scheduled_at column missing; updating without scheduling.");
+      if (message.includes("scheduled_at") || message.includes("main_featured")) {
+        console.warn("Missing posts columns; updating without scheduling/main_featured.");
         result = (await sql`
           UPDATE posts SET
             title = ${body.title},
@@ -320,6 +325,7 @@ export async function POST(req: Request) {
           image,
           category,
           featured,
+          main_featured,
           content,
           status,
           slug,
@@ -337,6 +343,7 @@ export async function POST(req: Request) {
           ${body.image},
           ${body.category},
           ${body.featured ?? false},
+          ${body.mainFeatured ?? false},
           ${body.content},
           ${shouldSchedule ? "draft" : body.status},
           ${slug},
@@ -350,7 +357,7 @@ export async function POST(req: Request) {
       `;
     } catch (err: any) {
       const message = err?.message || "";
-      if (message.includes("scheduled_at") || message.includes("likes_count") || message.includes("reads_count")) {
+      if (message.includes("main_featured") || message.includes("scheduled_at") || message.includes("likes_count") || message.includes("reads_count")) {
         console.warn("Missing posts columns; inserting without scheduling/likes/reads.");
         await sql`
           INSERT INTO posts (
@@ -405,6 +412,7 @@ export async function POST(req: Request) {
         image: post.image,
         category: post.category,
         featured: post.featured,
+        mainFeatured: post.mainFeatured,
         content: post.content,
         status: post.status,
       } as any).catch((err) => {

@@ -44,6 +44,7 @@ export async function GET(req: Request) {
         image: row.image,
         category: row.category,
         featured: row.featured,
+        mainFeatured: row.main_featured ?? false,
         content: row.content,
         status: row.status,
       } as any;

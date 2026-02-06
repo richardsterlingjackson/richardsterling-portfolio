@@ -15,7 +15,12 @@ const DATA_PATH = path.resolve(__dirname, '../api/posts/dev_posts.json');
 function readData() {
   try {
     const raw = fs.readFileSync(DATA_PATH, 'utf8');
-    return JSON.parse(raw);
+    const rows = JSON.parse(raw);
+    if (!Array.isArray(rows)) return [];
+    return rows.map((row) => ({
+      ...row,
+      mainFeatured: row.mainFeatured ?? row.main_featured ?? false,
+    }));
   } catch (e) {
     return [];
   }
@@ -45,6 +50,7 @@ app.post('/api/posts', (req, res) => {
     image: body.image,
     category: body.category,
     featured: body.featured ?? false,
+    mainFeatured: body.mainFeatured ?? false,
     content: body.content,
     status: body.status,
     created_at: now,
@@ -77,6 +83,7 @@ app.put('/api/posts/:id', (req, res) => {
     image: body.image,
     category: body.category,
     featured: body.featured ?? false,
+    mainFeatured: body.mainFeatured ?? false,
     content: body.content,
     status: body.status,
     slug: body.slug,
@@ -108,6 +115,7 @@ app.put('/api/posts', (req, res) => {
     image: body.image,
     category: body.category,
     featured: body.featured ?? false,
+    mainFeatured: body.mainFeatured ?? false,
     content: body.content,
     status: body.status,
     slug: body.slug,
