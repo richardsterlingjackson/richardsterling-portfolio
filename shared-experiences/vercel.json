@@ -12,7 +12,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": "(?i)(facebookexternalhit|facebot|twitterbot|linkedinbot|slackbot|discordbot|whatsapp|telegrambot|pinterest|googlebot)"
+          "value": ".*([Ff]acebookexternalhit|[Ff]acebot|[Ff]acebook|[Tt]witterbot|[Ll]inkedinbot|[Ss]lackbot|[Dd]iscordbot|[Ww]hatsapp|[Tt]elegrambot|[Pp]interest|[Gg]ooglebot).*"
         }
       ],
       "destination": "/api/prerender?slug=:slug"
