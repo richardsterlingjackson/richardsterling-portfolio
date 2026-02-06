@@ -719,7 +719,17 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               <div className="border rounded p-4 bg-muted/30">
                 <h3 className="text-sm font-semibold mb-2">Preview</h3>
                 <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>{watch("content")}</ReactMarkdown>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkBreaks]}
+                    components={{
+                      p: ({ children }) => (
+                        <p className="mb-4 last:mb-0">{children}</p>
+                      ),
+                      br: () => <span className="block h-4" />,
+                    }}
+                  >
+                    {watch("content")}
+                  </ReactMarkdown>
                 </div>
               </div>
             </div>
