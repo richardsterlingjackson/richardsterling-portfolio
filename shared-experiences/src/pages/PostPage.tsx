@@ -150,8 +150,7 @@ export default function PostPage() {
       ? `${window.location.origin}/posts/${encodeURIComponent(post.slug)}`
       : window.location.href;
     const text = `Check out: "${post?.title}" by @richardsterling`;
-    const shareUrl =
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     const win = window.open(shareUrl, "_blank", "noopener,noreferrer");
     if (win) win.opener = null;
   };
