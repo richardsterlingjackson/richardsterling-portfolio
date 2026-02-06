@@ -57,7 +57,14 @@ export function SearchResults() {
     return posts.filter((post) => {
       const title = post.title?.toLowerCase() || "";
       const content = post.content?.toLowerCase() || "";
-      return title.includes(query) || content.includes(query);
+      const excerpt = post.excerpt?.toLowerCase() || "";
+      const category = post.category?.toLowerCase() || "";
+      return (
+        title.includes(query) ||
+        excerpt.includes(query) ||
+        content.includes(query) ||
+        category.includes(query)
+      );
     });
   }, [posts, query]);
 
