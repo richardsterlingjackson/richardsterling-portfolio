@@ -22,6 +22,7 @@ type DbRow = {
   version: number | null;
   scheduled_at: string | null;
   likes_count: number | null;
+  reads_count: number | null;
 };
 
 type CreateBody = {
@@ -67,6 +68,7 @@ function mapRow(row: DbRow) {
     version: row.version,
     scheduledAt: row.scheduled_at,
     likesCount: row.likes_count ?? 0,
+    readsCount: row.reads_count ?? 0,
   };
 }
 
@@ -325,7 +327,8 @@ export async function POST(req: Request) {
           updated_at,
           version,
           scheduled_at,
-          likes_count
+          likes_count,
+          reads_count
         ) VALUES (
           ${id},
           ${body.title},
@@ -341,13 +344,14 @@ export async function POST(req: Request) {
           NOW(),
           1,
           ${shouldSchedule ? scheduledAt : null},
+          0,
           0
         )
       `;
     } catch (err: any) {
       const message = err?.message || "";
-      if (message.includes("scheduled_at") || message.includes("likes_count")) {
-        console.warn("Missing posts columns; inserting without scheduling/likes.");
+      if (message.includes("scheduled_at") || message.includes("likes_count") || message.includes("reads_count")) {
+        console.warn("Missing posts columns; inserting without scheduling/likes/reads.");
         await sql`
           INSERT INTO posts (
             id,

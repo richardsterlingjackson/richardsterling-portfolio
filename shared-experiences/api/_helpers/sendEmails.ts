@@ -1,10 +1,26 @@
 import { sql } from "../posts/db.js";
 import { Resend } from "resend";
+import crypto from "crypto";
 import type { BlogPost } from "../../src/data/posts";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
+
+function getSiteUrl(): string {
+  const raw = process.env.VERCEL_URL || "";
+  if (!raw) return "https://shared-experiences.com";
+  return raw.startsWith("http") ? raw : `https://${raw}`;
+}
+
+function buildUnsubscribeUrl(email: string, category?: string): string {
+  const secret = process.env.UNSUBSCRIBE_SECRET || "";
+  if (!secret) return "";
+  const token = crypto.createHmac("sha256", secret).update(email).digest("hex");
+  const base = getSiteUrl();
+  const categoryParam = category ? `&category=${encodeURIComponent(category)}` : "";
+  return `${base}/api/unsubscribe?email=${encodeURIComponent(email)}&token=${token}${categoryParam}`;
+}
 
 /**
  * Send emails to all subscribers of a category when a new post is published
@@ -43,7 +59,9 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
     console.log(`Sending emails to ${subscribers.length} subscribers for ${post.category}...`);
 
     // Send email to each subscriber
-    const emailPromises = subscribers.map((sub: any) =>
+    const emailPromises = subscribers.map((sub: any) => {
+      const unsubscribeCategoryUrl = buildUnsubscribeUrl(sub.email, sub.category);
+      const unsubscribeAllUrl = buildUnsubscribeUrl(sub.email, "all");
       resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL || "posts@yourdomain.com",
         to: sub.email,
@@ -70,10 +88,17 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
             <p style="font-size: 12px; color: #999;">
               You received this email because you subscribed to "${post.category}" posts.
             </p>
+            ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
+              <p style="font-size: 12px; color: #999;">
+                ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from ${sub.category}</a>` : ""}
+                ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
+                ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all</a>` : ""}
+              </p>
+            ` : ""}
           </div>
         `,
-      })
-    );
+      });
+    });
 
     const results = await Promise.all(emailPromises);
     console.log(`Sent ${results.length} emails for post: ${post.title}`);
@@ -114,7 +139,9 @@ export async function sendUpdateEmailToSubscribers(post: BlogPost) {
 
     console.log(`Sending update emails to ${subscribers.length} subscribers for ${post.category}...`);
 
-    const emailPromises = subscribers.map((sub: any) =>
+    const emailPromises = subscribers.map((sub: any) => {
+      const unsubscribeCategoryUrl = buildUnsubscribeUrl(sub.email, sub.category);
+      const unsubscribeAllUrl = buildUnsubscribeUrl(sub.email, "all");
       resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL || "posts@yourdomain.com",
         to: sub.email,
@@ -141,10 +168,17 @@ export async function sendUpdateEmailToSubscribers(post: BlogPost) {
             <p style="font-size: 12px; color: #999;">
               You received this email because you subscribed to "${post.category}" posts.
             </p>
+            ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
+              <p style="font-size: 12px; color: #999;">
+                ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from ${sub.category}</a>` : ""}
+                ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
+                ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all</a>` : ""}
+              </p>
+            ` : ""}
           </div>
         `,
-      })
-    );
+      });
+    });
 
     const results = await Promise.all(emailPromises);
     console.log(`Sent ${results.length} update emails for post: ${post.title}`);
@@ -165,6 +199,8 @@ export async function sendWelcomeEmail(email: string, category: string) {
       return;
     }
 
+    const unsubscribeCategoryUrl = buildUnsubscribeUrl(email, category);
+    const unsubscribeAllUrl = buildUnsubscribeUrl(email, "all");
     const result = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || "posts@yourdomain.com",
       to: email,
@@ -187,6 +223,13 @@ export async function sendWelcomeEmail(email: string, category: string) {
           <p style="font-size: 12px; color: #999;">
             © 2025 Shared Experiences. All rights reserved.
           </p>
+          ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
+            <p style="font-size: 12px; color: #999;">
+              ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from ${category}</a>` : ""}
+              ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
+              ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all</a>` : ""}
+            </p>
+          ` : ""}
         </div>
       `,
     });

@@ -23,6 +23,7 @@ export default function PostPage() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [liked, setLiked] = useState(false);
+  const [readsCount, setReadsCount] = useState(0);
 
   //
   // LOAD POST BY SLUG
@@ -38,6 +39,7 @@ export default function PostPage() {
         setPost(found);
         if (found) {
           setLikesCount(found.likesCount || 0);
+          setReadsCount(found.readsCount || 0);
           const storedLiked = localStorage.getItem(`liked_${found.id}`) === "1";
           setLiked(storedLiked);
         }
@@ -65,6 +67,27 @@ export default function PostPage() {
 
     loadPost();
   }, [postId]);
+
+  useEffect(() => {
+    if (!post) return;
+    const key = `read_${post.id}`;
+    if (sessionStorage.getItem(key)) return;
+
+    sessionStorage.setItem(key, "1");
+
+    fetch("/api/reads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId: post.id }),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.readsCount !== undefined) {
+          setReadsCount(data.readsCount);
+        }
+      })
+      .catch((err) => console.error("Read count failed:", err));
+  }, [post]);
 
   //
   // UPDATE DOCUMENT TITLE
@@ -289,6 +312,9 @@ export default function PostPage() {
               >
                 {copySuccess ? "✓ Copied!" : "Copy Link"}
               </Button>
+              <span className="text-xs text-muted-foreground">
+                {readsCount} reads
+              </span>
             </div>
 
             {/* Content */}
