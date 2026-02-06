@@ -6,6 +6,17 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/posts/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i)(facebookexternalhit|facebot|twitterbot|linkedinbot|slackbot|discordbot|whatsapp|telegrambot|pinterest|googlebot)"
+        }
+      ],
+      "destination": "/api/prerender?slug=:slug"
+    },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/" }
   ]

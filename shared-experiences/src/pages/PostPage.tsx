@@ -270,6 +270,11 @@ export default function PostPage() {
                 <span className="text-xs bg-muted px-2 py-1 rounded">
                   {calculateReadingTime(post.content)} min read
                 </span>
+                {post.featured && (
+                  <span className="text-xs bg-elegant-primary text-white px-2 py-1 rounded font-semibold uppercase tracking-wide">
+                    ⭐ Featured
+                  </span>
+                )}
               </div>
 
               <h1 className="text-4xl font-playfair font-bold text-elegant-text">
