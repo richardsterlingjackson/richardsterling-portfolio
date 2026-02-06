@@ -79,7 +79,7 @@ export default function Index() {
       <footer className="bg-card border-t border-border mt-16">
         <div className="container mx-auto px-4 py-8">
           <p className="text-center text-sm text-muted-foreground">
-            © 2025 shared-experiences. All rights reserved.
+            © 2025 Shared Experiences. All rights reserved.
           </p>
         </div>
       </footer>

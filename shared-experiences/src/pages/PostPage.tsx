@@ -15,6 +15,16 @@ function calculateReadingTime(text: string): number {
   return Math.ceil(wordCount / 200);
 }
 
+function formatPostDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export default function PostPage() {
   const { postId } = useParams();
   const [post, setPost] = useState<BlogPost | null>(null);
@@ -140,30 +150,28 @@ export default function PostPage() {
       ? `${window.location.origin}/posts/${encodeURIComponent(post.slug)}`
       : window.location.href;
     const text = `Check out: "${post?.title}" by @richardsterling`;
-    window.open(
+    const shareUrl =
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-      "_blank"
-    );
+    const win = window.open(shareUrl, "_blank", "noopener,noreferrer");
+    if (win) win.opener = null;
   };
 
   const shareToLinkedIn = () => {
     const url = post
       ? `${window.location.origin}/posts/${encodeURIComponent(post.slug)}`
       : window.location.href;
-    window.open(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-      "_blank"
-    );
+    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    const win = window.open(shareUrl, "_blank", "noopener,noreferrer");
+    if (win) win.opener = null;
   };
 
   const shareToFacebook = () => {
     const url = post
       ? `${window.location.origin}/posts/${encodeURIComponent(post.slug)}`
       : window.location.href;
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-      "_blank"
-    );
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    const win = window.open(shareUrl, "_blank", "noopener,noreferrer");
+    if (win) win.opener = null;
   };
 
   const handleLike = async () => {
@@ -261,7 +269,7 @@ export default function PostPage() {
             <div className="space-y-4">
               {/* Metadata: Date, Category, Reading Time */}
               <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                <time dateTime={post.date}>{post.date}</time>
+                <time dateTime={post.date}>{formatPostDate(post.date)}</time>
                 <span>•</span>
                 <span className="uppercase tracking-wide text-xs text-elegant-primary">
                   {post.category}
@@ -379,7 +387,7 @@ export default function PostPage() {
                           {relPost.title}
                         </h3>
                         <p className="text-xs text-muted-foreground">
-                          {relPost.date} • {calculateReadingTime(relPost.content)} min
+                          {formatPostDate(relPost.date)} • {calculateReadingTime(relPost.content)} min
                         </p>
                       </div>
                     </a>

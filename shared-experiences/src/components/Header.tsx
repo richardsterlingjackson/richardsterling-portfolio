@@ -9,9 +9,8 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isHome = location.pathname === "/";
   const isSearchPage = location.pathname === "/search";
-  const showSearch = isHome || isSearchPage;
+  const showSearch = true;
 
   //
   // PAGE TITLES

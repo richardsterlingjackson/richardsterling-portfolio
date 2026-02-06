@@ -26,6 +26,14 @@ function absoluteUrl(origin: string, url: string): string {
   return new URL(url, origin).toString();
 }
 
+function humanizeSlug(value: string): string {
+  return value
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const origin = url.origin;
@@ -47,7 +55,8 @@ export async function GET(req: Request) {
     }
   }
 
-  const title = post?.title || "Shared Experiences";
+  const fallbackTitle = slug ? humanizeSlug(slug) : "Shared Experiences";
+  const title = post?.title || fallbackTitle;
   const description = post?.excerpt || "Stories and reflections from Shared Experiences.";
   const category = post?.category || "";
   const pageUrl = slug ? `${origin}/posts/${encodeURIComponent(slug)}` : origin;
@@ -69,6 +78,10 @@ export async function GET(req: Request) {
     <meta property="og:type" content="article" />
     <meta property="og:url" content="${escapeHtml(pageUrl)}" />
     <meta property="og:image" content="${escapeHtml(ogImage)}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="${escapeHtml(title)}" />
+    <meta property="og:site_name" content="Shared Experiences" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escapeHtml(title)}" />
@@ -81,7 +94,7 @@ export async function GET(req: Request) {
 </html>`;
 
   return new Response(html, {
-    status: post && post.status === "published" ? 200 : 404,
+    status: 200,
     headers: { "Content-Type": "text/html; charset=utf-8" },
   });
 }
