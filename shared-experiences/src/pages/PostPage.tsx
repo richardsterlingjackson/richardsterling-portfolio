@@ -197,9 +197,8 @@ export default function PostPage() {
   };
 
   const pageUrl = typeof window !== "undefined" ? window.location.href : "";
-  const ogImageUrl = post
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category)}`
-    : "";
+  // Use Cloudinary image URL for og:image
+  const ogImageUrl = post && post.image ? post.image : "";
 
   //
   // LOADING STATE
