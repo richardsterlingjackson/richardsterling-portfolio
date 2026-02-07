@@ -1,4 +1,6 @@
-import { ImageResponse } from "@vercel/og";
+export const config = {
+  runtime: "edge",
+};
 
 const EMPTY_PNG_BASE64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2l2ZkAAAAASUVORK5CYII=";
@@ -41,6 +43,7 @@ export const runtime = "edge";
 
 export async function GET(req: Request) {
   try {
+    const { ImageResponse } = await import("@vercel/og");
     const { searchParams } = new URL(req.url);
     const title = searchParams.get("title") || "Shared Experiences";
     const category = searchParams.get("category") || "";
