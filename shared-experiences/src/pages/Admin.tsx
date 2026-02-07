@@ -119,6 +119,65 @@ export default function Admin() {
 }
 
 export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired: () => void; onLogout: () => void }) {
+    // Bulk delete selected posts
+    const handleBulkDelete = async () => {
+      try {
+        let failCount = 0;
+        for (const id of Array.from(selectedPostIds)) {
+          const ok = await deletePost(id);
+          if (!ok) failCount++;
+        }
+        const successCount = selectedPostIds.size - failCount;
+        toast({
+          title: `Deleted ${successCount} post${successCount !== 1 ? "s" : ""}`,
+          description: failCount > 0 ? `Failed to delete ${failCount} post${failCount !== 1 ? "s" : ""}.` : undefined,
+        });
+        const refreshed = await getStoredPosts();
+        setPosts(refreshed);
+        setSelectedPostIds(new Set());
+        resetForm();
+      } catch (err) {
+        console.error("handleBulkDelete error:", err);
+        toast({ title: "Bulk Delete Failed", description: "An unexpected error occurred.", variant: "destructive" });
+      }
+    };
+
+    // Bulk status change for selected posts
+    const handleBulkStatusChange = async (newStatus: "draft" | "published") => {
+      try {
+        let failCount = 0;
+        for (const id of Array.from(selectedPostIds)) {
+          const post = posts.find((p) => p.id === id);
+          if (!post) continue;
+          const payload: UpdatePostInput = {
+            title: post.title,
+            date: post.date,
+            excerpt: post.excerpt,
+            image: post.image,
+            category: post.category,
+            content: post.content,
+            status: newStatus,
+            featured: post.featured ?? false,
+            mainFeatured: newStatus === "published" ? post.mainFeatured ?? false : false,
+            slug: post.slug,
+          };
+          const ok = await updatePost(id, payload);
+          if (!ok) failCount++;
+        }
+        const successCount = selectedPostIds.size - failCount;
+        const action = newStatus === "published" ? "Published" : "Drafted";
+        toast({
+          title: `${action} ${successCount} post${successCount !== 1 ? "s" : ""}`,
+          description: failCount > 0 ? `Failed to update ${failCount} post${failCount !== 1 ? "s" : ""}.` : undefined,
+        });
+        const refreshed = await getStoredPosts();
+        setPosts(refreshed);
+        setSelectedPostIds(new Set());
+      } catch (err) {
+        console.error("handleBulkStatusChange error:", err);
+        toast({ title: "Bulk Update Failed", description: "An unexpected error occurred.", variant: "destructive" });
+      }
+    };
   React.useEffect(() => {
     document.title = "Admin – Shared Experiences – Richard Sterling Jackson";
   }, []);
@@ -380,7 +439,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     setRestoring(true);
     try {
       const raw = await restoreFile.text();
-      const { posts: backupPosts, mainFeaturedSlug } = parseBackup(raw);
+      const { posts: backupPosts } = parseBackup(raw);
 
       if (!backupPosts.length) {
         setBackupError("Backup file contains no posts.");
@@ -533,81 +592,14 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
         toast({ title: "Delete Failed", description: "Unable to delete post. Check console for details.", variant: "destructive" });
         return;
       }
-
       toast({ title: "Post Deleted", description: "The post has been removed." });
-
       const refreshed = await getStoredPosts();
       setPosts(refreshed);
-
       resetForm();
       setSelectedPostIds(new Set());
     } catch (err) {
       console.error("handleDeleteConfirmed error:", err);
       toast({ title: "Delete Failed", description: "An unexpected error occurred.", variant: "destructive" });
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    try {
-      let failCount = 0;
-      for (const id of Array.from(selectedPostIds)) {
-        const ok = await deletePost(id);
-        if (!ok) failCount++;
-      }
-
-      const successCount = selectedPostIds.size - failCount;
-      toast({
-        title: `Deleted ${successCount} post${successCount !== 1 ? "s" : ""}`,
-        description: failCount > 0 ? `Failed to delete ${failCount} post${failCount !== 1 ? "s" : ""}.` : undefined,
-      });
-
-      const refreshed = await getStoredPosts();
-      setPosts(refreshed);
-      setSelectedPostIds(new Set());
-      resetForm();
-    } catch (err) {
-      console.error("handleBulkDelete error:", err);
-      toast({ title: "Bulk Delete Failed", description: "An unexpected error occurred.", variant: "destructive" });
-    }
-  };
-
-  const handleBulkStatusChange = async (newStatus: "draft" | "published") => {
-    try {
-      let failCount = 0;
-      for (const id of Array.from(selectedPostIds)) {
-        const post = posts.find((p) => p.id === id);
-        if (!post) continue;
-
-        const payload: UpdatePostInput = {
-          title: post.title,
-          date: post.date,
-          excerpt: post.excerpt,
-          image: post.image,
-          category: post.category,
-          content: post.content,
-          status: newStatus,
-          featured: post.featured ?? false,
-          mainFeatured: newStatus === "published" ? post.mainFeatured ?? false : false,
-          slug: post.slug,
-        };
-
-        const ok = await updatePost(id, payload);
-        if (!ok) failCount++;
-      }
-
-      const successCount = selectedPostIds.size - failCount;
-      const action = newStatus === "published" ? "Published" : "Drafted";
-      toast({
-        title: `${action} ${successCount} post${successCount !== 1 ? "s" : ""}`,
-        description: failCount > 0 ? `Failed to update ${failCount} post${failCount !== 1 ? "s" : ""}.` : undefined,
-      });
-
-      const refreshed = await getStoredPosts();
-      setPosts(refreshed);
-      setSelectedPostIds(new Set());
-    } catch (err) {
-      console.error("handleBulkStatusChange error:", err);
-      toast({ title: "Bulk Update Failed", description: "An unexpected error occurred.", variant: "destructive" });
     }
   };
 

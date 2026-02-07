@@ -1,3 +1,26 @@
+// Atomically set only one post as main featured
+export async function setMainFeaturedPost(postId: string): Promise<boolean> {
+  try {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const token = getAdminToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch("/api/posts/set-main-featured", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ postId }),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      console.error("Failed to set main featured post:", res.status, res.statusText);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("Error setting main featured post:", err);
+    return false;
+  }
+}
 import type { BlogPost } from "@/data/posts";
 
 const API = "/api/posts";
