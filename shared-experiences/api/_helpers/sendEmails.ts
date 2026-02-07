@@ -240,25 +240,16 @@ export async function sendWelcomeEmail(email: string, category: string) {
             Visit Shared Experiences
           </a>
           <hr style="margin-top: 32px; border: none; border-top: 1px solid #eee;">
-          <p style="font-size: 12px; color: #999;">
-            © 2025 Shared Experiences. All rights reserved.
-          </p>
-          ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
-            <p style="font-size: 12px; color: #999;">
-              ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from post category</a>` : ""}
-              ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
-              ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
-            </p>
-          ` : ""}
-            <p style="font-size: 10px; color: #999;">
-              © 2025 Shared Experiences. All rights reserved.
-            </p>
+            
             ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
               <p style="font-size: 10px; color: #999; margin-top: 4px;">
-                ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from post category</a>` : ""}
+                ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from ${category} </a>` : ""}
                 ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
                 ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
               </p>
+              <p style="font-size: 10px; color: #999;">
+              © 2025 Shared Experiences. All rights reserved.
+            </p>
             ` : ""}
         </div>
       `,
