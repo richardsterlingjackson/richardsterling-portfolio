@@ -641,24 +641,46 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const draftPosts = posts.filter((p) => p.status === "draft").length;
 
   const setMainFeatured = async (targetId: string) => {
-    // Only update the selected post to mainFeatured: true, leave others unchanged
+    // 1. Set mainFeatured: false for all posts that are currently mainFeatured (except the new one)
+    const updates = posts
+      .filter((p) => p.mainFeatured && p.id !== targetId)
+      .map((p) =>
+        updatePost(p.id, {
+          title: p.title,
+          date: p.date,
+          excerpt: p.excerpt,
+          image: p.image,
+          category: p.category,
+          content: p.content,
+          status: p.status,
+          featured: p.featured ?? false,
+          mainFeatured: false,
+          slug: p.slug || slugifyTitle(p.title),
+          scheduledAt: p.scheduledAt ?? null,
+        })
+      );
+
+    // 2. Set mainFeatured: true for the selected post
     const post = posts.find((p) => p.id === targetId);
     if (!post) return;
-    const payload = {
-      title: post.title,
-      date: post.date,
-      excerpt: post.excerpt,
-      image: post.image,
-      category: post.category,
-      content: post.content,
-      status: post.status,
-      featured: post.featured ?? false,
-      mainFeatured: true,
-      slug: post.slug || slugifyTitle(post.title),
-      scheduledAt: post.scheduledAt ?? null,
-    };
-    const ok = await updatePost(post.id, payload);
-    if (!ok) {
+    updates.push(
+      updatePost(post.id, {
+        title: post.title,
+        date: post.date,
+        excerpt: post.excerpt,
+        image: post.image,
+        category: post.category,
+        content: post.content,
+        status: post.status,
+        featured: post.featured ?? false,
+        mainFeatured: true,
+        slug: post.slug || slugifyTitle(post.title),
+        scheduledAt: post.scheduledAt ?? null,
+      })
+    );
+
+    const results = await Promise.all(updates);
+    if (results.some((r) => !r)) {
       toast({ title: "Feature update failed", description: "Could not update main feature.", variant: "destructive" });
     } else {
       toast({ title: "Main feature set", description: `"${post.title}" will show on the home page.` });
