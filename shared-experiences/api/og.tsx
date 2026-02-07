@@ -10,7 +10,6 @@ const EMPTY_PNG = Buffer.from(
 export const runtime = "edge";
 
 
-export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const title = searchParams.get("title") || "Shared Experiences";
@@ -53,19 +52,17 @@ export async function GET(req: Request) {
       }
     );
   } catch (err: any) {
-    // Always return a valid PNG image, even on error
-    return new Response(EMPTY_PNG, {
-      status: 200,
-      headers: {
-        "Content-Type": "image/png",
-        "Cache-Control": "public, max-age=60",
-      },
-    });
+    console.error("OG image generation error:", err);
+    // Redirect to a static fallback PNG (replace with your own Cloudinary URL)
+    return Response.redirect(
+      "https://res.cloudinary.com/<your-cloud>/image/upload/v0000000/fallback.png",
+      302
+    );
   }
 }
 
 // Facebook and other bots may send HEAD requests. Always return a valid PNG.
-export async function HEAD() {
+export async function HEAD(req: Request) {
   return new Response(EMPTY_PNG, {
     status: 200,
     headers: {
