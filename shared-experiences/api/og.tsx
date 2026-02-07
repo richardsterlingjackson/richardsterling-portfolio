@@ -1,15 +1,27 @@
-
 import { ImageResponse } from "@vercel/og";
 
-// 1x1 transparent PNG (base64)
-const EMPTY_PNG = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2l2ZkAAAAASUVORK5CYII=",
-  "base64"
-);
+const EMPTY_PNG_BASE64 =
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2l2ZkAAAAASUVORK5CYII=";
+
+function base64ToBytes(b64: string): Uint8Array {
+  // Use Buffer if available (Node), otherwise use atob (edge environments / browsers)
+  if (typeof Buffer !== "undefined" && typeof Buffer.from === "function") {
+    return Buffer.from(b64, "base64");
+  }
+  const binary = typeof atob === "function" ? atob(b64) : globalThis.atob(b64);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+const EMPTY_PNG = base64ToBytes(EMPTY_PNG_BASE64);
 
 export const runtime = "edge";
 
-
+export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const title = searchParams.get("title") || "Shared Experiences";
@@ -53,11 +65,14 @@ export const runtime = "edge";
     );
   } catch (err: any) {
     console.error("OG image generation error:", err);
-    // Redirect to a static fallback PNG (replace with your own Cloudinary URL)
-    return Response.redirect(
-      "https://res.cloudinary.com/<your-cloud>/image/upload/v0000000/fallback.png",
-      302
-    );
+    // Return a tiny valid PNG inline so scrapers always get an image content type
+    return new Response(EMPTY_PNG, {
+      status: 200,
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=60",
+      },
+    });
   }
 }
 
