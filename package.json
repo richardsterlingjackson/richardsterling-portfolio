@@ -1,0 +1,12 @@
+{
+  "name": "richardsterling-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "bun run build || vite build"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
