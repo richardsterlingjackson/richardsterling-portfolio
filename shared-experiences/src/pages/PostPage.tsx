@@ -328,6 +328,7 @@ export default function PostPage() {
                 size="sm"
                 onClick={shareToFacebook}
                 className="text-xs sm:text-sm"
+                title="Share to your Facebook feed"
               >
                 Share on Facebook
               </Button>
@@ -336,6 +337,7 @@ export default function PostPage() {
                 size="sm"
                 onClick={handleCopyLink}
                 className="text-xs sm:text-sm"
+                title="Copy link. Paste in a Facebook group or anywhere to share."
               >
                 {copySuccess ? "✓ Copied!" : "Copy Link"}
               </Button>
@@ -343,6 +345,9 @@ export default function PostPage() {
                 {readsCount} reads
               </span>
             </div>
+            <p className="text-xs text-muted-foreground -mt-2">
+              To share in a Facebook group, use <strong>Copy Link</strong> and paste the link in your group.
+            </p>
 
             {/* Content */}
             <div className="prose prose-sm text-elegant-text">

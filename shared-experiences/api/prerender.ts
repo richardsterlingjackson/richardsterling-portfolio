@@ -20,12 +20,6 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function absoluteUrl(origin: string, url: string): string {
-  if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return new URL(url, origin).toString();
-}
-
 function humanizeSlug(value: string): string {
   return value
     .replace(/[-_]+/g, " ")
@@ -61,8 +55,8 @@ export async function GET(req: Request) {
   const category = post?.category || "";
   const pageUrl = slug ? `${origin}/posts/${encodeURIComponent(slug)}` : origin;
 
-  const imageFallback = `${origin}/api/og?title=${encodeURIComponent(title)}&category=${encodeURIComponent(category)}`;
-  const ogImage = post?.image ? absoluteUrl(origin, post.image) : imageFallback;
+  // Use our dynamic OG image so Facebook always gets a crawlable preview (post images can be blocked or fail for crawlers).
+  const ogImage = `${origin}/api/og?title=${encodeURIComponent(title)}&category=${encodeURIComponent(category)}`;
 
   const html = `<!doctype html>
 <html lang="en">
