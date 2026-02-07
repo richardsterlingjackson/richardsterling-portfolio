@@ -201,6 +201,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     image: z.string().url(),
     category: z.string().min(1),
     featured: z.boolean().optional(),
+    mainFeatured: z.boolean().optional(),
     content: z.string().min(20),
     status: z.enum(["draft", "published"]),
     scheduledAt: z.string().optional(),
@@ -216,6 +217,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       image: "",
       category: "",
       featured: false,
+      mainFeatured: false,
       content: "",
       status: "draft",
       scheduledAt: "",
@@ -639,42 +641,30 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const draftPosts = posts.filter((p) => p.status === "draft").length;
 
   const setMainFeatured = async (targetId: string) => {
-    let failCount = 0;
-    for (const post of posts) {
-      const nextMain = post.id === targetId;
-      if (post.mainFeatured === nextMain) continue;
-
-      const payload: UpdatePostInput = {
-        title: post.title,
-        date: post.date,
-        excerpt: post.excerpt,
-        image: post.image,
-        category: post.category,
-        content: post.content,
-        status: post.status,
-        featured: post.featured ?? false,
-        mainFeatured: nextMain,
-        slug: post.slug || slugifyTitle(post.title),
-        scheduledAt: post.scheduledAt ?? null,
-      };
-
-      const ok = await updatePost(post.id, payload);
-      if (!ok) failCount++;
-    }
-
-    if (failCount > 0) {
-      toast({
-        title: "Feature update failed",
-        description: "Some posts did not update.",
-        variant: "destructive",
-      });
+    // Only update the selected post to mainFeatured: true, leave others unchanged
+    const post = posts.find((p) => p.id === targetId);
+    if (!post) return;
+    const payload = {
+      title: post.title,
+      date: post.date,
+      excerpt: post.excerpt,
+      image: post.image,
+      category: post.category,
+      content: post.content,
+      status: post.status,
+      featured: post.featured ?? false,
+      mainFeatured: true,
+      slug: post.slug || slugifyTitle(post.title),
+      scheduledAt: post.scheduledAt ?? null,
+    };
+    const ok = await updatePost(post.id, payload);
+    if (!ok) {
+      toast({ title: "Feature update failed", description: "Could not update main feature.", variant: "destructive" });
     } else {
-      const selected = posts.find((post) => post.id === targetId);
-      toast({ title: "Main feature set", description: `"${selected?.title}" will show on the home page.` });
+      toast({ title: "Main feature set", description: `"${post.title}" will show on the home page.` });
+      const refreshed = await getStoredPosts();
+      setPosts(refreshed);
     }
-
-    const refreshed = await getStoredPosts();
-    setPosts(refreshed);
   };
 
   const handleSetMainFeatured = (post: BlogPost) => {
