@@ -151,5 +151,24 @@ app.delete('/api/posts', (req, res) => {
   res.status(204).end();
 });
 
+// Set one post as main featured, clear others (matches production POST /api/posts/set-main-featured).
+app.post('/api/posts/set-main-featured', (req, res) => {
+  const postId = req.body?.postId;
+  if (!postId || typeof postId !== 'string') {
+    return res.status(400).json({ error: 'Missing postId' });
+  }
+
+  const data = readData();
+  const idx = data.findIndex(r => r.id === postId);
+  if (idx === -1) return res.status(404).json({ error: 'Post not found' });
+
+  for (let i = 0; i < data.length; i++) {
+    data[i].mainFeatured = data[i].id === postId;
+    if (data[i].main_featured !== undefined) data[i].main_featured = data[i].id === postId;
+  }
+  writeData(data);
+  res.json({ success: true });
+});
+
 const PORT = process.env.DEV_API_PORT || 3001;
 app.listen(PORT, () => console.log(`Dev API listening on http://localhost:${PORT}`));
