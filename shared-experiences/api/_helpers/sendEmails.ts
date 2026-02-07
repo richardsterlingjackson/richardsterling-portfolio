@@ -87,16 +87,16 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
             <hr style="margin-top: 32px; border: none; border-top: 1px solid #eee;">
             <p style="font-size: 12px; color: #999;">
               You received this email because you subscribed to "${post.category}" posts.
-            </p>
+            </p> 
             ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
               <p style="font-size: 12px; color: #999;">
-                ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from ${sub.category}</a>` : ""}
+                ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from post category</a>` : ""}
                 ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
-                ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all</a>` : ""}
+                ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
               </p>
             ` : ""}
           </div>
-        `,
+        `,// Unsubscribe links for in above query 
       });
     });
 
@@ -170,9 +170,9 @@ export async function sendUpdateEmailToSubscribers(post: BlogPost) {
             </p>
             ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
               <p style="font-size: 12px; color: #999;">
-                ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from ${sub.category}</a>` : ""}
+                ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from post category</a>` : ""}
                 ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
-                ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all</a>` : ""}
+                ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
               </p>
             ` : ""}
           </div>
@@ -225,9 +225,9 @@ export async function sendWelcomeEmail(email: string, category: string) {
           </p>
           ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
             <p style="font-size: 12px; color: #999;">
-              ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from ${category}</a>` : ""}
+              ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from post category</a>` : ""}
               ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
-              ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all</a>` : ""}
+              ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
             </p>
           ` : ""}
         </div>
