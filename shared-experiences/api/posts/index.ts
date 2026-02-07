@@ -6,6 +6,7 @@ import { checkAdmin } from "../_helpers/auth.js";
 import { sendEmailsToSubscribers, sendUpdateEmailToSubscribers } from "../_helpers/sendEmails.js";
 import { v4 as uuid } from "uuid";
 
+// posts table: featured and main_featured both default to false in the DB
 type DbRow = {
   id: string;
   slug: string;
