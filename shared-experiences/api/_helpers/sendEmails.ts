@@ -3,9 +3,7 @@ import { Resend } from "resend";
 import crypto from "crypto";
 import type { BlogPost } from "../../src/data/posts";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 function getSiteUrl(): string {
   const raw = process.env.VERCEL_URL || "";
@@ -30,6 +28,9 @@ function buildUnsubscribeUrl(email: string, category?: string): string {
  */
 export async function sendEmailsToSubscribers(post: BlogPost) {
   try {
+  const secret = process.env.UNSUBSCRIBE_SECRET || "";
+  if (!secret) return "";
+  
     // Check if Resend API key is available
     if (!resend) {
       console.log("RESEND_API_KEY not set. Skipping email sending.");
@@ -175,6 +176,10 @@ export async function sendUpdateEmailToSubscribers(post: BlogPost) {
               Read Updated Post
             </a>
             <hr style="margin-top: 32px; border: none; border-top: 1px solid #eee;">
+                if (!resend) {
+                  console.log("RESEND_API_KEY not set. Skipping welcome email.");
+                  return;
+                }
             <p style="font-size: 10px; color: #999; margin-top: 18px;">
               You received this email because you subscribed to "${post.category}" posts.
             </p>
