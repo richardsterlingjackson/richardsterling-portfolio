@@ -4,20 +4,41 @@ const EMPTY_PNG_BASE64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2l2ZkAAAAASUVORK5CYII=";
 
 function base64ToBytes(b64: string): Uint8Array {
-  // Use Buffer if available (Node), otherwise use atob (edge environments / browsers)
   if (typeof Buffer !== "undefined" && typeof Buffer.from === "function") {
     return Buffer.from(b64, "base64");
   }
-  const binary = typeof atob === "function" ? atob(b64) : globalThis.atob(b64);
+  // atob may exist in edge runtimes; guard via globalThis
+  const atobFn = typeof atob === "function" ? atob : (globalThis as any).atob;
+  if (typeof atobFn === "function") {
+    const binary = atobFn(b64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  }
+  // Last resort: decode manually (very small string so OK)
+  let binary = "";
+  for (let i = 0; i < b64.length; i++) {
+    // fallback: not ideal, but prevents crashes
+    binary += String.fromCharCode(b64.charCodeAt(i));
+  }
   const len = binary.length;
   const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
+  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
   return bytes;
 }
 
-const EMPTY_PNG = base64ToBytes(EMPTY_PNG_BASE64);
+function getEmptyPngBytes(): Uint8Array {
+  try {
+    return base64ToBytes(EMPTY_PNG_BASE64);
+  } catch (err) {
+    // If conversion fails for any reason, return a tiny empty Uint8Array so we don't throw.
+    console.error("base64ToBytes failed:", err);
+    return new Uint8Array(0);
+  }
+}
 
 export const runtime = "edge";
 
@@ -65,7 +86,7 @@ export async function GET(req: Request) {
     );
   } catch (err: any) {
     console.error("OG image generation error:", err);
-    // Return a tiny valid PNG inline so scrapers always get an image content type
+    const EMPTY_PNG = getEmptyPngBytes();
     return new Response(EMPTY_PNG, {
       status: 200,
       headers: {
@@ -76,8 +97,8 @@ export async function GET(req: Request) {
   }
 }
 
-// Facebook and other bots may send HEAD requests. Always return a valid PNG.
 export async function HEAD(req: Request) {
+  const EMPTY_PNG = getEmptyPngBytes();
   return new Response(EMPTY_PNG, {
     status: 200,
     headers: {
