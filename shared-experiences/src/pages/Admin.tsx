@@ -520,7 +520,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           status: data.status,
           featured: !!data.featured,
           mainFeatured: !!(editingPost.mainFeatured && data.featured && data.status === "published"),
-          slug: editingPost.slug ?? slugifyTitle(data.title),
+          slug: slugifyTitle(data.title),
           scheduledAt: data.scheduledAt || null,
         };
 
