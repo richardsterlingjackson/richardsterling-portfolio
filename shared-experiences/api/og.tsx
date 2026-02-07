@@ -1,6 +1,14 @@
+
 import { ImageResponse } from "@vercel/og";
 
+// 1x1 transparent PNG (base64)
+const EMPTY_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2l2ZkAAAAASUVORK5CYII=",
+  "base64"
+);
+
 export const runtime = "edge";
+
 
 export async function GET(req: Request) {
   try {
@@ -45,6 +53,24 @@ export async function GET(req: Request) {
       }
     );
   } catch (err: any) {
-    return new Response("OG image error", { status: 500 });
+    // Always return a valid PNG image, even on error
+    return new Response(EMPTY_PNG, {
+      status: 200,
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=60",
+      },
+    });
   }
+}
+
+// Facebook and other bots may send HEAD requests. Always return a valid PNG.
+export async function HEAD() {
+  return new Response(EMPTY_PNG, {
+    status: 200,
+    headers: {
+      "Content-Type": "image/png",
+      "Cache-Control": "public, max-age=60",
+    },
+  });
 }
