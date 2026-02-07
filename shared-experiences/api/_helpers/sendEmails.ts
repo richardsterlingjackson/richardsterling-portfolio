@@ -95,6 +95,16 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
                 ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
               </p>
             ` : ""}
+              <p style="font-size: 10px; color: #999; margin-top: 18px;">
+                You received this email because you subscribed to "${post.category}" posts.
+              </p>
+              ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
+                <p style="font-size: 10px; color: #999; margin-top: 4px;">
+                  ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from post category</a>` : ""}
+                  ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
+                  ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
+                </p>
+              ` : ""}
           </div>
         `,// Unsubscribe links for in above query 
       });
@@ -175,6 +185,16 @@ export async function sendUpdateEmailToSubscribers(post: BlogPost) {
                 ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
               </p>
             ` : ""}
+              <p style="font-size: 10px; color: #999; margin-top: 18px;">
+                You received this email because you subscribed to "${post.category}" posts.
+              </p>
+              ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
+                <p style="font-size: 10px; color: #999; margin-top: 4px;">
+                  ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from post category</a>` : ""}
+                  ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
+                  ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
+                </p>
+              ` : ""}
           </div>
         `,
       });
@@ -230,6 +250,16 @@ export async function sendWelcomeEmail(email: string, category: string) {
               ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
             </p>
           ` : ""}
+            <p style="font-size: 10px; color: #999;">
+              © 2025 Shared Experiences. All rights reserved.
+            </p>
+            ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
+              <p style="font-size: 10px; color: #999; margin-top: 4px;">
+                ${unsubscribeCategoryUrl ? `<a href="${unsubscribeCategoryUrl}" style="color: #8b7355;">Unsubscribe from post category</a>` : ""}
+                ${unsubscribeCategoryUrl && unsubscribeAllUrl ? " | " : ""}
+                ${unsubscribeAllUrl ? `<a href="${unsubscribeAllUrl}" style="color: #8b7355;">Unsubscribe from all categories</a>` : ""}
+              </p>
+            ` : ""}
         </div>
       `,
     });
