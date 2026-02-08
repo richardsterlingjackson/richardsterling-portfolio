@@ -166,33 +166,33 @@ export default function Index() {
                   {(homeFeatured?.cards?.length
                     ? homeFeatured.cards
                     : [
-                        {
-                          image: postCardOne,
-                          category: "Product & Brand News",
-                          title: "Le Creuset’s Valentine’s Day Sale Comes With Free Heart Shaped Bowls",
-                          content: "By Shared Experiences",
-                          date: "Feb 08, 2026",
-                          link: "/posts",
-                          readMoreLabel: "Read more",
-                        },
-                        {
-                          image: postCardTwo,
-                          category: "Product & Brand News",
-                          title: "9 Trader Joe’s Valentine’s Day Sweet Treats to Get Before They’re Gone",
-                          content: "By Shared Experiences",
-                          date: "Feb 08, 2026",
-                          link: "/posts",
-                          readMoreLabel: "Read more",
-                        },
-                        {
-                          image: postCardThree,
-                          category: "Product & Brand News",
-                          title: "This $10 Aldi Serving Tray Makes Super Bowl Hosting So Much Easier",
-                          content: "By Shared Experiences",
-                          date: "Feb 08, 2026",
-                          link: "/posts",
-                          readMoreLabel: "Read more",
-                        },
+                    {
+                      image: postCardOne,
+                      category: "Product & Brand News",
+                      title: "Le Creuset’s Valentine’s Day Sale Comes With Free Heart Shaped Bowls",
+                      excerpt: "Start planning your celebration with special-edition cookware built to last.",
+                      date: "Feb 08, 2026",
+                      link: "/posts",
+                      readMoreLabel: "Read more",
+                    },
+                    {
+                      image: postCardTwo,
+                      category: "Product & Brand News",
+                      title: "9 Trader Joe’s Valentine’s Day Sweet Treats to Get Before They’re Gone",
+                      excerpt: "Sweet, small-batch snacks that are perfect for gifting (or keeping).",
+                      date: "Feb 08, 2026",
+                      link: "/posts",
+                      readMoreLabel: "Read more",
+                    },
+                    {
+                      image: postCardThree,
+                      category: "Product & Brand News",
+                      title: "This $10 Aldi Serving Tray Makes Super Bowl Hosting So Much Easier",
+                      excerpt: "Lightweight, durable, and ready for crowds—the MVP of any party shelf.",
+                      date: "Feb 08, 2026",
+                      link: "/posts",
+                      readMoreLabel: "Read more",
+                    },
                       ]).map((item) => (
                     <article
                       key={item.title}
