@@ -1224,6 +1224,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 <Button
                   type="button"
                   variant="destructive"
+                  size="sm"
                   onClick={handleRestoreBackup}
                   disabled={restoring || !restoreFile}
                 >
