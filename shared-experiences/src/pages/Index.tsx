@@ -91,14 +91,13 @@ export default function Index() {
             <section className="space-y-6">
               <div className="space-y-3">
                 <p className="text-sm uppercase tracking-[0.2em] text-elegant-primary">
-                  Shared Experiences
+                  {homeFeatured?.bubbleHeading || "New articles arriving soon"}
                 </p>
                 <h1 className="font-playfair text-3xl sm:text-4xl font-semibold text-elegant-text">
-                  Notes on building, learning, and living in public.
+                  {homeFeatured?.bubbleTitle || "A quiet place for ideas that earn their keep."}
                 </h1>
                 <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
-                  A running journal of experiments, reflections, and systems. Every post is a
-                  practical artifact or a small story designed to be useful later.
+                  {homeFeatured?.bubbleDescription || "Essays, systems, and experiments shaped into practical notes."}
                 </p>
               </div>
 
