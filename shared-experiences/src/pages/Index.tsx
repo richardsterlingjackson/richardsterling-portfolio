@@ -89,17 +89,21 @@ export default function Index() {
             {featured && <BlogPost post={featured} />}
 
             <section className="space-y-6">
-              <div className="space-y-3">
+              {homeFeatured?.bubbleHeading && (
                 <p className="text-sm uppercase tracking-[0.2em] text-elegant-primary">
-                  {homeFeatured?.bubbleHeading || "New articles arriving soon"}
+                  {homeFeatured.bubbleHeading}
                 </p>
+              )}
+              {homeFeatured?.bubbleTitle && (
                 <h1 className="font-playfair text-3xl sm:text-4xl font-semibold text-elegant-text">
-                  {homeFeatured?.bubbleTitle || "A quiet place for ideas that earn their keep."}
+                  {homeFeatured.bubbleTitle}
                 </h1>
+              )}
+              {homeFeatured?.bubbleDescription && (
                 <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
-                  {homeFeatured?.bubbleDescription || "Essays, systems, and experiments shaped into practical notes."}
+                  {homeFeatured.bubbleDescription}
                 </p>
-              </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="rounded-lg border border-border bg-card p-4">
