@@ -158,7 +158,7 @@ export default function Index() {
                   </h3>
                   <p className="text-sm sm:text-base text-white/90">
                     {homeFeatured?.bubbleDescription ||
-                      "A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
+                      "A rolling journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
                   </p>
                 </div>
                 </div>
