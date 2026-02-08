@@ -21,7 +21,7 @@ export default function Index() {
       image: string;
       title: string;
       category: string;
-      content: string;
+      excerpt: string;
       date: string;
       link: string;
       readMoreLabel: string;
