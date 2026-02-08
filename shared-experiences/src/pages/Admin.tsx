@@ -229,6 +229,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     heroTitle: "",
     heroSubtitle: "",
     heroCategory: "",
+    bubbleHeading: "",
+    bubbleTitle: "",
+    bubbleDescription: "",
     cards: [
       { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
       { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
@@ -424,6 +427,21 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     } finally {
       setHomeUploading(false);
     }
+  };
+
+  const updateCard = (index: number, field: string, value: string) => {
+    setHomeFeatured((prev) => ({
+      ...prev,
+      cards: prev.cards.map((card, idx) => (idx === index ? { ...card, [field]: value } : card)),
+    }));
+  };
+
+  const handleCardImageUpload = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    handleHomeImageUpload(file, (url) => updateCard(index, 'image', url));
   };
 
   const handleSelectUploadMode = React.useCallback(() => {
@@ -1216,222 +1234,129 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             {backupError && <p className="text-sm text-destructive">{backupError}</p>}
           </div>
 
-          {/* HOME FEATURED */}
+                      {/* HOME FEATURED */}
           <div className="space-y-6 bg-background/95 p-6 rounded-lg border">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-elegant-text">Home Featured Section</h2>
+              <div>
+                <h2 className="text-xl font-semibold text-elegant-text">Home Featured</h2>
+                <p className="text-sm text-muted-foreground">Controls the hero and "Good Things" cards on the home page.</p>
+              </div>
               <Button
-                type="button"
                 onClick={handleSaveHomeFeatured}
-                disabled={homeSaving || homeUploading}
+                disabled={homeSaving}
+                className="bg-elegant-accent text-white hover:bg-elegant-accent/90"
               >
-                {homeSaving ? "Savingâ€¦" : "Save Home Section"}
+                {homeSaving ? "Saving..." : "Save Home Section"}
               </Button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <label className="text-base text-muted-foreground font-bold">Home Banner Category</label>
+              <div className="space-y-3 bg-card border border-border rounded-lg p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Hero Copy</p>
                 <Input
+                  placeholder="Category label"
                   value={homeFeatured.heroCategory}
-                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroCategory: e.target.value }))}
-                  placeholder="Shared Experiences"
+                  onChange={(e) => setHomeFeatured({ ...homeFeatured, heroCategory: e.target.value })}
                 />
-
-                <label className="text-base text-muted-foreground font-bold">Home Banner Title</label>
                 <Input
+                  placeholder="Big headline"
                   value={homeFeatured.heroTitle}
-                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroTitle: e.target.value }))}
-                  placeholder="Notes on building, learning, and living in public."
+                  onChange={(e) => setHomeFeatured({ ...homeFeatured, heroTitle: e.target.value })}
                 />
-
-                <label className="text-base text-muted-foreground font-bold">Home Banner Description</label>
                 <Textarea
-                  rows={3}
+                  placeholder="Supporting subtitle"
                   value={homeFeatured.heroSubtitle}
-                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroSubtitle: e.target.value }))}
-                  placeholder="A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."
+                  onChange={(e) => setHomeFeatured({ ...homeFeatured, heroSubtitle: e.target.value })}
+                  rows={2}
                 />
-
-                <label className="text-base text-muted-foreground font-bold">Home Page Bubble Heading</label>
                 <Input
-                  value={homeFeatured.bubbleHeading || ""}
-                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, bubbleHeading: e.target.value }))}
-                  placeholder="New articles arriving soon"
+                  placeholder="Bubble heading"
+                  value={homeFeatured.bubbleHeading}
+                  onChange={(e) => setHomeFeatured({ ...homeFeatured, bubbleHeading: e.target.value })}
                 />
-
-                <label className="text-base text-muted-foreground font-bold">Home Page Bubble Title</label>
                 <Input
-                  value={homeFeatured.bubbleTitle || ""}
-                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, bubbleTitle: e.target.value }))}
-                  placeholder="A quiet place for ideas that earn their keep."
+                  placeholder="Bubble title"
+                  value={homeFeatured.bubbleTitle}
+                  onChange={(e) => setHomeFeatured({ ...homeFeatured, bubbleTitle: e.target.value })}
                 />
-
-                <label className="text-base text-muted-foreground font-bold">Home Page Bubble Description</label>
                 <Textarea
-                  rows={3}
-                  value={homeFeatured.bubbleDescription || ""}
-                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, bubbleDescription: e.target.value }))}
-                  placeholder="Essays, systems, and experiments shaped into practical notes."
+                  placeholder="Bubble description"
+                  value={homeFeatured.bubbleDescription}
+                  onChange={(e) => setHomeFeatured({ ...homeFeatured, bubbleDescription: e.target.value })}
+                  rows={2}
                 />
               </div>
 
-              <div className="space-y-3">
-                <label className="text-base text-muted-foreground font-bold">Hero Image</label>
+              <div className="space-y-3 bg-card border border-border rounded-lg p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Hero Image</p>
                 <Input
+                  placeholder="Image URL"
                   value={homeFeatured.heroImage}
-                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroImage: e.target.value }))}
-                  placeholder="Cloudinary image URL"
+                  onChange={(e) => setHomeFeatured({ ...homeFeatured, heroImage: e.target.value })}
                 />
-                <div className="flex items-center gap-3">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleHomeImageUpload(file, (url) =>
-                          setHomeFeatured((prev) => ({ ...prev, heroImage: url }))
-                        );
-                      }
-                    }}
-                    disabled={homeUploading}
-                  />
-                  <span className="text-xs text-muted-foreground">
-                    {homeUploading ? "Uploadingâ€¦" : "JPG/PNG"}
-                  </span>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <input type="file" accept="image/*" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleHomeImageUpload(file, (url) =>
+                        setHomeFeatured((prev) => ({ ...prev, heroImage: url }))
+                      );
+                    }
+                  }} />
+                  <span>{homeUploading ? "Uploading..." : "JPG/PNG recommended"}</span>
                 </div>
-                {homeFeatured.heroImage ? (
-                  <img
-                    src={homeFeatured.heroImage}
-                    alt="Hero preview"
-                    className="h-32 w-full rounded object-cover border"
-                  />
-                ) : null}
+                {homeFeatured.heroImage && (
+                  <img src={homeFeatured.heroImage} alt="Hero" className="w-full rounded-md border" />
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {homeFeatured.cards.map((card, index) => (
-                <div key={index} className="space-y-3 border border-border rounded-lg p-4">
-                  <h3 className="text-lg font-bold text-elegant-text mb-2">Card {index + 1}</h3>
-                  <label className="text-sm font-bold text-muted-foreground">Image URL</label>
+                <div key={index} className="space-y-3 bg-card border border-border rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-elegant-text">Card {index + 1}</h3>
+                    <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Good Thing</span>
+                  </div>
                   <Input
+                    placeholder="Image URL"
                     value={card.image}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setHomeFeatured((prev) => ({
-                        ...prev,
-                        cards: prev.cards.map((item, i) =>
-                          i === index ? { ...item, image: value } : item
-                        ),
-                      }));
-                    }}
-                    placeholder="Cloudinary image URL"
+                    onChange={(e) => updateCard(index, 'image', e.target.value)}
                   />
-                  <label className="text-sm font-bold text-muted-foreground">Upload Image</label>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <input type="file" accept="image/*" onChange={(e) => handleCardImageUpload(e, index)} />
+                    <span>{homeUploading ? "Uploading..." : "Upload image"}</span>
+                  </div>
                   <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleHomeImageUpload(file, (url) =>
-                          setHomeFeatured((prev) => ({
-                            ...prev,
-                            cards: prev.cards.map((item, i) =>
-                              i === index ? { ...item, image: url } : item
-                            ),
-                          }))
-                        );
-                      }
-                    }}
-                    disabled={homeUploading}
-                  />
-                  <label className="text-sm font-bold text-muted-foreground">Sub Heading</label>
-                  <Input
-                    value={card.category}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setHomeFeatured((prev) => ({
-                        ...prev,
-                        cards: prev.cards.map((item, i) =>
-                          i === index ? { ...item, category: value } : item
-                        ),
-                      }));
-                    }}
                     placeholder="Category"
+                    value={card.category}
+                    onChange={(e) => updateCard(index, 'category', e.target.value)}
                   />
-                  <label className="text-sm font-bold text-muted-foreground">Excerpt</label>
-                  <Textarea
-                    rows={2}
-                    value={card.excerpt}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setHomeFeatured((prev) => ({
-                        ...prev,
-                        cards: prev.cards.map((item, i) =>
-                          i === index ? { ...item, excerpt: value } : item
-                        ),
-                      }));
-                    }}
-                    placeholder="Excerpt text"
-                  />
-                  {/* <label className="text-sm font-bold text-muted-foreground">Date</label>
                   <Input
+                    placeholder="Date (e.g., Feb 08, 2026)"
                     value={card.date}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setHomeFeatured((prev) => ({
-                        ...prev,
-                        cards: prev.cards.map((item, i) =>
-                          i === index ? { ...item, date: value } : item
-                        ),
-                      }));
-                    }}
-                    placeholder="Date"
-                  /> */}
-                  <label className="text-sm font-bold text-muted-foreground">Title</label>
+                    onChange={(e) => updateCard(index, 'date', e.target.value)}
+                  />
                   <Input
-                    value={card.title}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setHomeFeatured((prev) => ({
-                        ...prev,
-                        cards: prev.cards.map((item, i) =>
-                          i === index ? { ...item, title: value } : item
-                        ),
-                      }));
-                    }}
                     placeholder="Title"
+                    value={card.title}
+                    onChange={(e) => updateCard(index, 'title', e.target.value)}
                   />
-                  <label className="text-sm font-bold text-muted-foreground">Link URL</label>
+                  <Textarea
+                    placeholder="Excerpt"
+                    value={card.excerpt ?? ''}
+                    onChange={(e) => updateCard(index, 'excerpt', e.target.value)}
+                    rows={2}
+                  />
                   <Input
+                    placeholder="Link"
                     value={card.link}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setHomeFeatured((prev) => ({
-                        ...prev,
-                        cards: prev.cards.map((item, i) =>
-                          i === index ? { ...item, link: value } : item
-                        ),
-                      }));
-                    }}
-                    placeholder="Link URL"
+                    onChange={(e) => updateCard(index, 'link', e.target.value)}
                   />
-                  <label className="text-sm font-bold text-muted-foreground">Read More Label</label>
                   <Input
-                    value={card.readMoreLabel}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setHomeFeatured((prev) => ({
-                        ...prev,
-                        cards: prev.cards.map((item, i) =>
-                          i === index ? { ...item, readMoreLabel: value } : item
-                        ),
-                      }));
-                    }}
                     placeholder="Read more label"
+                    value={card.readMoreLabel}
+                    onChange={(e) => updateCard(index, 'readMoreLabel', e.target.value)}
                   />
                 </div>
               ))}

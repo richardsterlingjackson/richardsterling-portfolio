@@ -16,14 +16,16 @@ export async function POST(req: Request) {
   const authErr = checkAdmin(req);
   if (authErr) return authErr;
 
-  let body: { postId?: string };
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
     return jsonResponse({ error: "Invalid JSON" }, 400);
   }
 
-  const postId = body?.postId;
+  const postId = typeof body === "object" && body !== null && "postId" in body
+    ? (body as { postId?: unknown }).postId
+    : undefined;
   if (!postId || typeof postId !== "string") {
     return jsonResponse({ error: "Missing postId" }, 400);
   }

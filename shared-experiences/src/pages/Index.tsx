@@ -17,6 +17,9 @@ export default function Index() {
     heroTitle: string;
     heroSubtitle: string;
     heroCategory: string;
+    bubbleHeading?: string;
+    bubbleTitle?: string;
+    bubbleDescription?: string;
     cards: Array<{
       image: string;
       title: string;
@@ -141,19 +144,22 @@ export default function Index() {
                   className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[520px]"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/10 to-transparent" />
-                <div className="absolute left-6 top-6 sm:left-10 sm:top-10 bg-white/95 backdrop-blur-sm p-5 sm:p-6 max-w-sm border border-white/40 shadow-lg">
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
+                <div
+                  className="absolute left-6 top-6 sm:left-10 sm:top-10 max-w-xl space-y-2"
+                  style={{ textShadow: "0 10px 30px rgba(0,0,0,0.45)" }}
+                >
+                  <p className="text-xs uppercase tracking-[0.2em] text-white/80">
                     {homeFeatured?.heroCategory || "Shared Experiences"}
                   </p>
-                  <h3 className="font-playfair text-2xl font-semibold text-elegant-text mt-2">
+                  <h3 className="font-playfair text-2xl sm:text-3xl font-semibold text-white">
                     {homeFeatured?.heroTitle || "Notes on building, learning, and living in public."}
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-sm sm:text-base text-white/90">
                     {homeFeatured?.heroSubtitle || "A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
                   </p>
                 </div>
-              </div>
+                </div>
 
               <div>
                 <div className="flex items-center justify-between">
