@@ -1231,26 +1231,26 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <label className="text-base text-muted-foreground font-bold">Hero Category</label>
+                <label className="text-base text-muted-foreground font-bold">Home Banner Category</label>
                 <Input
                   value={homeFeatured.heroCategory}
                   onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroCategory: e.target.value }))}
                   placeholder="Shared Experiences"
                 />
 
-                <label className="text-base text-muted-foreground font-bold">Hero Title</label>
+                <label className="text-base text-muted-foreground font-bold">Home Banner Title</label>
                 <Input
                   value={homeFeatured.heroTitle}
                   onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroTitle: e.target.value }))}
-                  placeholder="A quiet place for ideas that earn their keep."
+                  placeholder="Notes on building, learning, and living in public."
                 />
 
-                <label className="text-base text-muted-foreground font-bold">Hero Subtitle</label>
+                <label className="text-base text-muted-foreground font-bold">Home Banner Description</label>
                 <Textarea
                   rows={3}
                   value={homeFeatured.heroSubtitle}
                   onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroSubtitle: e.target.value }))}
-                  placeholder="Essays, systems, and experiments shaped into practical notes."
+                  placeholder="A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."
                 />
               </div>
 

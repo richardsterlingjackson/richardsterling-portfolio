@@ -144,10 +144,10 @@ export default function Index() {
                     {homeFeatured?.heroCategory || "Shared Experiences"}
                   </p>
                   <h3 className="font-playfair text-2xl font-semibold text-elegant-text mt-2">
-                    {homeFeatured?.heroTitle || "A quiet place for ideas that earn their keep."}
+                    {homeFeatured?.heroTitle || "Notes on building, learning, and living in public."}
                   </h3>
                   <p className="text-sm text-muted-foreground mt-2">
-                    {homeFeatured?.heroSubtitle || "Essays, systems, and experiments shaped into practical notes."}
+                    {homeFeatured?.heroSubtitle || "A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
                   </p>
                 </div>
               </div>
