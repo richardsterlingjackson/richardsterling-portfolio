@@ -54,6 +54,10 @@ export async function GET(req: Request) {
   const description = post?.excerpt || "Stories and reflections from Shared Experiences.";
   const category = post?.category || "";
   const pageUrl = slug ? `${origin}/posts/${encodeURIComponent(slug)}` : origin;
+  const fbAppId = process.env.FB_APP_ID || process.env.FACEBOOK_APP_ID || "";
+  const fbAppIdMeta = fbAppId
+    ? `<meta property="fb:app_id" content="${escapeHtml(fbAppId)}" />`
+    : "";
 
   // Use our dynamic OG image so Facebook always gets a crawlable preview (post images can be blocked or fail for crawlers).
   const ogImage = `${origin}/api/og?title=${encodeURIComponent(title)}&category=${encodeURIComponent(category)}`;
@@ -76,6 +80,7 @@ export async function GET(req: Request) {
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="${escapeHtml(title)}" />
     <meta property="og:site_name" content="Shared Experiences" />
+    ${fbAppIdMeta}
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escapeHtml(title)}" />
