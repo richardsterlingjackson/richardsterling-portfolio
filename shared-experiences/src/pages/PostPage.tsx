@@ -28,7 +28,7 @@ function formatPostDate(value: string): string {
 async function resolveSlug(slug: string): Promise<string | null> {
   try {
     const res = await fetch(
-      `/api/posts/resolve-slug?slug=${encodeURIComponent(slug)}`,
+      `/api/posts?resolveSlug=${encodeURIComponent(slug)}`,
       { cache: "no-store" }
     );
     if (!res.ok) return null;

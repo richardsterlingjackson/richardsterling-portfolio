@@ -51,7 +51,7 @@ function AdminGate({ onSuccess }: { onSuccess: () => void }) {
     }
 
     try {
-      const res = await fetch("/api/admin/login", {
+      const res = await fetch("/api/admin?action=login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -105,7 +105,7 @@ export default function Admin() {
   const [sessionExpired, setSessionExpired] = React.useState(false);
 
   React.useEffect(() => {
-    fetch("/api/admin/me", { credentials: "include" })
+    fetch("/api/admin?action=me", { credentials: "include" })
       .then((res) => {
         if (res.ok) setAuthorized(true);
       })
@@ -114,7 +114,7 @@ export default function Admin() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
+      await fetch("/api/admin?action=logout", { method: "POST", credentials: "include" });
     } catch (err) {
       console.error("Admin logout failed:", err);
     } finally {
@@ -255,7 +255,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       if (timeSinceActivity >= SESSION_TIMEOUT) {
         // Session expired
         onSessionExpired();
-        fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch((err) =>
+        fetch("/api/admin?action=logout", { method: "POST", credentials: "include" }).catch((err) =>
           console.error("Admin logout failed:", err)
         );
       } else if (timeSinceActivity >= WARNING_TIME && !timeoutWarning) {
