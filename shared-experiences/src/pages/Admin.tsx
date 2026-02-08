@@ -230,9 +230,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     heroSubtitle: "",
     heroCategory: "",
     cards: [
-      { image: "", title: "", category: "", content: "" },
-      { image: "", title: "", category: "", content: "" },
-      { image: "", title: "", category: "", content: "" },
+      { image: "", title: "", category: "", content: "", date: "", link: "", readMoreLabel: "" },
+      { image: "", title: "", category: "", content: "", date: "", link: "", readMoreLabel: "" },
+      { image: "", title: "", category: "", content: "", date: "", link: "", readMoreLabel: "" },
     ],
   });
 
@@ -1323,6 +1323,19 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     placeholder="Category"
                   />
                   <Input
+                    value={card.date}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setHomeFeatured((prev) => ({
+                        ...prev,
+                        cards: prev.cards.map((item, i) =>
+                          i === index ? { ...item, date: value } : item
+                        ),
+                      }));
+                    }}
+                    placeholder="Date"
+                  />
+                  <Input
                     value={card.title}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -1334,6 +1347,19 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       }));
                     }}
                     placeholder="Title"
+                  />
+                  <Input
+                    value={card.link}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setHomeFeatured((prev) => ({
+                        ...prev,
+                        cards: prev.cards.map((item, i) =>
+                          i === index ? { ...item, link: value } : item
+                        ),
+                      }));
+                    }}
+                    placeholder="Link URL"
                   />
                   <Textarea
                     rows={3}
@@ -1348,6 +1374,19 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       }));
                     }}
                     placeholder="Content"
+                  />
+                  <Input
+                    value={card.readMoreLabel}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setHomeFeatured((prev) => ({
+                        ...prev,
+                        cards: prev.cards.map((item, i) =>
+                          i === index ? { ...item, readMoreLabel: value } : item
+                        ),
+                      }));
+                    }}
+                    placeholder="Read more label"
                   />
                 </div>
               ))}

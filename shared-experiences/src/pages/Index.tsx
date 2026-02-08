@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import BlogPost from "@/components/BlogPost";
 import { getStoredPosts } from "@/lib/postStore";
 import type { BlogPost as BlogPostType } from "@/data/posts";
+import { Link } from "react-router-dom";
 import heroBanner from "@/assets/hero-banner.jpg";
 import postCardOne from "@/assets/blog-post-1.jpg";
 import postCardTwo from "@/assets/blog-post-2.webp";
@@ -21,6 +22,9 @@ export default function Index() {
       title: string;
       category: string;
       content: string;
+      date: string;
+      link: string;
+      readMoreLabel: string;
     }>;
   } | null>(null);
 
@@ -167,18 +171,27 @@ export default function Index() {
                           category: "Product & Brand News",
                           title: "Le Creuset’s Valentine’s Day Sale Comes With Free Heart Shaped Bowls",
                           content: "By Shared Experiences",
+                          date: "Feb 08, 2026",
+                          link: "/posts",
+                          readMoreLabel: "Read more",
                         },
                         {
                           image: postCardTwo,
                           category: "Product & Brand News",
                           title: "9 Trader Joe’s Valentine’s Day Sweet Treats to Get Before They’re Gone",
                           content: "By Shared Experiences",
+                          date: "Feb 08, 2026",
+                          link: "/posts",
+                          readMoreLabel: "Read more",
                         },
                         {
                           image: postCardThree,
                           category: "Product & Brand News",
                           title: "This $10 Aldi Serving Tray Makes Super Bowl Hosting So Much Easier",
                           content: "By Shared Experiences",
+                          date: "Feb 08, 2026",
+                          link: "/posts",
+                          readMoreLabel: "Read more",
                         },
                       ]).map((item) => (
                     <article
@@ -196,9 +209,29 @@ export default function Index() {
                           {item.category}
                         </p>
                         <h3 className="font-playfair text-lg font-semibold text-elegant-text">
-                          {item.title}
+                          {item.link ? (
+                            <Link
+                              to={item.link}
+                              className="hover:text-elegant-primary transition"
+                            >
+                              {item.title}
+                            </Link>
+                          ) : (
+                            item.title
+                          )}
                         </h3>
                         <p className="text-xs text-muted-foreground">{item.content}</p>
+                        {item.date ? (
+                          <p className="text-xs text-muted-foreground">{item.date}</p>
+                        ) : null}
+                        {item.link ? (
+                          <Link
+                            to={item.link}
+                            className="text-xs uppercase tracking-[0.2em] text-elegant-primary hover:underline"
+                          >
+                            {item.readMoreLabel || "Read more"}
+                          </Link>
+                        ) : null}
                       </div>
                     </article>
                   ))}
