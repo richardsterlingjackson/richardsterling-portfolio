@@ -1314,10 +1314,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {homeFeatured.cards.map((card, index) => (
                 <div key={index} className="space-y-3 bg-card border border-border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-elegant-text">Card {index + 1}</h3>
-                    <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Good Thing</span>
-                  </div>
+                  <h3 className="text-lg font-semibold text-elegant-text">Card {index + 1}</h3>
                   <Input
                     placeholder="Image URL"
                     value={card.image}
