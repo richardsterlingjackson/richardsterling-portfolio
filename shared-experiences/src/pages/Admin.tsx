@@ -221,6 +221,20 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [restoreFile, setRestoreFile] = React.useState<File | null>(null);
   const [restoring, setRestoring] = React.useState(false);
   const [backupError, setBackupError] = React.useState("");
+  const [homeUploading, setHomeUploading] = React.useState(false);
+  const [homeUploadError, setHomeUploadError] = React.useState("");
+  const [homeSaving, setHomeSaving] = React.useState(false);
+  const [homeFeatured, setHomeFeatured] = React.useState({
+    heroImage: "",
+    heroTitle: "",
+    heroSubtitle: "",
+    heroCategory: "",
+    cards: [
+      { image: "", title: "", category: "", content: "" },
+      { image: "", title: "", category: "", content: "" },
+      { image: "", title: "", category: "", content: "" },
+    ],
+  });
 
   const slugifyTitle = React.useCallback((value: string) => {
     return value
@@ -372,6 +386,44 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     }
   };
 
+  const handleHomeImageUpload = async (file: File, onUrl: (url: string) => void) => {
+    setHomeUploadError("");
+    setHomeUploading(true);
+    try {
+      const signRes = await fetch("/api/cloudinary/sign");
+      if (!signRes.ok) {
+        throw new Error("Failed to get upload signature");
+      }
+
+      const { cloudName, apiKey, timestamp, signature, folder } = await signRes.json();
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", apiKey);
+      formData.append("timestamp", String(timestamp));
+      formData.append("signature", signature);
+      formData.append("folder", folder);
+
+      const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const uploadData = await uploadRes.json();
+      if (uploadData.secure_url) {
+        onUrl(uploadData.secure_url);
+      }
+    } catch (err: any) {
+      setHomeUploadError(err?.message || "Upload failed");
+    } finally {
+      setHomeUploading(false);
+    }
+  };
+
   const handleSelectUploadMode = React.useCallback(() => {
     setImageMode("upload");
     requestAnimationFrame(() => {
@@ -383,9 +435,52 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     async function load() {
       const data = await getStoredPosts();
       setPosts(data);
+      try {
+        const homeRes = await fetch("/api/posts?home=1", { credentials: "include", cache: "no-store" });
+        if (homeRes.ok) {
+          const homeData = await homeRes.json();
+          if (homeData) {
+            setHomeFeatured((prev) => ({
+              ...prev,
+              ...homeData,
+              cards: Array.isArray(homeData.cards) && homeData.cards.length === 3
+                ? homeData.cards
+                : prev.cards,
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load home featured:", err);
+      }
     }
     load();
   }, []);
+
+  const handleSaveHomeFeatured = async () => {
+    setHomeUploadError("");
+    setHomeSaving(true);
+    try {
+      const res = await fetch("/api/posts?home=1", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Admin-Request": "1" },
+        credentials: "include",
+        body: JSON.stringify(homeFeatured),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to save home section");
+      }
+      const updated = await res.json();
+      if (updated) {
+        setHomeFeatured(updated);
+      }
+      toast({ title: "Home section saved", description: "Your featured section has been updated." });
+    } catch (err: any) {
+      console.error("Save home featured failed:", err);
+      toast({ title: "Save Failed", description: err?.message || "Unable to save home section.", variant: "destructive" });
+    } finally {
+      setHomeSaving(false);
+    }
+  };
 
   const handleBackupDownload = async () => {
     setBackupError("");
@@ -1102,6 +1197,163 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               </div>
             </div>
             {backupError && <p className="text-sm text-destructive">{backupError}</p>}
+          </div>
+
+          {/* HOME FEATURED */}
+          <div className="space-y-6 bg-background/95 p-6 rounded-lg border">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-elegant-text">Home Featured Section</h2>
+              <Button
+                type="button"
+                onClick={handleSaveHomeFeatured}
+                disabled={homeSaving || homeUploading}
+              >
+                {homeSaving ? "Savingâ€¦" : "Save Home Section"}
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <label className="text-sm text-muted-foreground">Hero Category</label>
+                <Input
+                  value={homeFeatured.heroCategory}
+                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroCategory: e.target.value }))}
+                  placeholder="Shared Experiences"
+                />
+
+                <label className="text-sm text-muted-foreground">Hero Title</label>
+                <Input
+                  value={homeFeatured.heroTitle}
+                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroTitle: e.target.value }))}
+                  placeholder="A quiet place for ideas that earn their keep."
+                />
+
+                <label className="text-sm text-muted-foreground">Hero Subtitle</label>
+                <Textarea
+                  rows={3}
+                  value={homeFeatured.heroSubtitle}
+                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroSubtitle: e.target.value }))}
+                  placeholder="Essays, systems, and experiments shaped into practical notes."
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm text-muted-foreground">Hero Image</label>
+                <Input
+                  value={homeFeatured.heroImage}
+                  onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroImage: e.target.value }))}
+                  placeholder="Cloudinary image URL"
+                />
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleHomeImageUpload(file, (url) =>
+                          setHomeFeatured((prev) => ({ ...prev, heroImage: url }))
+                        );
+                      }
+                    }}
+                    disabled={homeUploading}
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {homeUploading ? "Uploadingâ€¦" : "JPG/PNG"}
+                  </span>
+                </div>
+                {homeFeatured.heroImage ? (
+                  <img
+                    src={homeFeatured.heroImage}
+                    alt="Hero preview"
+                    className="h-32 w-full rounded object-cover border"
+                  />
+                ) : null}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {homeFeatured.cards.map((card, index) => (
+                <div key={index} className="space-y-3 border border-border rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-elegant-text">
+                    Card {index + 1}
+                  </h3>
+                  <Input
+                    value={card.image}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setHomeFeatured((prev) => ({
+                        ...prev,
+                        cards: prev.cards.map((item, i) =>
+                          i === index ? { ...item, image: value } : item
+                        ),
+                      }));
+                    }}
+                    placeholder="Cloudinary image URL"
+                  />
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleHomeImageUpload(file, (url) =>
+                          setHomeFeatured((prev) => ({
+                            ...prev,
+                            cards: prev.cards.map((item, i) =>
+                              i === index ? { ...item, image: url } : item
+                            ),
+                          }))
+                        );
+                      }
+                    }}
+                    disabled={homeUploading}
+                  />
+                  <Input
+                    value={card.category}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setHomeFeatured((prev) => ({
+                        ...prev,
+                        cards: prev.cards.map((item, i) =>
+                          i === index ? { ...item, category: value } : item
+                        ),
+                      }));
+                    }}
+                    placeholder="Category"
+                  />
+                  <Input
+                    value={card.title}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setHomeFeatured((prev) => ({
+                        ...prev,
+                        cards: prev.cards.map((item, i) =>
+                          i === index ? { ...item, title: value } : item
+                        ),
+                      }));
+                    }}
+                    placeholder="Title"
+                  />
+                  <Textarea
+                    rows={3}
+                    value={card.content}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setHomeFeatured((prev) => ({
+                        ...prev,
+                        cards: prev.cards.map((item, i) =>
+                          i === index ? { ...item, content: value } : item
+                        ),
+                      }));
+                    }}
+                    placeholder="Content"
+                  />
+                </div>
+              ))}
+            </div>
+
+            {homeUploadError && <p className="text-sm text-destructive">{homeUploadError}</p>}
           </div>
 
           {/* POSTS LIST CONTROLS */}

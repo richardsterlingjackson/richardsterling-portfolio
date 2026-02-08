@@ -55,6 +55,19 @@ type UpdateBody = {
   scheduledAt?: string | null;
 };
 
+type HomeFeatured = {
+  heroImage: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroCategory: string;
+  cards: Array<{
+    image: string;
+    title: string;
+    category: string;
+    content: string;
+  }>;
+};
+
 function mapRow(row: DbRow) {
   return {
     id: row.id,
@@ -84,6 +97,143 @@ function slugify(input: string): string {
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+}
+
+async function ensureHomeFeaturedTable() {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS home_featured (
+        id integer PRIMARY KEY,
+        hero_image text NOT NULL DEFAULT '',
+        hero_title text NOT NULL DEFAULT '',
+        hero_subtitle text NOT NULL DEFAULT '',
+        hero_category text NOT NULL DEFAULT '',
+        card1_image text NOT NULL DEFAULT '',
+        card1_title text NOT NULL DEFAULT '',
+        card1_category text NOT NULL DEFAULT '',
+        card1_content text NOT NULL DEFAULT '',
+        card2_image text NOT NULL DEFAULT '',
+        card2_title text NOT NULL DEFAULT '',
+        card2_category text NOT NULL DEFAULT '',
+        card2_content text NOT NULL DEFAULT '',
+        card3_image text NOT NULL DEFAULT '',
+        card3_title text NOT NULL DEFAULT '',
+        card3_category text NOT NULL DEFAULT '',
+        card3_content text NOT NULL DEFAULT '',
+        updated_at timestamptz DEFAULT now()
+      )
+    `;
+  } catch (err) {
+    console.warn("Failed to ensure home_featured table:", err);
+  }
+}
+
+async function getHomeFeatured(): Promise<HomeFeatured | null> {
+  try {
+    await ensureHomeFeaturedTable();
+    const rows = (await sql`
+      SELECT * FROM home_featured WHERE id = 1 LIMIT 1
+    `) as any[];
+    const row = rows[0];
+    if (!row) return null;
+    return {
+      heroImage: row.hero_image || "",
+      heroTitle: row.hero_title || "",
+      heroSubtitle: row.hero_subtitle || "",
+      heroCategory: row.hero_category || "",
+      cards: [
+        {
+          image: row.card1_image || "",
+          title: row.card1_title || "",
+          category: row.card1_category || "",
+          content: row.card1_content || "",
+        },
+        {
+          image: row.card2_image || "",
+          title: row.card2_title || "",
+          category: row.card2_category || "",
+          content: row.card2_content || "",
+        },
+        {
+          image: row.card3_image || "",
+          title: row.card3_title || "",
+          category: row.card3_category || "",
+          content: row.card3_content || "",
+        },
+      ],
+    };
+  } catch (err) {
+    console.error("Failed to load home_featured:", err);
+    return null;
+  }
+}
+
+async function upsertHomeFeatured(payload: HomeFeatured) {
+  await ensureHomeFeaturedTable();
+  const cards = payload.cards ?? [];
+  const c1 = cards[0] ?? { image: "", title: "", category: "", content: "" };
+  const c2 = cards[1] ?? { image: "", title: "", category: "", content: "" };
+  const c3 = cards[2] ?? { image: "", title: "", category: "", content: "" };
+
+  await sql`
+    INSERT INTO home_featured (
+      id,
+      hero_image,
+      hero_title,
+      hero_subtitle,
+      hero_category,
+      card1_image,
+      card1_title,
+      card1_category,
+      card1_content,
+      card2_image,
+      card2_title,
+      card2_category,
+      card2_content,
+      card3_image,
+      card3_title,
+      card3_category,
+      card3_content,
+      updated_at
+    ) VALUES (
+      1,
+      ${payload.heroImage || ""},
+      ${payload.heroTitle || ""},
+      ${payload.heroSubtitle || ""},
+      ${payload.heroCategory || ""},
+      ${c1.image || ""},
+      ${c1.title || ""},
+      ${c1.category || ""},
+      ${c1.content || ""},
+      ${c2.image || ""},
+      ${c2.title || ""},
+      ${c2.category || ""},
+      ${c2.content || ""},
+      ${c3.image || ""},
+      ${c3.title || ""},
+      ${c3.category || ""},
+      ${c3.content || ""},
+      NOW()
+    )
+    ON CONFLICT (id) DO UPDATE SET
+      hero_image = EXCLUDED.hero_image,
+      hero_title = EXCLUDED.hero_title,
+      hero_subtitle = EXCLUDED.hero_subtitle,
+      hero_category = EXCLUDED.hero_category,
+      card1_image = EXCLUDED.card1_image,
+      card1_title = EXCLUDED.card1_title,
+      card1_category = EXCLUDED.card1_category,
+      card1_content = EXCLUDED.card1_content,
+      card2_image = EXCLUDED.card2_image,
+      card2_title = EXCLUDED.card2_title,
+      card2_category = EXCLUDED.card2_category,
+      card2_content = EXCLUDED.card2_content,
+      card3_image = EXCLUDED.card3_image,
+      card3_title = EXCLUDED.card3_title,
+      card3_category = EXCLUDED.card3_category,
+      card3_content = EXCLUDED.card3_content,
+      updated_at = NOW()
+  `;
 }
 
 async function ensureSlugAliasTable() {
@@ -131,6 +281,15 @@ async function isSlugTaken(slug: string, excludePostId?: string): Promise<boolea
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
+    const home = url.searchParams.get("home");
+    if (home === "1") {
+      const data = await getHomeFeatured();
+      return new Response(JSON.stringify(data ?? null), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const resolveSlug = url.searchParams.get("resolveSlug");
     if (resolveSlug) {
       try {
@@ -218,6 +377,18 @@ export async function PUT(req: Request) {
   if (authErr) return authErr;
 
   try {
+    const url = new URL(req.url);
+    const home = url.searchParams.get("home");
+    if (home === "1") {
+      const payload = (await req.json()) as HomeFeatured;
+      await upsertHomeFeatured(payload);
+      const updated = await getHomeFeatured();
+      return new Response(JSON.stringify(updated ?? null), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const id = getId(req);
 
     if (!id) {
