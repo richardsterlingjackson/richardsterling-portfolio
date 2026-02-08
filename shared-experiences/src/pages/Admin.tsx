@@ -1231,21 +1231,21 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <label className="text-sm text-muted-foreground">Hero Category</label>
+                <label className="text-base text-muted-foreground font-bold">Hero Category</label>
                 <Input
                   value={homeFeatured.heroCategory}
                   onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroCategory: e.target.value }))}
                   placeholder="Shared Experiences"
                 />
 
-                <label className="text-sm text-muted-foreground">Hero Title</label>
+                <label className="text-base text-muted-foreground font-bold">Hero Title</label>
                 <Input
                   value={homeFeatured.heroTitle}
                   onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroTitle: e.target.value }))}
                   placeholder="A quiet place for ideas that earn their keep."
                 />
 
-                <label className="text-sm text-muted-foreground">Hero Subtitle</label>
+                <label className="text-base text-muted-foreground font-bold">Hero Subtitle</label>
                 <Textarea
                   rows={3}
                   value={homeFeatured.heroSubtitle}
@@ -1255,7 +1255,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               </div>
 
               <div className="space-y-3">
-                <label className="text-sm text-muted-foreground">Hero Image</label>
+                <label className="text-base text-muted-foreground font-bold">Hero Image</label>
                 <Input
                   value={homeFeatured.heroImage}
                   onChange={(e) => setHomeFeatured((prev) => ({ ...prev, heroImage: e.target.value }))}
@@ -1292,9 +1292,8 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {homeFeatured.cards.map((card, index) => (
                 <div key={index} className="space-y-3 border border-border rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-elegant-text">
-                    Card {index + 1}
-                  </h3>
+                  <h3 className="text-lg font-bold text-elegant-text mb-2">Card {index + 1}</h3>
+                  <label className="text-sm font-bold text-muted-foreground">Image URL</label>
                   <Input
                     value={card.image}
                     onChange={(e) => {
@@ -1308,6 +1307,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     placeholder="Cloudinary image URL"
                   />
+                  <label className="text-sm font-bold text-muted-foreground">Upload Image</label>
                   <Input
                     type="file"
                     accept="image/*"
@@ -1326,6 +1326,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     disabled={homeUploading}
                   />
+                  <label className="text-sm font-bold text-muted-foreground">Category</label>
                   <Input
                     value={card.category}
                     onChange={(e) => {
@@ -1339,6 +1340,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     placeholder="Category"
                   />
+                  <label className="text-sm font-bold text-muted-foreground">Excerpt</label>
                   <Textarea
                     rows={2}
                     value={card.excerpt}
@@ -1353,6 +1355,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     placeholder="Excerpt text"
                   />
+                  <label className="text-sm font-bold text-muted-foreground">Date</label>
                   <Input
                     value={card.date}
                     onChange={(e) => {
@@ -1366,6 +1369,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     placeholder="Date"
                   />
+                  <label className="text-sm font-bold text-muted-foreground">Title</label>
                   <Input
                     value={card.title}
                     onChange={(e) => {
@@ -1379,6 +1383,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     placeholder="Title"
                   />
+                  <label className="text-sm font-bold text-muted-foreground">Link URL</label>
                   <Input
                     value={card.link}
                     onChange={(e) => {
@@ -1392,20 +1397,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     placeholder="Link URL"
                   />
-                  <Textarea
-                    rows={3}
-                    value={card.excerpt}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setHomeFeatured((prev) => ({
-                        ...prev,
-                        cards: prev.cards.map((item, i) =>
-                          i === index ? { ...item, excerpt: value } : item
-                        ),
-                      }));
-                    }}
-                    placeholder="Excerpt"
-                  />
+                  <label className="text-sm font-bold text-muted-foreground">Read More Label</label>
                   <Input
                     value={card.readMoreLabel}
                     onChange={(e) => {
