@@ -1326,7 +1326,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     disabled={homeUploading}
                   />
-                  <label className="text-sm font-bold text-muted-foreground">Category</label>
+                  <label className="text-sm font-bold text-muted-foreground">Sub Heading</label>
                   <Input
                     value={card.category}
                     onChange={(e) => {
@@ -1355,7 +1355,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     placeholder="Excerpt text"
                   />
-                  <label className="text-sm font-bold text-muted-foreground">Date</label>
+                  {/* <label className="text-sm font-bold text-muted-foreground">Date</label>
                   <Input
                     value={card.date}
                     onChange={(e) => {
@@ -1368,7 +1368,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       }));
                     }}
                     placeholder="Date"
-                  />
+                  /> */}
                   <label className="text-sm font-bold text-muted-foreground">Title</label>
                   <Input
                     value={card.title}

@@ -155,11 +155,11 @@ export default function Index() {
               <div>
                 <div className="flex items-center justify-between">
                   <h2 className="font-playfair text-xl sm:text-2xl font-semibold text-elegant-text">
-                    Good Things
+                    Featured Articles
                   </h2>
-                  <a href="/posts" className="text-sm text-elegant-primary hover:underline">
+                  {/* <a href="/posts" className="text-sm text-elegant-primary hover:underline">
                     View all
-                  </a>
+                  </a> */}
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -207,9 +207,9 @@ export default function Index() {
                       <div className="p-4 space-y-2">
                         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground flex flex-wrap gap-2">
                           <span>{item.category}</span>
-                          {item.date && (
+                          {/* {item.date && (
                             <span className="opacity-70">• {item.date}</span>
-                          )}
+                          )} */}
                         </p>
                         <h3 className="font-playfair text-lg font-semibold text-elegant-text">
                           {item.link ? (
