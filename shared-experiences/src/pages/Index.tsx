@@ -151,14 +151,14 @@ export default function Index() {
                   style={{ textShadow: "0 10px 30px rgba(0,0,0,0.45)" }}
                 >
                   <p className="text-xs uppercase tracking-[0.2em] text-white/80">
-                    {homeFeatured?.bubbleHeading || "Relatable Connections"}
+                    {homeFeatured?.bubbleHeading || "New Articles Arriving Soon"}
                   </p>
                   <h3 className="font-playfair text-2xl sm:text-3xl font-semibold text-white">
-                    {homeFeatured?.bubbleTitle || "Notes on building, learning, and living in public."}
+                    {homeFeatured?.bubbleTitle || "A quiet place for ideas that earn their keep.."}
                   </h3>
                   <p className="text-sm sm:text-base text-white/90">
                     {homeFeatured?.bubbleDescription ||
-                      "A rolling journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
+                      "Trying things, falling fast, and writing about it."}
                   </p>
                 </div>
                 </div>

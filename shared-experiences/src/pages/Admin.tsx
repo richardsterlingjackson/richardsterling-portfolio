@@ -1242,8 +1242,10 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 <p className="text-sm text-muted-foreground">Controls the hero and "Good Things" cards on the home page.</p>
               </div>
               <Button
-                 onClick={handleSaveHomeFeatured}
-                 className="bg-elegant-accent text-white hover:bg-elegant-accent/90"
+                type="button"
+                variant="default"
+                size="default"
+                onClick={handleSaveHomeFeatured}
               >
                 {homeSaving ? "Saving..." : "Save Home Section"}
               </Button>
