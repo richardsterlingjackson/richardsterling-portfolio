@@ -63,6 +63,9 @@ type HomeFeatured = {
   heroTitle: string;
   heroSubtitle: string;
   heroCategory: string;
+  bubbleHeading?: string;
+  bubbleTitle?: string;
+  bubbleDescription?: string;
   cards: Array<{
     image: string;
     title: string;
@@ -136,9 +139,16 @@ async function ensureHomeFeaturedTable() {
         card3_date text NOT NULL DEFAULT '',
         card3_link text NOT NULL DEFAULT '',
         card3_read_more text NOT NULL DEFAULT '',
+        bubble_heading text NOT NULL DEFAULT '',
+        bubble_title text NOT NULL DEFAULT '',
+        bubble_description text NOT NULL DEFAULT '',
         updated_at timestamptz DEFAULT now()
       )
     `;
+    // Add new columns for bubble content if they don't exist (idempotent)
+    await sql`ALTER TABLE home_featured ADD COLUMN IF NOT EXISTS bubble_heading text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE home_featured ADD COLUMN IF NOT EXISTS bubble_title text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE home_featured ADD COLUMN IF NOT EXISTS bubble_description text NOT NULL DEFAULT ''`;
   } catch (err) {
     console.warn("Failed to ensure home_featured table:", err);
   }
@@ -157,6 +167,9 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
       heroTitle: row.hero_title || "",
       heroSubtitle: row.hero_subtitle || "",
       heroCategory: row.hero_category || "",
+      bubbleHeading: row.bubble_heading || "",
+      bubbleTitle: row.bubble_title || "",
+      bubbleDescription: row.bubble_description || "",
       cards: [
         {
           image: row.card1_image || "",
@@ -207,6 +220,9 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       hero_title,
       hero_subtitle,
       hero_category,
+      bubble_heading,
+      bubble_title,
+      bubble_description,
       card1_image,
       card1_title,
       card1_category,
@@ -235,6 +251,9 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       ${payload.heroTitle || ""},
       ${payload.heroSubtitle || ""},
       ${payload.heroCategory || ""},
+      ${payload.bubbleHeading || ""},
+      ${payload.bubbleTitle || ""},
+      ${payload.bubbleDescription || ""},
       ${c1.image || ""},
       ${c1.title || ""},
       ${c1.category || ""},
@@ -284,6 +303,9 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       card3_date = EXCLUDED.card3_date,
       card3_link = EXCLUDED.card3_link,
       card3_read_more = EXCLUDED.card3_read_more,
+      bubble_heading = EXCLUDED.bubble_heading,
+      bubble_title = EXCLUDED.bubble_title,
+      bubble_description = EXCLUDED.bubble_description,
       updated_at = NOW()
   `;
 }
