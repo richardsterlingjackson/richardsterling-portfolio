@@ -28,6 +28,14 @@ function humanizeSlug(value: string): string {
     .replace(/\b\w/g, (match) => match.toUpperCase());
 }
 
+function toAbsoluteUrl(origin: string, value: string): string {
+  if (!value) return value;
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("//")) return `https:${value}`;
+  if (value.startsWith("/")) return `${origin}${value}`;
+  return `${origin}/${value}`;
+}
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const origin = url.origin;
@@ -59,8 +67,11 @@ export async function GET(req: Request) {
     ? `<meta property="fb:app_id" content="${escapeHtml(fbAppId)}" />`
     : "";
 
-  // Use our dynamic OG image so Facebook always gets a crawlable preview (post images can be blocked or fail for crawlers).
-  const ogImage = `${origin}/api/og?title=${encodeURIComponent(title)}&category=${encodeURIComponent(category)}`;
+  const postImage = (post?.image || "").trim();
+  // Prefer the post's Cloudinary image when available; fall back to the dynamic OG image.
+  const ogImage = postImage
+    ? toAbsoluteUrl(origin, postImage)
+    : `${origin}/api/og?title=${encodeURIComponent(title)}&category=${encodeURIComponent(category)}`;
 
   const html = `<!doctype html>
 <html lang="en">
@@ -76,6 +87,7 @@ export async function GET(req: Request) {
     <meta property="og:type" content="article" />
     <meta property="og:url" content="${escapeHtml(pageUrl)}" />
     <meta property="og:image" content="${escapeHtml(ogImage)}" />
+    <meta property="og:image:secure_url" content="${escapeHtml(ogImage)}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="${escapeHtml(title)}" />
