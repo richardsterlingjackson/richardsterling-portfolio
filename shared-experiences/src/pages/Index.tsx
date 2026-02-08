@@ -205,8 +205,11 @@ export default function Index() {
                         loading="lazy"
                       />
                       <div className="p-4 space-y-2">
-                        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                          {item.category}
+                        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground flex flex-wrap gap-2">
+                          <span>{item.category}</span>
+                          {item.date && (
+                            <span className="opacity-70">• {item.date}</span>
+                          )}
                         </p>
                         <h3 className="font-playfair text-lg font-semibold text-elegant-text">
                           {item.link ? (
@@ -220,10 +223,9 @@ export default function Index() {
                             item.title
                           )}
                         </h3>
-                        <p className="text-xs text-muted-foreground">{item.content}</p>
-                        {item.date ? (
-                          <p className="text-xs text-muted-foreground">{item.date}</p>
-                        ) : null}
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {item.excerpt || item.content}
+                        </p>
                         {item.link ? (
                           <Link
                             to={item.link}

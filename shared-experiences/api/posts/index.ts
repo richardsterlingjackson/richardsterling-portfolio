@@ -64,7 +64,7 @@ type HomeFeatured = {
     image: string;
     title: string;
     category: string;
-    content: string;
+    excerpt: string;
     date: string;
     link: string;
     readMoreLabel: string;
@@ -114,21 +114,21 @@ async function ensureHomeFeaturedTable() {
         card1_image text NOT NULL DEFAULT '',
         card1_title text NOT NULL DEFAULT '',
         card1_category text NOT NULL DEFAULT '',
-        card1_content text NOT NULL DEFAULT '',
+        card1_excerpt text NOT NULL DEFAULT '',
         card1_date text NOT NULL DEFAULT '',
         card1_link text NOT NULL DEFAULT '',
         card1_read_more text NOT NULL DEFAULT '',
         card2_image text NOT NULL DEFAULT '',
         card2_title text NOT NULL DEFAULT '',
         card2_category text NOT NULL DEFAULT '',
-        card2_content text NOT NULL DEFAULT '',
+        card2_excerpt text NOT NULL DEFAULT '',
         card2_date text NOT NULL DEFAULT '',
         card2_link text NOT NULL DEFAULT '',
         card2_read_more text NOT NULL DEFAULT '',
         card3_image text NOT NULL DEFAULT '',
         card3_title text NOT NULL DEFAULT '',
         card3_category text NOT NULL DEFAULT '',
-        card3_content text NOT NULL DEFAULT '',
+        card3_excerpt text NOT NULL DEFAULT '',
         card3_date text NOT NULL DEFAULT '',
         card3_link text NOT NULL DEFAULT '',
         card3_read_more text NOT NULL DEFAULT '',
@@ -158,7 +158,7 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
           image: row.card1_image || "",
           title: row.card1_title || "",
           category: row.card1_category || "",
-          content: row.card1_content || "",
+          excerpt: row.card1_excerpt || "",
           date: row.card1_date || "",
           link: row.card1_link || "",
           readMoreLabel: row.card1_read_more || "",
@@ -167,7 +167,7 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
           image: row.card2_image || "",
           title: row.card2_title || "",
           category: row.card2_category || "",
-          content: row.card2_content || "",
+          excerpt: row.card2_excerpt || "",
           date: row.card2_date || "",
           link: row.card2_link || "",
           readMoreLabel: row.card2_read_more || "",
@@ -176,7 +176,7 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
           image: row.card3_image || "",
           title: row.card3_title || "",
           category: row.card3_category || "",
-          content: row.card3_content || "",
+          excerpt: row.card3_excerpt || "",
           date: row.card3_date || "",
           link: row.card3_link || "",
           readMoreLabel: row.card3_read_more || "",
@@ -192,9 +192,9 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
 async function upsertHomeFeatured(payload: HomeFeatured) {
   await ensureHomeFeaturedTable();
   const cards = payload.cards ?? [];
-  const c1 = cards[0] ?? { image: "", title: "", category: "", content: "", date: "", link: "", readMoreLabel: "" };
-  const c2 = cards[1] ?? { image: "", title: "", category: "", content: "", date: "", link: "", readMoreLabel: "" };
-  const c3 = cards[2] ?? { image: "", title: "", category: "", content: "", date: "", link: "", readMoreLabel: "" };
+  const c1 = cards[0] ?? { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" };
+  const c2 = cards[1] ?? { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" };
+  const c3 = cards[2] ?? { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" };
 
   await sql`
     INSERT INTO home_featured (
@@ -206,21 +206,21 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       card1_image,
       card1_title,
       card1_category,
-      card1_content,
+      card1_excerpt,
       card1_date,
       card1_link,
       card1_read_more,
       card2_image,
       card2_title,
       card2_category,
-      card2_content,
+      card2_excerpt,
       card2_date,
       card2_link,
       card2_read_more,
       card3_image,
       card3_title,
       card3_category,
-      card3_content,
+      card3_excerpt,
       card3_date,
       card3_link,
       card3_read_more,
@@ -234,21 +234,21 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       ${c1.image || ""},
       ${c1.title || ""},
       ${c1.category || ""},
-      ${c1.content || ""},
+      ${c1.excerpt || ""},
       ${c1.date || ""},
       ${c1.link || ""},
       ${c1.readMoreLabel || ""},
       ${c2.image || ""},
       ${c2.title || ""},
       ${c2.category || ""},
-      ${c2.content || ""},
+      ${c2.excerpt || ""},
       ${c2.date || ""},
       ${c2.link || ""},
       ${c2.readMoreLabel || ""},
       ${c3.image || ""},
       ${c3.title || ""},
       ${c3.category || ""},
-      ${c3.content || ""},
+      ${c3.excerpt || ""},
       ${c3.date || ""},
       ${c3.link || ""},
       ${c3.readMoreLabel || ""},
@@ -262,21 +262,21 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       card1_image = EXCLUDED.card1_image,
       card1_title = EXCLUDED.card1_title,
       card1_category = EXCLUDED.card1_category,
-      card1_content = EXCLUDED.card1_content,
+      card1_excerpt = EXCLUDED.card1_excerpt,
       card1_date = EXCLUDED.card1_date,
       card1_link = EXCLUDED.card1_link,
       card1_read_more = EXCLUDED.card1_read_more,
       card2_image = EXCLUDED.card2_image,
       card2_title = EXCLUDED.card2_title,
       card2_category = EXCLUDED.card2_category,
-      card2_content = EXCLUDED.card2_content,
+      card2_excerpt = EXCLUDED.card2_excerpt,
       card2_date = EXCLUDED.card2_date,
       card2_link = EXCLUDED.card2_link,
       card2_read_more = EXCLUDED.card2_read_more,
       card3_image = EXCLUDED.card3_image,
       card3_title = EXCLUDED.card3_title,
       card3_category = EXCLUDED.card3_category,
-      card3_content = EXCLUDED.card3_content,
+      card3_excerpt = EXCLUDED.card3_excerpt,
       card3_date = EXCLUDED.card3_date,
       card3_link = EXCLUDED.card3_link,
       card3_read_more = EXCLUDED.card3_read_more,

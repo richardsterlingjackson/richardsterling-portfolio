@@ -230,9 +230,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     heroSubtitle: "",
     heroCategory: "",
     cards: [
-      { image: "", title: "", category: "", content: "", date: "", link: "", readMoreLabel: "" },
-      { image: "", title: "", category: "", content: "", date: "", link: "", readMoreLabel: "" },
-      { image: "", title: "", category: "", content: "", date: "", link: "", readMoreLabel: "" },
+      { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
+      { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
+      { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
     ],
   });
 
@@ -1322,6 +1322,20 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     }}
                     placeholder="Category"
                   />
+                  <Textarea
+                    rows={2}
+                    value={card.excerpt}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setHomeFeatured((prev) => ({
+                        ...prev,
+                        cards: prev.cards.map((item, i) =>
+                          i === index ? { ...item, excerpt: value } : item
+                        ),
+                      }));
+                    }}
+                    placeholder="Excerpt text"
+                  />
                   <Input
                     value={card.date}
                     onChange={(e) => {
@@ -1363,17 +1377,17 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                   />
                   <Textarea
                     rows={3}
-                    value={card.content}
+                    value={card.excerpt}
                     onChange={(e) => {
                       const value = e.target.value;
                       setHomeFeatured((prev) => ({
                         ...prev,
                         cards: prev.cards.map((item, i) =>
-                          i === index ? { ...item, content: value } : item
+                          i === index ? { ...item, excerpt: value } : item
                         ),
                       }));
                     }}
-                    placeholder="Content"
+                    placeholder="Excerpt"
                   />
                   <Input
                     value={card.readMoreLabel}
