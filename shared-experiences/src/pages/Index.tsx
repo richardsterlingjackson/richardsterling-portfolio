@@ -92,21 +92,18 @@ export default function Index() {
             {featured && <BlogPost post={featured} />}
 
             <section className="space-y-6">
-              {homeFeatured?.bubbleHeading && (
-                <p className="text-sm uppercase tracking-[0.2em] text-elegant-primary">
-                  {homeFeatured.bubbleHeading}
+              <div className="space-y-2 max-w-2xl">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  {homeFeatured?.heroCategory || "Relatable Connections"}
                 </p>
-              )}
-              {homeFeatured?.bubbleTitle && (
-                <h1 className="font-playfair text-3xl sm:text-4xl font-semibold text-elegant-text">
-                  {homeFeatured.bubbleTitle}
-                </h1>
-              )}
-              {homeFeatured?.bubbleDescription && (
-                <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
-                  {homeFeatured.bubbleDescription}
+                <h2 className="font-playfair text-2xl sm:text-3xl font-semibold text-elegant-text">
+                  {homeFeatured?.heroTitle || "Notes on building, learning, and living in public."}
+                </h2>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  {homeFeatured?.heroSubtitle ||
+                    "A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
                 </p>
-              )}
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="rounded-lg border border-border bg-card p-4">
@@ -136,15 +133,7 @@ export default function Index() {
               </div>
 
               <div className="space-y-2 max-w-2xl">
-                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  {homeFeatured?.heroCategory || "Shared Experiences"}
-                </p>
-                <h2 className="font-playfair text-2xl sm:text-3xl font-semibold text-elegant-text">
-                  {homeFeatured?.heroTitle || "Notes on building, learning, and living in public."}
-                </h2>
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  {homeFeatured?.heroSubtitle || "A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
-                </p>
+                {/* hero copy duplicates handled above; kept block for visual spacing if needed */}
               </div>
             </section>
 
@@ -162,13 +151,14 @@ export default function Index() {
                   style={{ textShadow: "0 10px 30px rgba(0,0,0,0.45)" }}
                 >
                   <p className="text-xs uppercase tracking-[0.2em] text-white/80">
-                    {homeFeatured?.heroCategory || "Shared Experiences"}
+                    {homeFeatured?.bubbleHeading || "Relatable Connections"}
                   </p>
                   <h3 className="font-playfair text-2xl sm:text-3xl font-semibold text-white">
-                    {homeFeatured?.heroTitle || "Notes on building, learning, and living in public."}
+                    {homeFeatured?.bubbleTitle || "Notes on building, learning, and living in public."}
                   </h3>
                   <p className="text-sm sm:text-base text-white/90">
-                    {homeFeatured?.heroSubtitle || "A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
+                    {homeFeatured?.bubbleDescription ||
+                      "A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
                   </p>
                 </div>
                 </div>
