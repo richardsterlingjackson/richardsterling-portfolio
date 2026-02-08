@@ -25,6 +25,7 @@ type DbRow = {
   scheduled_at: string | null;
   likes_count: number | null;
   reads_count: number | null;
+  hidden: boolean | null;
 };
 
 type CreateBody = {
@@ -39,6 +40,7 @@ type CreateBody = {
   status: "draft" | "published";
   slug?: string;
   scheduledAt?: string | null;
+  hidden?: boolean;
 };
 
 type UpdateBody = {
@@ -53,6 +55,7 @@ type UpdateBody = {
   status: "draft" | "published";
   slug?: string;
   scheduledAt?: string | null;
+  hidden?: boolean;
 };
 
 type HomeFeatured = {
@@ -90,6 +93,7 @@ function mapRow(row: DbRow) {
     scheduledAt: row.scheduled_at,
     likesCount: row.likes_count ?? 0,
     readsCount: row.reads_count ?? 0,
+    hidden: row.hidden ?? false,
   };
 }
 
@@ -504,6 +508,7 @@ export async function PUT(req: Request) {
           category = ${body.category},
           featured = ${body.featured ?? false},
           main_featured = ${body.mainFeatured ?? false},
+          hidden = ${body.hidden ?? false},
           content = ${body.content},
           status = ${shouldSchedule ? "draft" : body.status},
           slug = ${slug},
@@ -515,8 +520,8 @@ export async function PUT(req: Request) {
       `) as DbRow[];
     } catch (err: any) {
       const message = err?.message || "";
-      if (message.includes("scheduled_at") || message.includes("main_featured")) {
-        console.warn("Missing posts columns; updating without scheduling/main_featured.");
+      if (message.includes("scheduled_at") || message.includes("main_featured") || message.includes("hidden")) {
+        console.warn("Missing posts columns; updating without scheduling/main_featured/hidden.");
         result = (await sql`
           UPDATE posts SET
             title = ${body.title},
@@ -664,6 +669,7 @@ export async function POST(req: Request) {
           category,
           featured,
           main_featured,
+          hidden,
           content,
           status,
           slug,
@@ -682,6 +688,7 @@ export async function POST(req: Request) {
           ${body.category},
           ${body.featured ?? false},
           ${body.mainFeatured ?? false},
+          ${body.hidden ?? false},
           ${body.content},
           ${shouldSchedule ? "draft" : body.status},
           ${slug},
@@ -695,8 +702,8 @@ export async function POST(req: Request) {
       `;
     } catch (err: any) {
       const message = err?.message || "";
-      if (message.includes("main_featured") || message.includes("scheduled_at") || message.includes("likes_count") || message.includes("reads_count")) {
-        console.warn("Missing posts columns; inserting without scheduling/likes/reads.");
+      if (message.includes("main_featured") || message.includes("scheduled_at") || message.includes("likes_count") || message.includes("reads_count") || message.includes("hidden")) {
+        console.warn("Missing posts columns; inserting without scheduling/likes/reads/hidden.");
         await sql`
           INSERT INTO posts (
             id,

@@ -21,6 +21,7 @@ export type BlogPost = {
   scheduledAt: string | null;
   likesCount: number;
   readsCount: number;
+  hidden: boolean;
 };
 
 // Legacy placeholder array — kept empty on purpose.

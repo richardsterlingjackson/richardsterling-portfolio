@@ -39,7 +39,7 @@ export default function Sidebar() {
   //
   const recentPosts = useMemo(() => {
     return allPosts
-      .filter((p) => p.status === "published")
+      .filter((p) => p.status === "published" && !p.hidden)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 5);
   }, [allPosts]);

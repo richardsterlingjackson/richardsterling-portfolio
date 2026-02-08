@@ -302,6 +302,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     category: z.string().min(1),
     featured: z.boolean().optional(),
     mainFeatured: z.boolean().optional(),
+    hidden: z.boolean().optional(),
     content: z.string().min(20),
     status: z.enum(["draft", "published"]),
     scheduledAt: z.string().optional(),
@@ -318,6 +319,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       category: "",
       featured: false,
       mainFeatured: false,
+      hidden: false,
       content: "",
       status: "draft",
       scheduledAt: "",
@@ -641,6 +643,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           status: data.status,
           featured: !!data.featured,
           mainFeatured: !!(editingPost.mainFeatured && data.featured && data.status === "published"),
+          hidden: !!data.hidden,
           slug: slugifyTitle(data.title),
           scheduledAt: data.scheduledAt || null,
         };
@@ -663,6 +666,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           status: data.status,
           featured: !!data.featured,
           mainFeatured: false,
+          hidden: !!data.hidden,
         };
 
         const created = await savePost({
@@ -700,6 +704,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       category: post.category,
       featured: post.featured ?? false,
       mainFeatured: post.mainFeatured ?? false,
+      hidden: post.hidden ?? false,
       content: post.content,
       status: post.status,
       scheduledAt: post.scheduledAt ?? "",
@@ -1141,6 +1146,17 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               />
               <label htmlFor="featured" className="text-sm text-elegant-text">
                 Mark this post as featured
+              </label>
+            </div>
+            <div className="bg-muted/50 border rounded px-3 py-2 text-sm flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="hidden"
+                {...register("hidden")}
+                className="h-4 w-4 accent-elegant-primary"
+              />
+              <label htmlFor="hidden" className="text-sm text-elegant-text">
+                Is hidden (exclude from recent lists)
               </label>
             </div>
 

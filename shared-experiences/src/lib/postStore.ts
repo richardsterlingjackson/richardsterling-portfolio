@@ -24,7 +24,7 @@ const API = "/api/posts";
 
 export type NewPostInput = Pick<
   BlogPost,
-  "title" | "date" | "excerpt" | "image" | "category" | "featured" | "mainFeatured" | "content" | "status"
+  "title" | "date" | "excerpt" | "image" | "category" | "featured" | "mainFeatured" | "content" | "status" | "hidden"
 >;
 
 export type NewPostPayload = NewPostInput & {
@@ -44,6 +44,7 @@ export type UpdatePostInput = {
   status: "draft" | "published";
   slug: string;
   scheduledAt?: string | null;
+  hidden?: boolean;
 };
 
 export async function getStoredPosts(): Promise<BlogPost[]> {

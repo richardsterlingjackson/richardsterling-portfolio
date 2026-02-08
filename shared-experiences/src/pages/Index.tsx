@@ -60,7 +60,7 @@ export default function Index() {
   const recentPosts = useMemo(
     () =>
       posts.filter(
-        (p) => p.status === "published" && (!featured || p.id !== featured.id)
+        (p) => p.status === "published" && !p.hidden && (!featured || p.id !== featured.id)
       ),
     [posts, featured]
   );
@@ -224,7 +224,7 @@ export default function Index() {
                           )}
                         </h3>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          {item.excerpt || item.content}
+                          {item.excerpt}
                         </p>
                         {item.link ? (
                           <Link
