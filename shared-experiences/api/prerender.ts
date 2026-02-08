@@ -48,7 +48,7 @@ export async function GET(req: Request) {
       const rows = (await sql`
         SELECT title, excerpt, image, category, slug, status
         FROM posts
-        WHERE slug = ${slug}
+        WHERE slug = ${slug} AND status = 'published'
         LIMIT 1
       `) as DbRow[];
       post = rows[0] ?? null;
@@ -63,7 +63,7 @@ export async function GET(req: Request) {
         SELECT p.slug AS canonical
         FROM post_slug_aliases a
         JOIN posts p ON p.id = a.post_id
-        WHERE a.slug = ${slug}
+        WHERE a.slug = ${slug} AND p.status = 'published'
         LIMIT 1
       `) as { canonical: string }[];
       const canonical = aliasRows[0]?.canonical;

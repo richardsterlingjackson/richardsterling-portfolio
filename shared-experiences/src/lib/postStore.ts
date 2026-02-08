@@ -1,13 +1,10 @@
 // Atomically set only one post as main featured
 export async function setMainFeaturedPost(postId: string): Promise<boolean> {
   try {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    const token = getAdminToken();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
     const res = await fetch("/api/posts/set-main-featured", {
       method: "POST",
-      headers,
+      headers: { "Content-Type": "application/json", "X-Admin-Request": "1" },
+      credentials: "include",
       body: JSON.stringify({ postId }),
       cache: "no-store",
     });
@@ -24,12 +21,6 @@ export async function setMainFeaturedPost(postId: string): Promise<boolean> {
 import type { BlogPost } from "@/data/posts";
 
 const API = "/api/posts";
-
-// Helper to get the admin token from sessionStorage (set when user logs in)
-function getAdminToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return sessionStorage.getItem("adminToken");
-}
 
 export type NewPostInput = Pick<
   BlogPost,
@@ -60,6 +51,7 @@ export async function getStoredPosts(): Promise<BlogPost[]> {
     const res = await fetch(API, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       cache: "no-store",
     });
 
@@ -80,14 +72,11 @@ export async function savePost(
   post: NewPostPayload
 ): Promise<BlogPost | null> {
   try {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    const token = getAdminToken();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
     const res = await fetch(API, {
       method: "POST",
       body: JSON.stringify(post),
-      headers,
+      headers: { "Content-Type": "application/json", "X-Admin-Request": "1" },
+      credentials: "include",
       cache: "no-store",
     });
 
@@ -109,14 +98,11 @@ export async function updatePost(
   post: UpdatePostInput
 ): Promise<BlogPost | null> {
   try {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    const token = getAdminToken();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
     const res = await fetch(`${API}?id=${encodeURIComponent(id)}`, {
       method: "PUT",
       body: JSON.stringify(post),
-      headers,
+      headers: { "Content-Type": "application/json", "X-Admin-Request": "1" },
+      credentials: "include",
       cache: "no-store",
     });
 
@@ -135,13 +121,10 @@ export async function updatePost(
 
 export async function deletePost(id: string): Promise<boolean> {
   try {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    const token = getAdminToken();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
     const res = await fetch(`${API}?id=${encodeURIComponent(id)}`, {
       method: "DELETE",
-      headers,
+      headers: { "Content-Type": "application/json", "X-Admin-Request": "1" },
+      credentials: "include",
       cache: "no-store",
     });
 

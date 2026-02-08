@@ -37,24 +37,40 @@ import {
 import type { BlogPost } from "@/data/posts";
 import { categories } from "@/data/categories";
 
-// Token-based auth: User enters token at login gate, stored in sessionStorage.
-// Token is sent in Authorization header for each request and validated by server.
-// This way, the token is never embedded in source code or visible to dev tools observers.
+// Token-based auth: User enters token at login gate.
+// Server sets an HttpOnly cookie session; the token is not stored in the browser.
 
 function AdminGate({ onSuccess }: { onSuccess: () => void }) {
   const [token, setToken] = React.useState("");
   const [error, setError] = React.useState("");
 
-  const handleEnter = () => {
+  const handleEnter = async () => {
     if (!token.trim()) {
       setError("Please enter the admin token");
       return;
     }
 
-    // Store token in sessionStorage; postStore will use it for requests
-    sessionStorage.setItem("adminToken", token);
-    setError("");
-    onSuccess();
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ token }),
+      });
+      if (!res.ok) {
+        if (res.status === 429) {
+          setError("Too many attempts. Please wait and try again.");
+        } else {
+          setError("Invalid token");
+        }
+        return;
+      }
+      setError("");
+      onSuccess();
+    } catch (err) {
+      console.error("Admin login failed:", err);
+      setError("Login failed. Try again.");
+    }
   };
 
   return (
@@ -89,13 +105,21 @@ export default function Admin() {
   const [sessionExpired, setSessionExpired] = React.useState(false);
 
   React.useEffect(() => {
-    const token = sessionStorage.getItem("adminToken");
-    if (token) setAuthorized(true);
+    fetch("/api/admin/me", { credentials: "include" })
+      .then((res) => {
+        if (res.ok) setAuthorized(true);
+      })
+      .catch((err) => console.error("Admin session check failed:", err));
   }, []);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("adminToken");
-    setAuthorized(false);
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
+    } catch (err) {
+      console.error("Admin logout failed:", err);
+    } finally {
+      setAuthorized(false);
+    }
   };
 
   if (sessionExpired) {
@@ -103,7 +127,7 @@ export default function Admin() {
       <div className="max-w-sm mx-auto py-24 space-y-4 text-center">
         <h2 className="text-xl font-semibold">Session Expired</h2>
         <p className="text-sm text-muted-foreground">
-          Your session has timed out after 30 minutes of inactivity.
+          Your session has timed out after 60 minutes of inactivity.
         </p>
         <Button onClick={() => { setSessionExpired(false); handleLogout(); }}>
           Return to Login
@@ -231,7 +255,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       if (timeSinceActivity >= SESSION_TIMEOUT) {
         // Session expired
         onSessionExpired();
-        sessionStorage.removeItem("adminToken");
+        fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch((err) =>
+          console.error("Admin logout failed:", err)
+        );
       } else if (timeSinceActivity >= WARNING_TIME && !timeoutWarning) {
         // Show warning
         setTimeoutWarning(true);
@@ -1244,5 +1270,3 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     </div>
   );
 }
-
-

@@ -2,7 +2,7 @@
 export const runtime = "nodejs";
 
 import { sql } from "./db.js";
-import { checkAdmin } from "../_helpers/auth.js";
+import { checkAdmin, isAdmin } from "../_helpers/auth.js";
 import { sendEmailsToSubscribers, sendUpdateEmailToSubscribers } from "../_helpers/sendEmails.js";
 import { v4 as uuid } from "uuid";
 
@@ -128,11 +128,16 @@ async function isSlugTaken(slug: string, excludePostId?: string): Promise<boolea
   return false;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const rows = (await sql`
-      SELECT * FROM posts ORDER BY created_at DESC
-    `) as DbRow[];
+    const admin = isAdmin(req);
+    const rows = admin
+      ? ((await sql`
+          SELECT * FROM posts ORDER BY created_at DESC
+        `) as DbRow[])
+      : ((await sql`
+          SELECT * FROM posts WHERE status = 'published' ORDER BY created_at DESC
+        `) as DbRow[]);
 
     const posts = rows.map(mapRow);
 

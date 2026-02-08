@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
   try {
     const direct = (await sql`
-      SELECT slug FROM posts WHERE slug = ${slug} LIMIT 1
+      SELECT slug FROM posts WHERE slug = ${slug} AND status = 'published' LIMIT 1
     `) as { slug: string }[];
 
     if (direct.length) {
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
       SELECT p.slug AS canonical
       FROM post_slug_aliases a
       JOIN posts p ON p.id = a.post_id
-      WHERE a.slug = ${slug}
+      WHERE a.slug = ${slug} AND p.status = 'published'
       LIMIT 1
     `) as { canonical: string }[];
 

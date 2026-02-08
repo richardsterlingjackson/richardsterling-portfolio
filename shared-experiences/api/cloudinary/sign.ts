@@ -1,8 +1,11 @@
 export const runtime = "nodejs";
 
 import crypto from "crypto";
+import { checkAdmin } from "../_helpers/auth.js";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const authErr = checkAdmin(req);
+  if (authErr) return authErr;
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
