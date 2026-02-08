@@ -546,6 +546,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       status,
       featured: Boolean(data.featured),
       mainFeatured: Boolean(data.mainFeatured),
+      hidden: typeof data.hidden === "boolean" ? data.hidden : false,
       scheduledAt: typeof data.scheduledAt === "string" ? data.scheduledAt : null,
       slug: typeof data.slug === "string" ? data.slug : undefined,
     };
@@ -666,7 +667,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           status: data.status,
           featured: !!data.featured,
           mainFeatured: false,
-          hidden: !!data.hidden,
+          hidden: typeof data.hidden === "boolean" ? data.hidden : false,
         };
 
         const created = await savePost({
