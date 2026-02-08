@@ -86,6 +86,48 @@ function slugify(input: string): string {
     .replace(/-+/g, "-");
 }
 
+async function ensureSlugAliasTable() {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS post_slug_aliases (
+        slug text PRIMARY KEY,
+        post_id uuid NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        created_at timestamptz DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS post_slug_aliases_post_id_idx
+      ON post_slug_aliases (post_id)
+    `;
+  } catch (err) {
+    console.warn("Failed to ensure post_slug_aliases table:", err);
+  }
+}
+
+async function isSlugTaken(slug: string, excludePostId?: string): Promise<boolean> {
+  const postRows = excludePostId
+    ? ((await sql`
+        SELECT id FROM posts WHERE slug = ${slug} AND id != ${excludePostId} LIMIT 1
+      `) as { id: string }[])
+    : ((await sql`
+        SELECT id FROM posts WHERE slug = ${slug} LIMIT 1
+      `) as { id: string }[]);
+
+  if (postRows.length) return true;
+
+  try {
+    await ensureSlugAliasTable();
+    const aliasRows = (await sql`
+      SELECT post_id FROM post_slug_aliases WHERE slug = ${slug} LIMIT 1
+    `) as { post_id: string }[];
+    if (aliasRows.length && aliasRows[0]?.post_id !== excludePostId) return true;
+  } catch (err) {
+    console.warn("Slug alias check failed:", err);
+  }
+
+  return false;
+}
+
 export async function GET() {
   try {
     const rows = (await sql`
@@ -126,6 +168,19 @@ export async function PUT(req: Request) {
       });
     }
 
+    const currentRows = (await sql`
+      SELECT id, slug FROM posts WHERE id = ${id} LIMIT 1
+    `) as { id: string; slug: string }[];
+
+    if (!currentRows.length) {
+      return new Response(JSON.stringify({ error: "Post not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const currentSlug = currentRows[0].slug;
+
     const body = (await req.json()) as UpdateBody;
 
     const scheduledAt = body.scheduledAt ? new Date(body.scheduledAt) : null;
@@ -150,15 +205,10 @@ export async function PUT(req: Request) {
       }
     }
 
-    const slug = body.slug && typeof body.slug === "string"
-      ? body.slug
-      : slugify(body.title);
+    const slug = body.slug && typeof body.slug === "string" ? body.slug : slugify(body.title);
 
-    const existing = (await sql`
-      SELECT id FROM posts WHERE slug = ${slug} AND id != ${id} LIMIT 1
-    `) as { id: string }[];
-
-    if (existing.length) {
+    const slugTaken = await isSlugTaken(slug, id);
+    if (slugTaken) {
       return new Response(JSON.stringify({ error: "Slug already exists" }), {
         status: 409,
         headers: { "Content-Type": "application/json" },
@@ -218,6 +268,19 @@ export async function PUT(req: Request) {
     }
 
     const updatedPost = mapRow(result[0]);
+
+    if (currentSlug && currentSlug !== slug) {
+      try {
+        await ensureSlugAliasTable();
+        await sql`
+          INSERT INTO post_slug_aliases (slug, post_id)
+          VALUES (${currentSlug}, ${id})
+          ON CONFLICT (slug) DO NOTHING
+        `;
+      } catch (err) {
+        console.warn("Failed to save slug alias:", err);
+      }
+    }
 
     if (updatedPost.status === "published") {
       sendUpdateEmailToSubscribers(updatedPost as any).catch((err) =>
@@ -308,11 +371,7 @@ export async function POST(req: Request) {
         : slugify(body.title);
 
     let slug = baseSlug;
-    const existing = (await sql`
-      SELECT slug FROM posts WHERE slug = ${slug} LIMIT 1
-    `) as DbRow[];
-
-    if (existing.length) {
+    if (await isSlugTaken(slug)) {
       slug = `${baseSlug}-${id.slice(0, 6)}`;
     }
 

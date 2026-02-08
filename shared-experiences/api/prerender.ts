@@ -57,6 +57,30 @@ export async function GET(req: Request) {
     }
   }
 
+  if (!post && slug) {
+    try {
+      const aliasRows = (await sql`
+        SELECT p.slug AS canonical
+        FROM post_slug_aliases a
+        JOIN posts p ON p.id = a.post_id
+        WHERE a.slug = ${slug}
+        LIMIT 1
+      `) as { canonical: string }[];
+      const canonical = aliasRows[0]?.canonical;
+      if (canonical) {
+        return Response.redirect(
+          `${origin}/posts/${encodeURIComponent(canonical)}`,
+          301
+        );
+      }
+    } catch (err: any) {
+      const message = err?.message || "";
+      if (!message.includes("post_slug_aliases")) {
+        console.error("prerender alias lookup failed:", err);
+      }
+    }
+  }
+
   const fallbackTitle = slug ? humanizeSlug(slug) : "Shared Experiences";
   const title = post?.title || fallbackTitle;
   const description = post?.excerpt || "Stories and reflections from Shared Experiences.";

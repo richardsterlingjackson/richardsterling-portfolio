@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getStoredPosts } from "@/lib/postStore";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
@@ -25,8 +25,26 @@ function formatPostDate(value: string): string {
   });
 }
 
+async function resolveSlug(slug: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `/api/posts/resolve-slug?slug=${encodeURIComponent(slug)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data && typeof data.slug === "string") {
+      return data.slug as string;
+    }
+  } catch (err) {
+    console.error("Resolve slug failed:", err);
+  }
+  return null;
+}
+
 export default function PostPage() {
   const { postId } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +63,14 @@ export default function PostPage() {
 
         // Find by slug (URL param)
         const found = storedPosts.find((p) => p.slug === postId) || null;
+
+        if (!found && postId) {
+          const resolved = await resolveSlug(postId);
+          if (resolved && resolved !== postId) {
+            navigate(`/posts/${encodeURIComponent(resolved)}`, { replace: true });
+            return;
+          }
+        }
 
         setPost(found);
         if (found) {
@@ -76,7 +102,7 @@ export default function PostPage() {
     }
 
     loadPost();
-  }, [postId]);
+  }, [postId, navigate]);
 
   useEffect(() => {
     if (!post) return;
