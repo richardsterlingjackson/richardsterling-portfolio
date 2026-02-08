@@ -134,6 +134,18 @@ export default function Index() {
                   </p>
                 </div>
               </div>
+
+              <div className="space-y-2 max-w-2xl">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  {homeFeatured?.heroCategory || "Shared Experiences"}
+                </p>
+                <h2 className="font-playfair text-2xl sm:text-3xl font-semibold text-elegant-text">
+                  {homeFeatured?.heroTitle || "Notes on building, learning, and living in public."}
+                </h2>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  {homeFeatured?.heroSubtitle || "A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
+                </p>
+              </div>
             </section>
 
             <section className="space-y-8">
