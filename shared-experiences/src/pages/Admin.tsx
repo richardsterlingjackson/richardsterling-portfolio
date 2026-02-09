@@ -1208,7 +1208,8 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               <Button type="button" variant="default" size="default" onClick={handleBackupDownload}>
                 Download Backup
               </Button>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <div className="flex flex-1 flex-col sm:flex-row gap-2">
+                <div className="flex flex-col gap-1 flex-1">
                   <input
                     type="file"
                     accept="application/json"
@@ -1218,24 +1219,28 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       setRestoreFile(event.target.files?.[0] ?? null);
                     }}
                   />
+
                   {restoreFile && (
                     <p className="text-xs text-muted-foreground">
                       Selected: {restoreFile.name} ({(restoreFile.size / 1024).toFixed(1)} KB)
                     </p>
                   )}
-
-              <Button
-                type="button"
-                variant="default"
-                size="default"
-                onClick={handleRestoreBackup}
-                disabled={restoring || !restoreFile}
-              >
-                {restoring ? "Restoring..." : "Restore Backup"}
-              </Button>
                 </div>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleRestoreBackup}
+                  disabled={restoring || !restoreFile}
+                >
+                  {restoring ? "Restoring…" : "Restore Backup"}
+                </Button>
               </div>
-            {backupError && <p className="text-sm text-destructive">{backupError}</p>}
+
+              {backupError && (
+                <p className="text-sm text-destructive">{backupError}</p>
+              )}
+            </div>
           </div>
 
                       {/* HOME FEATURED */}
