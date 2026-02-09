@@ -1244,7 +1244,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 </div>
                 <Button
                   type="button"
-                  variant="destructive"
+                  variant="default"
                   size="sm"
                   onClick={handleRestoreBackup}
                   disabled={restoring || !restoreFile}
@@ -1259,7 +1259,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             </div>
           </div>
 
-                      {/* HOME FEATURED */}
+          {/* HOME FEATURED */}
           <div className="space-y-6 bg-background/95 p-6 rounded-lg border">
             <div className="flex items-center justify-between">
               <div>
