@@ -5,6 +5,7 @@ import BlogPost from "@/components/BlogPost";
 import { getStoredPosts } from "@/lib/postStore";
 import type { BlogPost as BlogPostType } from "@/data/posts";
 import { Link } from "react-router-dom";
+import { Calendar } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
 import postCardOne from "@/assets/blog-post-1.jpg";
 import postCardTwo from "@/assets/blog-post-2.webp";
@@ -78,6 +79,17 @@ export default function Index() {
       totalLikes,
     };
   }, [posts]);
+
+  const formatCardDate = (date?: string) => {
+    if (!date) return null;
+    const parsed = new Date(date);
+    if (Number.isNaN(parsed.getTime())) return date;
+    return parsed.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -168,86 +180,95 @@ export default function Index() {
                   <h2 className="font-playfair text-xl sm:text-2xl font-semibold text-elegant-text">
                     Featured Articles
                   </h2>
-                  {/* <a href="/posts" className="text-sm text-elegant-primary hover:underline">
-                    View all
-                  </a> */}
-                </div>
+                    <a href="/posts" className="text-sm text-elegant-primary hover:underline">
+                      View all
+                    </a> 
+                  </div>
 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                   {(homeFeatured?.cards?.length
                     ? homeFeatured.cards
                     : [
-                    {
-                      image: postCardOne,
-                      category: "Product & Brand News",
-                      title: "Le Creuset’s Valentine’s Day Sale Comes With Free Heart Shaped Bowls",
-                      excerpt: "Start planning your celebration with special-edition cookware built to last.",
-                      date: "Feb 08, 2026",
-                      link: "/posts",
-                      readMoreLabel: "Read more",
-                    },
-                    {
-                      image: postCardTwo,
-                      category: "Product & Brand News",
-                      title: "9 Trader Joe’s Valentine’s Day Sweet Treats to Get Before They’re Gone",
-                      excerpt: "Sweet, small-batch snacks that are perfect for gifting (or keeping).",
-                      date: "Feb 08, 2026",
-                      link: "/posts",
-                      readMoreLabel: "Read more",
-                    },
-                    {
-                      image: postCardThree,
-                      category: "Product & Brand News",
-                      title: "This $10 Aldi Serving Tray Makes Super Bowl Hosting So Much Easier",
-                      excerpt: "Lightweight, durable, and ready for crowds—the MVP of any party shelf.",
-                      date: "Feb 08, 2026",
-                      link: "/posts",
-                      readMoreLabel: "Read more",
-                    },
-                      ]).map((item) => (
-                    <article
-                      key={item.title}
-                      className="border border-border rounded-lg overflow-hidden bg-card hover:border-elegant-primary transition"
-                    >
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full h-[200px] object-cover"
-                        loading="lazy"
-                      />
-                      <div className="p-4 space-y-2">
-                        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground flex flex-wrap gap-2">
-                          <span>{item.category}</span>
-                          {/* {item.date && (
-                            <span className="opacity-70">• {item.date}</span>
-                          )} */}
-                        </p>
-                        <h3 className="font-playfair text-lg font-semibold text-elegant-text">
-                          {item.link ? (
-                            <Link
-                              to={item.link}
-                              className="hover:text-elegant-primary transition"
-                            >
-                              {item.title}
-                            </Link>
-                          ) : (
-                            item.title
-                          )}
-                        </h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {item.excerpt}
-                        </p>
-                        {item.link ? (
-                          <Link
-                            to={item.link}
-                            className="text-xs uppercase tracking-[0.2em] text-elegant-primary hover:underline"
-                          >
-                            {item.readMoreLabel || "Read more"}
-                          </Link>
-                        ) : null}
-                      </div>
-                    </article>
-                  ))}
+                        {
+                          image: postCardOne,
+                          category: "Product & Brand News",
+                          title: "Le Creuset’s Valentine’s Day Sale Comes With Free Heart Shaped Bowls",
+                          excerpt: "Start planning your celebration with special-edition cookware built to last.",
+                          date: "Feb 08, 2026",
+                          link: "/posts",
+                          readMoreLabel: "Read more",
+                        },
+                        {
+                          image: postCardTwo,
+                          category: "Product & Brand News",
+                          title: "9 Trader Joe’s Valentine’s Day Sweet Treats to Get Before They’re Gone",
+                          excerpt: "Sweet, small-batch snacks that are perfect for gifting (or keeping).",
+                          date: "Feb 08, 2026",
+                          link: "/posts",
+                          readMoreLabel: "Read more",
+                        },
+                        {
+                          image: postCardThree,
+                          category: "Product & Brand News",
+                          title: "This $10 Aldi Serving Tray Makes Super Bowl Hosting So Much Easier",
+                          excerpt: "Lightweight, durable, and ready for crowds—the MVP of any party shelf.",
+                          date: "Feb 08, 2026",
+                          link: "/posts",
+                          readMoreLabel: "Read more",
+                        },
+                      ]).map((item) => {
+                      const displayDate = formatCardDate(item.date);
+                      return (
+                        <article
+                          key={item.title}
+                          className="group border border-border/80 rounded-xl overflow-hidden bg-card shadow-sm hover:shadow-md hover:-translate-y-1 transition-transform duration-150"
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-[210px] object-cover"
+                            loading="lazy"
+                          />
+                          <div className="p-5 space-y-3">
+                            <div className="flex items-center flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                              <span className="inline-flex items-center gap-2 rounded-full bg-muted/70 px-3 py-1 text-[11px] font-semibold text-elegant-text tracking-[0.16em]">
+                                {item.category}
+                              </span>
+                              {displayDate && (
+                                <>
+                                  <span className="text-muted-foreground/60">&middot;</span>
+                                  <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                                    <Calendar className="h-3 w-3" />
+                                    <time dateTime={item.date}>{displayDate}</time>
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                            <h3 className="font-playfair text-xl font-semibold leading-snug text-elegant-text group-hover:text-elegant-primary transition-colors">
+                              {item.link ? (
+                                <Link to={item.link} className="block">
+                                  {item.title}
+                                </Link>
+                              ) : (
+                                item.title
+                              )}
+                            </h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                              {item.excerpt}
+                            </p>
+                            {item.link ? (
+                              <Link
+                                to={item.link}
+                                className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-elegant-primary hover:gap-3 transition-all"
+                              >
+                                {item.readMoreLabel || "Read more"}
+                                <span aria-hidden>&rarr;</span>
+                              </Link>
+                            ) : null}
+                          </div>
+                        </article>
+                      );
+                    })}
                 </div>
               </div>
             </section>
