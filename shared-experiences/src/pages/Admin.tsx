@@ -64,6 +64,7 @@ type SiteSettingsPayload = {
   postFallbackImage: string;
   categoriesImage: string;
   categoriesFallbackImage: string;
+  categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
 };
 
 type MediaLibraryAsset = {
@@ -284,6 +285,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     postFallbackImage: "",
     categoriesImage: "",
     categoriesFallbackImage: "",
+    categoryCardImages: {},
   });
   const [settingsSaving, setSettingsSaving] = React.useState(false);
   const [settingsFileLabel, setSettingsFileLabel] = React.useState("");
@@ -292,6 +294,10 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const categoriesImageInputRef = React.useRef<HTMLInputElement | null>(null);
   const [categoriesFallbackLabel, setCategoriesFallbackLabel] = React.useState("");
   const categoriesFallbackInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [categoryCardImageLabels, setCategoryCardImageLabels] = React.useState<Record<string, string>>({});
+  const [categoryCardFallbackLabels, setCategoryCardFallbackLabels] = React.useState<Record<string, string>>({});
+  const categoryCardImageInputs = React.useRef<(HTMLInputElement | null)[]>([]);
+  const categoryCardFallbackInputs = React.useRef<(HTMLInputElement | null)[]>([]);
   const [homeFeatured, setHomeFeatured] = React.useState<HomeFeaturedPayload>({
     heroImage: "",
     heroTitle: "",
@@ -506,6 +512,24 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     }));
   };
 
+  const updateCategoryCardImage = React.useCallback(
+    (slug: string, field: "image" | "fallbackImage", value: string) => {
+      setSiteSettings((prev) => ({
+        ...prev,
+        categoryCardImages: {
+          ...prev.categoryCardImages,
+          [slug]: {
+            image: "",
+            fallbackImage: "",
+            ...prev.categoryCardImages[slug],
+            [field]: value,
+          },
+        },
+      }));
+    },
+    []
+  );
+
   const handleCardImageUpload = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -615,6 +639,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               postFallbackImage: settingsData.postFallbackImage || "",
               categoriesImage: settingsData.categoriesImage || "",
               categoriesFallbackImage: settingsData.categoriesFallbackImage || "",
+              categoryCardImages: settingsData.categoryCardImages || {},
             });
           }
         }
@@ -671,6 +696,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           postFallbackImage: updated.postFallbackImage || "",
           categoriesImage: updated.categoriesImage || "",
           categoriesFallbackImage: updated.categoriesFallbackImage || "",
+          categoryCardImages: updated.categoryCardImages || {},
         });
       }
       toast({ title: "Settings saved", description: "Site-wide images updated." });
@@ -1908,6 +1934,164 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       className="w-full max-w-sm rounded-md border"
                     />
                   )}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Category Card Images</p>
+                    <p className="text-xs text-muted-foreground">
+                      Leave both fields blank to use the local default fallback.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-5">
+                  {categories.map((category, index) => {
+                    const config = siteSettings.categoryCardImages[category.slug] || {
+                      image: "",
+                      fallbackImage: "",
+                    };
+                    const preview = config.image || config.fallbackImage;
+                    return (
+                      <div key={category.slug} className="rounded-lg border border-border p-4 space-y-3 bg-card/40">
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-semibold text-elegant-text">{category.label}</p>
+                            <p className="text-xs text-muted-foreground">{category.slug}</p>
+                          </div>
+                          {preview ? (
+                            <img
+                              src={preview}
+                              alt={`${category.label} preview`}
+                              className="h-12 w-20 rounded-md object-cover border border-border"
+                            />
+                          ) : null}
+                        </div>
+
+                        <div className="space-y-2">
+                          <Input
+                            placeholder="Image URL"
+                            value={config.image}
+                            onChange={(e) => updateCategoryCardImage(category.slug, "image", e.target.value)}
+                          />
+                          <input
+                            ref={(el) => {
+                              categoryCardImageInputs.current[index] = el;
+                            }}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setCategoryCardImageLabels((prev) => ({
+                                  ...prev,
+                                  [category.slug]: file.name,
+                                }));
+                                handleHomeImageUpload(file, (url) =>
+                                  updateCategoryCardImage(category.slug, "image", url)
+                                );
+                              }
+                            }}
+                          />
+                          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                            <button
+                              type="button"
+                              className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                              onClick={() => categoryCardImageInputs.current[index]?.click()}
+                              disabled={homeUploading}
+                            >
+                              Upload
+                            </button>
+                            <button
+                              type="button"
+                              className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                              onClick={() =>
+                                openMediaLibrary((url) => {
+                                  setCategoryCardImageLabels((prev) => ({
+                                    ...prev,
+                                    [category.slug]: "From library",
+                                  }));
+                                  updateCategoryCardImage(category.slug, "image", url);
+                                })
+                              }
+                              disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                            >
+                              Library
+                            </button>
+                            {categoryCardImageLabels[category.slug] && (
+                              <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                                {categoryCardImageLabels[category.slug]}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Input
+                            placeholder="Fallback image URL"
+                            value={config.fallbackImage}
+                            onChange={(e) =>
+                              updateCategoryCardImage(category.slug, "fallbackImage", e.target.value)
+                            }
+                          />
+                          <input
+                            ref={(el) => {
+                              categoryCardFallbackInputs.current[index] = el;
+                            }}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setCategoryCardFallbackLabels((prev) => ({
+                                  ...prev,
+                                  [category.slug]: file.name,
+                                }));
+                                handleHomeImageUpload(file, (url) =>
+                                  updateCategoryCardImage(category.slug, "fallbackImage", url)
+                                );
+                              }
+                            }}
+                          />
+                          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                            <button
+                              type="button"
+                              className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                              onClick={() => categoryCardFallbackInputs.current[index]?.click()}
+                              disabled={homeUploading}
+                            >
+                              Upload
+                            </button>
+                            <button
+                              type="button"
+                              className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                              onClick={() =>
+                                openMediaLibrary((url) => {
+                                  setCategoryCardFallbackLabels((prev) => ({
+                                    ...prev,
+                                    [category.slug]: "From library",
+                                  }));
+                                  updateCategoryCardImage(category.slug, "fallbackImage", url);
+                                })
+                              }
+                              disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                            >
+                              Library
+                            </button>
+                            {categoryCardFallbackLabels[category.slug] && (
+                              <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                                {categoryCardFallbackLabels[category.slug]}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

@@ -15,6 +15,7 @@ let siteSettings = {
   postFallbackImage: "",
   categoriesImage: "",
   categoriesFallbackImage: "",
+  categoryCardImages: {},
 };
 
 function readData() {
@@ -110,6 +111,7 @@ app.put('/api/posts', (req, res) => {
       postFallbackImage: req.body?.postFallbackImage || "",
       categoriesImage: req.body?.categoriesImage || "",
       categoriesFallbackImage: req.body?.categoriesFallbackImage || "",
+      categoryCardImages: req.body?.categoryCardImages || {},
     };
     return res.json(siteSettings);
   }

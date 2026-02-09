@@ -20,6 +20,9 @@ export default function Categories() {
   const [loading, setLoading] = useState(true);
   const [headerImage, setHeaderImage] = useState(categoriesFallback);
   const [headerFallbackImage, setHeaderFallbackImage] = useState(categoriesFallback);
+  const [categoryCardImages, setCategoryCardImages] = useState<
+    Record<string, { image?: string; fallbackImage?: string }>
+  >({});
 
   //
   // LOAD POSTS
@@ -50,6 +53,7 @@ export default function Categories() {
       const hero = settings?.categoriesImage || fallback;
       setHeaderFallbackImage(fallback);
       setHeaderImage(hero);
+      setCategoryCardImages(settings?.categoryCardImages || {});
     });
     return () => {
       active = false;
@@ -133,29 +137,48 @@ export default function Categories() {
               <p className="text-muted-foreground text-md">No categories found.</p>
             ) : (
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {categoryData.map(({ label, slug, count }) => (
-                  <li
-                    key={slug}
-                    className="group border border-border rounded-xl p-6 bg-card/70 hover:border-elegant-primary/60 hover:shadow-md transition"
-                  >
-                    <Link to={`/category/${slug}`} className="block space-y-3">
-                      <div className="flex items-center justify-between gap-4">
-                        <h3 className="text-xl font-semibold text-elegant-text group-hover:text-elegant-primary transition-colors">
-                          {label}
-                        </h3>
-                        <span className="text-[11px] uppercase tracking-[0.2em] px-2.5 py-1 rounded-full border border-border bg-background text-muted-foreground">
-                          {count} post{count > 1 ? "s" : ""}
+                {categoryData.map(({ label, slug, count }) => {
+                  const config = categoryCardImages[slug] || {};
+                  const fallbackImage = config.fallbackImage || categoriesFallback;
+                  const cardImage = config.image || fallbackImage;
+                  return (
+                    <li
+                      key={slug}
+                      className="group border border-border rounded-xl p-6 bg-card/70 hover:border-elegant-primary/60 hover:shadow-md transition"
+                    >
+                      <Link to={`/category/${slug}`} className="block space-y-4">
+                        <div className="overflow-hidden rounded-lg border border-border bg-muted/40">
+                          <img
+                            src={cardImage}
+                            alt={`${label} category`}
+                            className="w-full h-40 object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              if (target.src !== fallbackImage) {
+                                target.src = fallbackImage;
+                              }
+                            }}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <h3 className="text-xl font-semibold text-elegant-text group-hover:text-elegant-primary transition-colors">
+                            {label}
+                          </h3>
+                          <span className="text-[11px] uppercase tracking-[0.2em] px-2.5 py-1 rounded-full border border-border bg-background text-muted-foreground">
+                            {count} post{count > 1 ? "s" : ""}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Explore posts curated under {label}.
+                        </p>
+                        <span className="text-[11px] uppercase tracking-[0.2em] text-elegant-primary">
+                          View posts
                         </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Explore posts curated under {label}.
-                      </p>
-                      <span className="text-[11px] uppercase tracking-[0.2em] text-elegant-primary">
-                        View posts
-                      </span>
-                    </Link>
-                  </li>
-                ))}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
