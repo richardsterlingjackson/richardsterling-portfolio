@@ -219,6 +219,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [uploadError, setUploadError] = React.useState("");
   const uploadInputRef = React.useRef<HTMLInputElement | null>(null);
   const [restoreFile, setRestoreFile] = React.useState<File | null>(null);
+  const restoreInputRef = React.useRef<HTMLInputElement | null>(null);
   const [restoring, setRestoring] = React.useState(false);
   const [backupError, setBackupError] = React.useState("");
   const [homeUploading, setHomeUploading] = React.useState(false);
@@ -1211,6 +1212,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               <div className="flex flex-1 flex-col sm:flex-row gap-2">
                 <div className="flex flex-col gap-1 flex-1">
                   <input
+                    ref={restoreInputRef}
                     type="file"
                     accept="application/json"
                     className="rounded border border-border bg-background/60 px-3 py-2 text-sm"
@@ -1221,9 +1223,23 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                   />
 
                   {restoreFile && (
-                    <p className="text-xs text-muted-foreground">
-                      Selected: {restoreFile.name} ({(restoreFile.size / 1024).toFixed(1)} KB)
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-muted-foreground">
+                        Selected: {restoreFile.name} ({(restoreFile.size / 1024).toFixed(1)} KB)
+                      </p>
+                      <button
+                        type="button"
+                        className="text-xs underline text-muted-foreground hover:text-foreground"
+                        onClick={() => {
+                          setRestoreFile(null);
+                          if (restoreInputRef.current) {
+                            restoreInputRef.current.value = "";
+                          }
+                        }}
+                      >
+                        Clear
+                      </button>
+                    </div>
                   )}
                 </div>
                 <Button
