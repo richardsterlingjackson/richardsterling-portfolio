@@ -1,3 +1,4 @@
+// Email helpers: send publish/update/welcome emails to subscribers via Resend.
 import { sql } from "../posts/db.js";
 import { Resend } from "resend";
 import crypto from "crypto";

@@ -1,3 +1,4 @@
+// Post page: loads a post by slug, renders content, and shows related posts.
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getStoredPosts } from "@/lib/postStore";

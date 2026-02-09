@@ -1,3 +1,4 @@
+// Blog post card used across lists (featured, recent, category, search).
 import { Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePostFallbackImage } from "@/hooks/use-post-fallback";

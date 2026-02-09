@@ -1,6 +1,7 @@
 // api/posts/index.ts
 export const runtime = "nodejs";
 
+// Posts API: CRUD for posts, home featured config, and site settings.
 import { sql } from "./db.js";
 import { checkAdmin, isAdmin } from "../_helpers/auth.js";
 import { sendEmailsToSubscribers, sendUpdateEmailToSubscribers } from "../_helpers/sendEmails.js";

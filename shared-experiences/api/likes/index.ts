@@ -1,3 +1,4 @@
+// Likes API: increments/decrements like counts with basic fingerprinting.
 export const runtime = "nodejs";
 
 import { sql } from "../posts/db.js";

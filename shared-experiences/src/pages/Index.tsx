@@ -1,3 +1,4 @@
+// Home page: loads posts + home featured config, then renders hero, cards, and recent posts.
 import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";

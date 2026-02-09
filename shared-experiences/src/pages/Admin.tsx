@@ -1,5 +1,6 @@
 "use client";
 
+// Admin dashboard: auth gate + post editor + backups + home featured + site settings + post list.
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

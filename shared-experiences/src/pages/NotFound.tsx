@@ -1,3 +1,4 @@
+// 404 page: logs missing routes and provides a way back home.
 import { useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 

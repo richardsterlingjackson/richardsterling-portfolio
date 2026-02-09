@@ -1,3 +1,4 @@
+// Cron endpoint: publishes scheduled posts and triggers subscriber emails.
 export const runtime = "nodejs";
 
 import { sql } from "../posts/db.js";

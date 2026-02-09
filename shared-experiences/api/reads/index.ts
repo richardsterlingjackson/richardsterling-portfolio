@@ -1,3 +1,4 @@
+// Reads API: increments read count when a post is viewed.
 export const runtime = "nodejs";
 
 import { sql } from "../posts/db.js";

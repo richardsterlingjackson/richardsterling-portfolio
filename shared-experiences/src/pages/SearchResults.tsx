@@ -1,3 +1,4 @@
+// Search page: filters posts by query string and renders results.
 import { useLocation } from "react-router-dom";
 import { useMemo, useEffect, useState } from "react";
 import { getStoredPosts } from "@/lib/postStore";

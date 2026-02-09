@@ -1,3 +1,4 @@
+// Health check: verifies DB connectivity and table presence.
 export const runtime = "nodejs";
 
 import { sql } from "../posts/db.js";

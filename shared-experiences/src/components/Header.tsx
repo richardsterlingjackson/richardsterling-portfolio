@@ -1,3 +1,4 @@
+// Global header: nav links + search bar + page title updates.
 import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";

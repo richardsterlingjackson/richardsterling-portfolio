@@ -1,3 +1,4 @@
+// Category page: resolves category label, filters posts, renders list for one category.
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import Header from "@/components/Header";

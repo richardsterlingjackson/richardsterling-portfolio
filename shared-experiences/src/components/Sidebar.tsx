@@ -1,3 +1,4 @@
+// Sidebar: newsletter signup + recent/popular posts + category list.
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getStoredPosts } from "@/lib/postStore";

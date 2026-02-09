@@ -1,3 +1,4 @@
+// Prerender endpoint: returns server-side HTML for social crawlers.
 export const runtime = "nodejs";
 
 import { sql } from "./posts/db.js";

@@ -1,3 +1,4 @@
+// Categories page: aggregates published posts into category counts.
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
@@ -117,5 +118,4 @@ export default function Categories() {
     </div>
   );
 }
-
 

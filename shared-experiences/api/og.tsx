@@ -1,4 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
+// Open Graph image generator (edge runtime).
 export const config = {
   runtime: "edge",
 };

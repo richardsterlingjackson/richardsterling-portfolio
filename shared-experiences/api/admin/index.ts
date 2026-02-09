@@ -1,3 +1,4 @@
+// Admin auth API: login/logout/session checks with basic rate limiting.
 export const runtime = "nodejs";
 
 import {
