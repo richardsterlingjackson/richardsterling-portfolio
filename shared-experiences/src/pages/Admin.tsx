@@ -224,6 +224,12 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [backupError, setBackupError] = React.useState("");
   const [homeUploading, setHomeUploading] = React.useState(false);
   const [homeUploadError, setHomeUploadError] = React.useState("");
+  const [heroFileLabel, setHeroFileLabel] = React.useState("");
+  const [cardFileLabels, setCardFileLabels] = React.useState<Record<number, string>>({});
+  const heroFileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const cardFileInputs = React.useRef<(HTMLInputElement | null)[]>([]);
+  const [cloudInfo, setCloudInfo] = React.useState<{ cloudName: string; apiKey: string } | null>(null);
+  const [mediaLibraryReady, setMediaLibraryReady] = React.useState(false);
   const [homeSaving, setHomeSaving] = React.useState(false);
   const [homeFeatured, setHomeFeatured] = React.useState({
     heroImage: "",
@@ -442,6 +448,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     if (!file) {
       return;
     }
+    setCardFileLabels((prev) => ({ ...prev, [index]: file.name }));
     handleHomeImageUpload(file, (url) => updateCard(index, 'image', url));
   };
 
@@ -451,6 +458,64 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       uploadInputRef.current?.click();
     });
   }, []);
+
+  React.useEffect(() => {
+    fetch("/api/cloudinary/sign")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.cloudName && data?.apiKey) {
+          setCloudInfo({ cloudName: data.cloudName, apiKey: data.apiKey });
+        }
+      })
+      .catch(() => {
+        setHomeUploadError("Cloudinary credentials unavailable.");
+      });
+  }, []);
+
+  React.useEffect(() => {
+    if (mediaLibraryReady) return;
+    const existing = document.getElementById("cloudinary-media-library");
+    if (existing) {
+      setMediaLibraryReady(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.id = "cloudinary-media-library";
+    script.src = "https://media-library.cloudinary.com/global/all.js";
+    script.async = true;
+    script.onload = () => setMediaLibraryReady(true);
+    script.onerror = () => setHomeUploadError("Cloudinary media library failed to load.");
+    document.body.appendChild(script);
+  }, [mediaLibraryReady]);
+
+  const openMediaLibrary = React.useCallback(
+    (onUrl: (url: string) => void) => {
+      const cloudinary = (window as any)?.cloudinary;
+      if (!cloudInfo || !mediaLibraryReady || !cloudinary?.createMediaLibrary) {
+        setHomeUploadError("Media library not ready yet.");
+        return;
+      }
+      const instance = cloudinary.createMediaLibrary(
+        {
+          cloud_name: cloudInfo.cloudName,
+          api_key: cloudInfo.apiKey,
+          multiple: false,
+        },
+        {
+          insertHandler: (data: any) => {
+            const asset = data?.assets?.[0];
+            if (asset?.secure_url) {
+              onUrl(asset.secure_url);
+            }
+            instance.hide();
+          },
+        },
+        document.body
+      );
+      instance.show();
+    },
+    [cloudInfo, mediaLibraryReady]
+  );
 
   React.useEffect(() => {
     async function load() {
@@ -1103,7 +1168,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             ) : (
               <div className="space-y-2">
                 <input type="hidden" {...register("image")} />
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2">
                   <Input
                     ref={uploadInputRef}
                     type="file"
@@ -1113,7 +1178,21 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       if (file) handleImageUpload(file);
                     }}
                     disabled={uploadingImage}
+                    className="sm:w-auto"
                   />
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() =>
+                      openMediaLibrary((url) => {
+                        setValue("image", url, { shouldValidate: true });
+                        uploadInputRef.current && (uploadInputRef.current.value = "");
+                      })
+                    }
+                    disabled={uploadingImage || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
                   <span className="text-xs text-muted-foreground">
                     {uploadingImage ? "Uploading…" : "JPG/PNG"}
                   </span>
@@ -1320,16 +1399,51 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                   value={homeFeatured.heroImage}
                   onChange={(e) => setHomeFeatured({ ...homeFeatured, heroImage: e.target.value })}
                 />
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <input type="file" accept="image/*" onChange={(e) => {
+                <input
+                  ref={heroFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
+                      setHeroFileLabel(file.name);
                       handleHomeImageUpload(file, (url) =>
                         setHomeFeatured((prev) => ({ ...prev, heroImage: url }))
                       );
                     }
-                  }} />
-                  <span>{homeUploading ? "Uploading..." : "JPG/PNG recommended"}</span>
+                  }}
+                />
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => heroFileInputRef.current?.click()}
+                    disabled={homeUploading}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => openMediaLibrary((url) =>
+                      setHomeFeatured((prev) => {
+                        setHeroFileLabel("From library");
+                        return { ...prev, heroImage: url };
+                      })
+                    )}
+                    disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {homeUploading ? "Uploading..." : "JPG/PNG recommended"}
+                  </span>
+                  {heroFileLabel && (
+                    <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                      {heroFileLabel}
+                    </span>
+                  )}
                 </div>
                 {homeFeatured.heroImage && (
                   <img src={homeFeatured.heroImage} alt="Hero" className="w-full rounded-md border" />
@@ -1346,9 +1460,45 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     value={card.image}
                     onChange={(e) => updateCard(index, 'image', e.target.value)}
                   />
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <input type="file" accept="image/*" onChange={(e) => handleCardImageUpload(e, index)} />
-                    <span>{homeUploading ? "Uploading..." : "Upload image"}</span>
+                  <input
+                    ref={(el) => {
+                      cardFileInputs.current[index] = el;
+                    }}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleCardImageUpload(e, index)}
+                  />
+                  <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                      onClick={() => cardFileInputs.current[index]?.click()}
+                      disabled={homeUploading}
+                    >
+                      Upload
+                    </button>
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                      onClick={() =>
+                        openMediaLibrary((url) => {
+                          setCardFileLabels((prev) => ({ ...prev, [index]: "From library" }));
+                          updateCard(index, 'image', url);
+                        })
+                      }
+                      disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                    >
+                      Library
+                    </button>
+                    <span className="text-xs text-muted-foreground">
+                      {homeUploading ? "Uploading..." : "JPG/PNG"}
+                    </span>
+                    {cardFileLabels[index] && (
+                      <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                        {cardFileLabels[index]}
+                      </span>
+                    )}
                   </div>
                   <Input
                     placeholder="Category"
