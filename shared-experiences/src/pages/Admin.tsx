@@ -519,8 +519,6 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
         categoryCardImages: {
           ...prev.categoryCardImages,
           [slug]: {
-            image: "",
-            fallbackImage: "",
             ...prev.categoryCardImages[slug],
             [field]: value,
           },
@@ -626,7 +624,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               ...prev,
               ...homeData,
               cards: Array.isArray(homeData.cards) && homeData.cards.length === 3
-                ? homeData.cards.map((card) => ({ fallbackImage: "", ...card }))
+                ? homeData.cards.map((card) => ({ ...card, fallbackImage: card.fallbackImage ?? "" }))
                 : prev.cards,
             }));
           }
