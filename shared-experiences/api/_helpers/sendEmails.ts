@@ -67,7 +67,10 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
 
     // Send email to each subscriber
     const emailPromises = (subscribers as SubscriberRow[]).map((sub) => {
-      const unsubscribeCategoryUrl = buildUnsubscribeUrl(sub.email, sub.category);
+      const unsubscribeCategoryUrl = buildUnsubscribeUrl(
+        sub.email,
+        sub.category || undefined
+      );
       const unsubscribeAllUrl = buildUnsubscribeUrl(sub.email, "all");
       resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL || "posts@yourdomain.com",
@@ -157,7 +160,10 @@ export async function sendUpdateEmailToSubscribers(post: BlogPost) {
     console.log(`Sending update emails to ${subscribers.length} subscribers for ${post.category}...`);
 
     const emailPromises = (subscribers as SubscriberRow[]).map((sub) => {
-      const unsubscribeCategoryUrl = buildUnsubscribeUrl(sub.email, sub.category);
+      const unsubscribeCategoryUrl = buildUnsubscribeUrl(
+        sub.email,
+        sub.category || undefined
+      );
       const unsubscribeAllUrl = buildUnsubscribeUrl(sub.email, "all");
       resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL || "posts@yourdomain.com",

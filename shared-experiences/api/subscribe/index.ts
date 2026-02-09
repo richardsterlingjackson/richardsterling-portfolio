@@ -10,6 +10,13 @@ type SubscriberRow = {
   created_at: string | null;
 };
 
+const mapSubscriberRow = (row: Record<string, unknown>): SubscriberRow => ({
+  id: String(row.id ?? ""),
+  email: typeof row.email === "string" ? row.email : "",
+  category: typeof row.category === "string" ? row.category : "",
+  created_at: typeof row.created_at === "string" ? row.created_at : null,
+});
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only accept POST requests
   if (req.method !== "POST") {
@@ -76,7 +83,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         `;
 
         if (inserted.length) {
-          results.push(inserted[0]);
+          results.push(mapSubscriberRow(inserted[0]));
           sendWelcomeEmail(email, cat).catch((err) =>
             console.error("Failed to send welcome email:", err)
           );
@@ -91,7 +98,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         `;
 
         if (updatedSame.length) {
-          results.push(updatedSame[0]);
+          results.push(mapSubscriberRow(updatedSame[0]));
           continue;
         }
       }

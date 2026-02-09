@@ -63,6 +63,13 @@ export async function GET(req: Request) {
         mainFeatured: row.main_featured ?? false,
         content: row.content,
         status: row.status,
+        createdAt: row.created_at ?? null,
+        updatedAt: row.updated_at ?? null,
+        version: row.version ?? 1,
+        scheduledAt: row.scheduled_at ?? null,
+        likesCount: row.likes_count ?? 0,
+        readsCount: row.reads_count ?? 0,
+        hidden: row.hidden ?? false,
       };
 
       sendEmailsToSubscribers(post).catch((err) =>
