@@ -1204,16 +1204,11 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           {/* BACKUP & RESTORE */}
           <div className="space-y-3 bg-background/95 p-6 rounded-lg border">
             <h2 className="text-xl font-semibold text-elegant-text">Backup & Restore</h2>
-            <p className="text-sm text-muted-foreground">
-              Download a JSON backup of all posts. Restore will overwrite all existing posts.
-            </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
               <Button type="button" variant="default" size="default" onClick={handleBackupDownload}>
                 Download Backup
               </Button>
-
               <div className="flex-1 space-y-2">
-                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Restore File</p>
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     <input
@@ -1225,7 +1220,6 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                         setRestoreFile(event.target.files?.[0] ?? null);
                       }}
                     />
-                    <span className="text-xs text-muted-foreground">JSON only</span>
                   </div>
                   {restoreFile && (
                     <p className="text-xs text-muted-foreground">
