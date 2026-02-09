@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -1208,31 +1207,25 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             <p className="text-sm text-muted-foreground">
               Download a JSON backup of all posts. Restore will overwrite all existing posts.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
               <Button type="button" variant="default" size="default" onClick={handleBackupDownload}>
                 Download Backup
               </Button>
 
               <div className="flex-1 space-y-2">
-                <div className="space-y-1">
-                  <Label htmlFor="restore-backup-file" className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    Restore file
-                  </Label>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Restore File</p>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <Input
-                    id="restore-backup-file"
                     type="file"
                     accept="application/json"
                     onChange={(event) => {
                       setBackupError("");
                       setRestoreFile(event.target.files?.[0] ?? null);
                     }}
+                    className="sm:max-w-xs"
                   />
+                  <span className="text-xs text-muted-foreground">JSON only</span>
                 </div>
-                {restoreFile && (
-                  <p className="text-xs text-muted-foreground">
-                    Selected: {restoreFile.name} ({(restoreFile.size / 1024).toFixed(1)} KB)
-                  </p>
-                )}
               </div>
 
               <Button
@@ -1242,7 +1235,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 onClick={handleRestoreBackup}
                 disabled={restoring || !restoreFile}
               >
-                {restoring ? "Restoring…" : "Restore Backup"}
+                {restoring ? "Restoring..." : "Restore Backup"}
               </Button>
             </div>
             {backupError && <p className="text-sm text-destructive">{backupError}</p>}
