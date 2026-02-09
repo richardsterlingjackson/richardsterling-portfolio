@@ -1212,10 +1212,10 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 Download Backup
               </Button>
 
-              <div className="flex flex-1 flex-col sm:flex-row gap-2">
+              <div className="flex items-center flex-col sm:flex-row gap-2">
                 <Input
                   type="file"
-                  className="w-full border border-gray-700 rounded px-3 py-2 text-sm"
+                  className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
                   accept="application/json"
                   onChange={(event) => {
                     setBackupError("");
