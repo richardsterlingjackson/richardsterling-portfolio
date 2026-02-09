@@ -1215,7 +1215,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               <div className="flex flex-1 flex-col sm:flex-row gap-2">
                 <Input
                   type="file"
-                  className="border border-border"
+                  className="w-full border rounded px-3 py-2 text-sm"
                   accept="application/json"
                   onChange={(event) => {
                     setBackupError("");
