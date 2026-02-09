@@ -1213,56 +1213,15 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               </Button>
 
               <div className="flex flex-1 flex-col sm:flex-row gap-2">
-                <div className="w-full">
-                  <label htmlFor="backup-upload" className="block mb-2 text-sm font-medium text-elegant-text">Upload Backup File</label>
-                  <div
-                    className="border border-gray-700 rounded px-3 py-6 text-sm flex flex-col items-center justify-center bg-muted/20 cursor-pointer hover:bg-muted/40 transition"
-                    onDrop={e => {
-                      e.preventDefault();
-                      setBackupError("");
-                      const file = e.dataTransfer.files?.[0];
-                      if (file && file.type === "application/json") {
-                        setRestoreFile(file);
-                      } else {
-                        setBackupError("Please upload a JSON file.");
-                      }
-                    }}
-                    onDragOver={e => e.preventDefault()}
-                  >
-                    <input
-                      id="backup-upload"
-                      type="file"
-                      accept="application/json"
-                      className="hidden"
-                      onChange={event => {
-                        setBackupError("");
-                        setRestoreFile(event.target.files?.[0] ?? null);
-                      }}
-                    />
-                    <button
-                      type="button"
-                      className="px-4 py-2 bg-elegant-primary text-white rounded font-semibold mb-2"
-                      onClick={() => document.getElementById("backup-upload")?.click()}
-                    >
-                      Choose File
-                    </button>
-                    <span className="text-xs text-muted-foreground mb-2">or drag and drop a JSON file here</span>
-                    {restoreFile ? (
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-sm font-medium text-elegant-text">{restoreFile.name}</span>
-                        <button
-                          type="button"
-                          className="text-xs text-destructive border border-destructive rounded px-2 py-1"
-                          onClick={() => setRestoreFile(null)}
-                        >
-                          Clear
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="text-sm text-muted-foreground mt-2">No file chosen</span>
-                    )}
-                  </div>
-                </div>
+                <Input
+                  type="file"
+                  className="w-full border border-gray-700 rounded px-3 py-2 text-sm"
+                  accept="application/json"
+                  onChange={(event) => {
+                    setBackupError("");
+                    setRestoreFile(event.target.files?.[0] ?? null);
+                  }}
+                />
                 
                 <Button
                   type="button"
