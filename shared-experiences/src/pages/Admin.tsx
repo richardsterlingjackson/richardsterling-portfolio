@@ -1945,7 +1945,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                   </div>
                 </div>
 
-                <div className="grid gap-5">
+                <div className="grid gap-5 lg:grid-cols-2">
                   {categories.map((category, index) => {
                     const config = siteSettings.categoryCardImages[category.slug] || {
                       image: "",
