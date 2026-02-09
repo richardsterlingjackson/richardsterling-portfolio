@@ -13,6 +13,7 @@ type CategoryInfo = {
   label: string;
   slug: string;
   count: number;
+  latestDate?: string;
 };
 
 export default function Categories() {
@@ -64,22 +65,36 @@ export default function Categories() {
   // BUILD CATEGORY COUNTS (memoized)
   //
   const categoryData = useMemo<CategoryInfo[]>(() => {
-    const map = new Map<string, number>();
+    const map = new Map<string, { count: number; latestDate?: string }>();
 
     posts.forEach((post) => {
       const category = post.category?.trim();
-      if (category) {
-        map.set(category, (map.get(category) || 0) + 1);
+      if (!category) return;
+      const current = map.get(category) || { count: 0, latestDate: undefined };
+      const nextCount = current.count + 1;
+
+      let nextLatest = current.latestDate;
+      const parsed = post.date ? new Date(post.date) : null;
+      if (parsed && !Number.isNaN(parsed.getTime())) {
+        if (!current.latestDate || parsed > new Date(current.latestDate)) {
+          nextLatest = post.date;
+        }
       }
+
+      map.set(category, { count: nextCount, latestDate: nextLatest });
     });
 
     // Convert to array using official category list
     return categoryList
-      .map(({ label, slug }) => ({
-        label,
-        slug,
-        count: map.get(label) || 0,
-      }))
+      .map(({ label, slug }) => {
+        const entry = map.get(label);
+        return {
+          label,
+          slug,
+          count: entry?.count || 0,
+          latestDate: entry?.latestDate,
+        };
+      })
       .filter((c) => c.count > 0); // Only show categories that actually have posts
   }, [posts]);
 
@@ -137,7 +152,7 @@ export default function Categories() {
               <p className="text-muted-foreground text-md">No categories found.</p>
             ) : (
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {categoryData.map(({ label, slug, count }) => {
+                {categoryData.map(({ label, slug, count, latestDate }) => {
                   const config = categoryCardImages[slug] || {};
                   const fallbackImage = config.fallbackImage || categoriesFallback;
                   const cardImage = config.image || fallbackImage;
@@ -169,14 +184,19 @@ export default function Categories() {
                             {count} post{count > 1 ? "s" : ""}
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          Explore posts curated under {label}.
+                      <p className="text-sm text-muted-foreground">
+                        Explore posts curated under {label}.
+                      </p>
+                      {latestDate && (
+                        <p className="text-xs text-muted-foreground">
+                          Latest: {latestDate}
                         </p>
-                        <span className="text-[11px] uppercase tracking-[0.2em] text-elegant-primary">
-                          View posts
-                        </span>
-                      </Link>
-                    </li>
+                      )}
+                      <span className="text-[11px] uppercase tracking-[0.2em] text-elegant-primary">
+                        View posts
+                      </span>
+                    </Link>
+                  </li>
                   );
                 })}
               </ul>
