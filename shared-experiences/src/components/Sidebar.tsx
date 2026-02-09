@@ -49,7 +49,7 @@ export default function Sidebar() {
   //
   const popularPosts = useMemo(() => {
     return allPosts
-      .filter((p) => p.status === "published")
+      .filter((p) => p.status === "published" && !p.hidden)
       .sort((a, b) => {
         const readsDiff = (b.readsCount || 0) - (a.readsCount || 0);
         if (readsDiff !== 0) return readsDiff;
@@ -63,7 +63,7 @@ export default function Sidebar() {
   //
   const categoryWithCounts = useMemo(() => {
     return categories.map(({ slug, label }) => {
-      const count = allPosts.filter((p) => p.category === label && p.status === "published").length;
+      const count = allPosts.filter((p) => p.category === label && p.status === "published" && !p.hidden).length;
       return { slug, label, count };
     });
   }, [allPosts]);
