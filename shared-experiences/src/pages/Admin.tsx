@@ -1208,26 +1208,21 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               <Button type="button" variant="default" size="default" onClick={handleBackupDownload}>
                 Download Backup
               </Button>
-              <div className="flex-1 space-y-2">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <input
-                      type="file"
-                      accept="application/json"
-                      className="rounded border border-border bg-background/60 px-3 py-2 text-sm"
-                      onChange={(event) => {
-                        setBackupError("");
-                        setRestoreFile(event.target.files?.[0] ?? null);
-                      }}
-                    />
-                  </div>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <input
+                    type="file"
+                    accept="application/json"
+                    className="rounded border border-border bg-background/60 px-3 py-2 text-sm"
+                    onChange={(event) => {
+                      setBackupError("");
+                      setRestoreFile(event.target.files?.[0] ?? null);
+                    }}
+                  />
                   {restoreFile && (
                     <p className="text-xs text-muted-foreground">
                       Selected: {restoreFile.name} ({(restoreFile.size / 1024).toFixed(1)} KB)
                     </p>
                   )}
-                </div>
-              </div>
 
               <Button
                 type="button"
@@ -1238,7 +1233,8 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               >
                 {restoring ? "Restoring..." : "Restore Backup"}
               </Button>
-            </div>
+                </div>
+              </div>
             {backupError && <p className="text-sm text-destructive">{backupError}</p>}
           </div>
 
