@@ -1223,8 +1223,8 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 />
                 <Button
                   type="button"
-                  variant="destructive"
-                  size="sm"
+                  variant="default"
+                  size="default"
                   onClick={handleRestoreBackup}
                   disabled={restoring || !restoreFile}
                 >
