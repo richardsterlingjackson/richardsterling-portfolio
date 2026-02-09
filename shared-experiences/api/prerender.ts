@@ -16,7 +16,7 @@ function escapeHtml(value: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
@@ -73,8 +73,8 @@ export async function GET(req: Request) {
           301
         );
       }
-    } catch (err: any) {
-      const message = err?.message || "";
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "";
       if (!message.includes("post_slug_aliases")) {
         console.error("prerender alias lookup failed:", err);
       }

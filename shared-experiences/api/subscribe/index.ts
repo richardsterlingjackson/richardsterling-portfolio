@@ -2,6 +2,13 @@ import { sql } from "../posts/db.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { sendWelcomeEmail } from "../_helpers/sendEmails.js";
 
+type SubscriberRow = {
+  id: string;
+  email: string;
+  category: string;
+  created_at: string | null;
+};
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only accept POST requests
   if (req.method !== "POST") {
@@ -57,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         `;
       }
 
-      const results: any[] = [];
+      const results: SubscriberRow[] = [];
 
       for (const cat of targetCategories) {
         const inserted = await sql`
@@ -96,17 +103,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       return res.status(500).json({ error: "Failed to subscribe" });
-    } catch (dbErr: any) {
+    } catch (dbErr: unknown) {
+      const message = dbErr instanceof Error ? dbErr.message : "";
       // If table doesn't exist, still return success but log the error
-      if (dbErr?.message?.includes("does not exist")) {
-        console.warn("Subscribers table does not exist. Create it with:", dbErr.message);
+      if (message.includes("does not exist")) {
+        console.warn("Subscribers table does not exist. Create it with:", message);
         return res.status(200).json({ message: "Subscription received (table setup needed)" });
       }
 
       throw dbErr;
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to subscribe";
     console.error("Subscribe error:", err);
-    return res.status(500).json({ error: "Failed to subscribe", details: err.message });
+    return res.status(500).json({ error: "Failed to subscribe", details: message });
   }
 }

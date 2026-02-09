@@ -11,6 +11,7 @@ const app = express();
 app.use(express.json());
 
 const DATA_PATH = path.resolve(__dirname, '../api/posts/dev_posts.json');
+let siteSettings = { postFallbackImage: "" };
 
 function readData() {
   try {
@@ -31,6 +32,9 @@ function writeData(data) {
 }
 
 app.get('/api/posts', (req, res) => {
+  if (req.query.settings === '1') {
+    return res.json(siteSettings);
+  }
   const rows = readData();
   rows.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
   res.json(rows);
@@ -97,6 +101,12 @@ app.put('/api/posts/:id', (req, res) => {
 
 // Support query-string id to match frontend dev requests.
 app.put('/api/posts', (req, res) => {
+  if (req.query.settings === '1') {
+    siteSettings = {
+      postFallbackImage: req.body?.postFallbackImage || "",
+    };
+    return res.json(siteSettings);
+  }
   const id = req.query.id;
   if (!id || typeof id !== 'string') {
     return res.status(400).json({ error: 'Missing post ID' });

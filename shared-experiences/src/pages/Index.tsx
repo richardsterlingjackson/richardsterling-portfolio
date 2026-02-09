@@ -23,6 +23,7 @@ export default function Index() {
     bubbleDescription?: string;
     cards: Array<{
       image: string;
+      fallbackImage?: string;
       title: string;
       category: string;
       excerpt: string;
@@ -216,18 +217,26 @@ export default function Index() {
                           link: "/posts",
                           readMoreLabel: "Read more",
                         },
-                      ]).map((item) => {
+                      ]).map((item, index) => {
                       const displayDate = formatCardDate(item.date);
+                      const defaultFallbacks = [postCardOne, postCardTwo, postCardThree];
+                      const fallbackImage = item.fallbackImage || defaultFallbacks[index];
+                      const primaryImage = item.image || fallbackImage;
                       return (
                         <article
                           key={item.title}
                           className="group border border-border/80 rounded-xl overflow-hidden bg-card shadow-sm hover:shadow-md hover:-translate-y-1 transition-transform duration-150"
                         >
                           <img
-                            src={item.image}
+                            src={primaryImage}
                             alt={item.title}
                             className="w-full h-[210px] object-cover"
                             loading="lazy"
+                            onError={(e) => {
+                              if (fallbackImage && e.currentTarget.src !== fallbackImage) {
+                                e.currentTarget.src = fallbackImage;
+                              }
+                            }}
                           />
                           <div className="p-5 space-y-3">
                             <div className="flex items-center flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">

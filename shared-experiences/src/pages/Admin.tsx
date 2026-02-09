@@ -39,6 +39,50 @@ import { categories } from "@/data/categories";
 
 // Token-based auth: User enters token at login gate.
 // Server sets an HttpOnly cookie session; the token is not stored in the browser.
+type HomeFeaturedPayload = {
+  heroImage: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroCategory: string;
+  bubbleHeading?: string;
+  bubbleTitle?: string;
+  bubbleDescription?: string;
+  cards: Array<{
+    image: string;
+    fallbackImage?: string;
+    title: string;
+    category: string;
+    excerpt: string;
+    date: string;
+    link: string;
+    readMoreLabel: string;
+  }>;
+};
+
+type SiteSettingsPayload = {
+  postFallbackImage: string;
+};
+
+type MediaLibraryAsset = {
+  secure_url?: string;
+};
+
+type MediaLibraryInsertData = {
+  assets?: MediaLibraryAsset[];
+};
+
+type MediaLibraryInstance = {
+  show: () => void;
+  hide: () => void;
+};
+
+type CloudinaryMediaLibrary = {
+  createMediaLibrary: (
+    config: { cloud_name: string; api_key: string; multiple?: boolean },
+    options: { insertHandler: (data: MediaLibraryInsertData) => void },
+    target: HTMLElement
+  ) => MediaLibraryInstance;
+};
 
 function AdminGate({ onSuccess }: { onSuccess: () => void }) {
   const [token, setToken] = React.useState("");
@@ -226,12 +270,18 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [homeUploadError, setHomeUploadError] = React.useState("");
   const [heroFileLabel, setHeroFileLabel] = React.useState("");
   const [cardFileLabels, setCardFileLabels] = React.useState<Record<number, string>>({});
+  const [cardFallbackLabels, setCardFallbackLabels] = React.useState<Record<number, string>>({});
   const heroFileInputRef = React.useRef<HTMLInputElement | null>(null);
   const cardFileInputs = React.useRef<(HTMLInputElement | null)[]>([]);
+  const cardFallbackFileInputs = React.useRef<(HTMLInputElement | null)[]>([]);
   const [cloudInfo, setCloudInfo] = React.useState<{ cloudName: string; apiKey: string } | null>(null);
   const [mediaLibraryReady, setMediaLibraryReady] = React.useState(false);
   const [homeSaving, setHomeSaving] = React.useState(false);
-  const [homeFeatured, setHomeFeatured] = React.useState({
+  const [siteSettings, setSiteSettings] = React.useState<SiteSettingsPayload>({ postFallbackImage: "" });
+  const [settingsSaving, setSettingsSaving] = React.useState(false);
+  const [settingsFileLabel, setSettingsFileLabel] = React.useState("");
+  const settingsFileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [homeFeatured, setHomeFeatured] = React.useState<HomeFeaturedPayload>({
     heroImage: "",
     heroTitle: "",
     heroSubtitle: "",
@@ -240,9 +290,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     bubbleTitle: "",
     bubbleDescription: "",
     cards: [
-      { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
-      { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
-      { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
+      { image: "", fallbackImage: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
+      { image: "", fallbackImage: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
+      { image: "", fallbackImage: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" },
     ],
   });
 
@@ -391,8 +441,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       if (uploadData.secure_url) {
         setValue("image", uploadData.secure_url, { shouldValidate: true });
       }
-    } catch (err: any) {
-      setUploadError(err?.message || "Upload failed");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Upload failed";
+      setUploadError(message);
     } finally {
       setUploadingImage(false);
     }
@@ -429,8 +480,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       if (uploadData.secure_url) {
         onUrl(uploadData.secure_url);
       }
-    } catch (err: any) {
-      setHomeUploadError(err?.message || "Upload failed");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Upload failed";
+      setHomeUploadError(message);
     } finally {
       setHomeUploading(false);
     }
@@ -450,6 +502,15 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     }
     setCardFileLabels((prev) => ({ ...prev, [index]: file.name }));
     handleHomeImageUpload(file, (url) => updateCard(index, 'image', url));
+  };
+
+  const handleCardFallbackUpload = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    setCardFallbackLabels((prev) => ({ ...prev, [index]: file.name }));
+    handleHomeImageUpload(file, (url) => updateCard(index, 'fallbackImage', url));
   };
 
   const handleSelectUploadMode = React.useCallback(() => {
@@ -490,7 +551,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
 
   const openMediaLibrary = React.useCallback(
     (onUrl: (url: string) => void) => {
-      const cloudinary = (window as any)?.cloudinary;
+      const cloudinary = (window as Window & { cloudinary?: CloudinaryMediaLibrary }).cloudinary;
       if (!cloudInfo || !mediaLibraryReady || !cloudinary?.createMediaLibrary) {
         setHomeUploadError("Media library not ready yet.");
         return;
@@ -502,7 +563,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           multiple: false,
         },
         {
-          insertHandler: (data: any) => {
+          insertHandler: (data: MediaLibraryInsertData) => {
             const asset = data?.assets?.[0];
             if (asset?.secure_url) {
               onUrl(asset.secure_url);
@@ -524,15 +585,24 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       try {
         const homeRes = await fetch("/api/posts?home=1", { credentials: "include", cache: "no-store" });
         if (homeRes.ok) {
-          const homeData = await homeRes.json();
+          const homeData = (await homeRes.json()) as HomeFeaturedPayload | null;
           if (homeData) {
             setHomeFeatured((prev) => ({
               ...prev,
               ...homeData,
               cards: Array.isArray(homeData.cards) && homeData.cards.length === 3
-                ? homeData.cards
+                ? homeData.cards.map((card) => ({ fallbackImage: "", ...card }))
                 : prev.cards,
             }));
+          }
+        }
+        const settingsRes = await fetch("/api/posts?settings=1", { credentials: "include", cache: "no-store" });
+        if (settingsRes.ok) {
+          const settingsData = (await settingsRes.json()) as SiteSettingsPayload | null;
+          if (settingsData) {
+            setSiteSettings({
+              postFallbackImage: settingsData.postFallbackImage || "",
+            });
           }
         }
       } catch (err) {
@@ -560,11 +630,41 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
         setHomeFeatured(updated);
       }
       toast({ title: "Home section saved", description: "Your featured section has been updated." });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unable to save home section.";
       console.error("Save home featured failed:", err);
-      toast({ title: "Save Failed", description: err?.message || "Unable to save home section.", variant: "destructive" });
+      toast({ title: "Save Failed", description: message, variant: "destructive" });
     } finally {
       setHomeSaving(false);
+    }
+  };
+
+  const handleSaveSiteSettings = async () => {
+    setHomeUploadError("");
+    setSettingsSaving(true);
+    try {
+      const res = await fetch("/api/posts?settings=1", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Admin-Request": "1" },
+        credentials: "include",
+        body: JSON.stringify(siteSettings),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to save site settings");
+      }
+      const updated = await res.json();
+      if (updated) {
+        setSiteSettings({
+          postFallbackImage: updated.postFallbackImage || "",
+        });
+      }
+      toast({ title: "Settings saved", description: "Site-wide image fallback updated." });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unable to save site settings.";
+      console.error("Save site settings failed:", err);
+      toast({ title: "Save Failed", description: message, variant: "destructive" });
+    } finally {
+      setSettingsSaving(false);
     }
   };
 
@@ -1186,7 +1286,9 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     onClick={() =>
                       openMediaLibrary((url) => {
                         setValue("image", url, { shouldValidate: true });
-                        uploadInputRef.current && (uploadInputRef.current.value = "");
+                        if (uploadInputRef.current) {
+                          uploadInputRef.current.value = "";
+                        }
                       })
                     }
                     disabled={uploadingImage || !mediaLibraryReady || !cloudInfo}
@@ -1501,6 +1603,48 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     )}
                   </div>
                   <Input
+                    placeholder="Fallback image URL"
+                    value={card.fallbackImage ?? ""}
+                    onChange={(e) => updateCard(index, 'fallbackImage', e.target.value)}
+                  />
+                  <input
+                    ref={(el) => {
+                      cardFallbackFileInputs.current[index] = el;
+                    }}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleCardFallbackUpload(e, index)}
+                  />
+                  <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                      onClick={() => cardFallbackFileInputs.current[index]?.click()}
+                      disabled={homeUploading}
+                    >
+                      Upload fallback
+                    </button>
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                      onClick={() =>
+                        openMediaLibrary((url) => {
+                          setCardFallbackLabels((prev) => ({ ...prev, [index]: "From library" }));
+                          updateCard(index, 'fallbackImage', url);
+                        })
+                      }
+                      disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                    >
+                      Library
+                    </button>
+                    {cardFallbackLabels[index] && (
+                      <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                        {cardFallbackLabels[index]}
+                      </span>
+                    )}
+                  </div>
+                  <Input
                     placeholder="Category"
                     value={card.category}
                     onChange={(e) => updateCard(index, 'category', e.target.value)}
@@ -1536,6 +1680,88 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             </div>
 
             {homeUploadError && <p className="text-sm text-destructive">{homeUploadError}</p>}
+          </div>
+
+          {/* SITE SETTINGS */}
+          <div className="space-y-4 bg-background/95 p-6 rounded-lg border">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-elegant-text">Site Settings</h2>
+                <p className="text-sm text-muted-foreground">Control global fallbacks used across posts.</p>
+              </div>
+              <Button
+                type="button"
+                variant="default"
+                size="default"
+                onClick={handleSaveSiteSettings}
+              >
+                {settingsSaving ? "Saving..." : "Save Settings"}
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Post Fallback Image</p>
+              <Input
+                placeholder="Fallback image URL"
+                value={siteSettings.postFallbackImage}
+                onChange={(e) =>
+                  setSiteSettings((prev) => ({ ...prev, postFallbackImage: e.target.value }))
+                }
+              />
+              <input
+                ref={settingsFileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setSettingsFileLabel(file.name);
+                    handleHomeImageUpload(file, (url) =>
+                      setSiteSettings((prev) => ({ ...prev, postFallbackImage: url }))
+                    );
+                  }
+                }}
+              />
+              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                <button
+                  type="button"
+                  className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                  onClick={() => settingsFileInputRef.current?.click()}
+                  disabled={homeUploading}
+                >
+                  Upload
+                </button>
+                <button
+                  type="button"
+                  className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                  onClick={() =>
+                    openMediaLibrary((url) => {
+                      setSettingsFileLabel("From library");
+                      setSiteSettings((prev) => ({ ...prev, postFallbackImage: url }));
+                    })
+                  }
+                  disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                >
+                  Library
+                </button>
+                <span className="text-xs text-muted-foreground">
+                  {homeUploading ? "Uploading..." : "JPG/PNG"}
+                </span>
+                {settingsFileLabel && (
+                  <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                    {settingsFileLabel}
+                  </span>
+                )}
+              </div>
+              {siteSettings.postFallbackImage && (
+                <img
+                  src={siteSettings.postFallbackImage}
+                  alt="Post fallback"
+                  className="w-full max-w-sm rounded-md border"
+                />
+              )}
+            </div>
           </div>
 
           {/* POSTS LIST CONTROLS */}

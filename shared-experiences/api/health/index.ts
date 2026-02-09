@@ -29,12 +29,13 @@ export async function GET(req: Request) {
         headers: { "Content-Type": "application/json" },
       }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Health check failed";
     console.error("GET /api/health failed:", err);
     return new Response(
       JSON.stringify({
         ok: false,
-        error: err?.message || "Health check failed",
+        error: message,
       }),
       {
         status: 500,

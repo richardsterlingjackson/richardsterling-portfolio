@@ -1,5 +1,6 @@
 import { Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
+import { usePostFallbackImage } from "@/hooks/use-post-fallback";
 
 interface BlogPostProps {
   post: {
@@ -15,9 +16,8 @@ interface BlogPostProps {
   };
 }
 
-const fallbackImage = "https://via.placeholder.com/800x400?text=Image+Unavailable";
-
 export default function BlogPost({ post }: BlogPostProps) {
+  const fallbackImage = usePostFallbackImage();
   const {
     title,
     date,
@@ -29,7 +29,9 @@ export default function BlogPost({ post }: BlogPostProps) {
   } = post;
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    e.currentTarget.src = fallbackImage;
+    if (fallbackImage && e.currentTarget.src !== fallbackImage) {
+      e.currentTarget.src = fallbackImage;
+    }
   };
 
   const formattedDate = new Date(date).toLocaleDateString("en-US", {

@@ -5,6 +5,7 @@ import { sql } from "./db.js";
 import { checkAdmin, isAdmin } from "../_helpers/auth.js";
 import { sendEmailsToSubscribers, sendUpdateEmailToSubscribers } from "../_helpers/sendEmails.js";
 import { v4 as uuid } from "uuid";
+import type { BlogPost } from "../../src/data/posts";
 
 // posts table: featured and main_featured both default to false in the DB
 type DbRow = {
@@ -26,6 +27,44 @@ type DbRow = {
   likes_count: number | null;
   reads_count: number | null;
   hidden: boolean | null;
+};
+
+type SiteSettingsRow = {
+  post_fallback_image: string | null;
+};
+
+type HomeFeaturedRow = {
+  hero_image: string | null;
+  hero_title: string | null;
+  hero_subtitle: string | null;
+  hero_category: string | null;
+  bubble_heading: string | null;
+  bubble_title: string | null;
+  bubble_description: string | null;
+  card1_image: string | null;
+  card1_fallback_image: string | null;
+  card1_title: string | null;
+  card1_category: string | null;
+  card1_excerpt: string | null;
+  card1_date: string | null;
+  card1_link: string | null;
+  card1_read_more: string | null;
+  card2_image: string | null;
+  card2_fallback_image: string | null;
+  card2_title: string | null;
+  card2_category: string | null;
+  card2_excerpt: string | null;
+  card2_date: string | null;
+  card2_link: string | null;
+  card2_read_more: string | null;
+  card3_image: string | null;
+  card3_fallback_image: string | null;
+  card3_title: string | null;
+  card3_category: string | null;
+  card3_excerpt: string | null;
+  card3_date: string | null;
+  card3_link: string | null;
+  card3_read_more: string | null;
 };
 
 type CreateBody = {
@@ -68,6 +107,7 @@ type HomeFeatured = {
   bubbleDescription?: string;
   cards: Array<{
     image: string;
+    fallbackImage?: string;
     title: string;
     category: string;
     excerpt: string;
@@ -75,6 +115,10 @@ type HomeFeatured = {
     link: string;
     readMoreLabel: string;
   }>;
+};
+
+type SiteSettings = {
+  postFallbackImage: string;
 };
 
 function mapRow(row: DbRow) {
@@ -119,6 +163,7 @@ async function ensureHomeFeaturedTable() {
         hero_subtitle text NOT NULL DEFAULT '',
         hero_category text NOT NULL DEFAULT '',
         card1_image text NOT NULL DEFAULT '',
+        card1_fallback_image text NOT NULL DEFAULT '',
         card1_title text NOT NULL DEFAULT '',
         card1_category text NOT NULL DEFAULT '',
         card1_excerpt text NOT NULL DEFAULT '',
@@ -126,6 +171,7 @@ async function ensureHomeFeaturedTable() {
         card1_link text NOT NULL DEFAULT '',
         card1_read_more text NOT NULL DEFAULT '',
         card2_image text NOT NULL DEFAULT '',
+        card2_fallback_image text NOT NULL DEFAULT '',
         card2_title text NOT NULL DEFAULT '',
         card2_category text NOT NULL DEFAULT '',
         card2_excerpt text NOT NULL DEFAULT '',
@@ -133,6 +179,7 @@ async function ensureHomeFeaturedTable() {
         card2_link text NOT NULL DEFAULT '',
         card2_read_more text NOT NULL DEFAULT '',
         card3_image text NOT NULL DEFAULT '',
+        card3_fallback_image text NOT NULL DEFAULT '',
         card3_title text NOT NULL DEFAULT '',
         card3_category text NOT NULL DEFAULT '',
         card3_excerpt text NOT NULL DEFAULT '',
@@ -149,9 +196,54 @@ async function ensureHomeFeaturedTable() {
     await sql`ALTER TABLE home_featured ADD COLUMN IF NOT EXISTS bubble_heading text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE home_featured ADD COLUMN IF NOT EXISTS bubble_title text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE home_featured ADD COLUMN IF NOT EXISTS bubble_description text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE home_featured ADD COLUMN IF NOT EXISTS card1_fallback_image text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE home_featured ADD COLUMN IF NOT EXISTS card2_fallback_image text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE home_featured ADD COLUMN IF NOT EXISTS card3_fallback_image text NOT NULL DEFAULT ''`;
   } catch (err) {
     console.warn("Failed to ensure home_featured table:", err);
   }
+}
+
+async function ensureSiteSettingsTable() {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS site_settings (
+        id integer PRIMARY KEY,
+        post_fallback_image text NOT NULL DEFAULT '',
+        updated_at timestamptz DEFAULT now()
+      )
+    `;
+  } catch (err) {
+    console.warn("Failed to ensure site_settings table:", err);
+  }
+}
+
+async function getSiteSettings(): Promise<SiteSettings | null> {
+  try {
+    await ensureSiteSettingsTable();
+    const rows = (await sql`
+      SELECT * FROM site_settings WHERE id = 1 LIMIT 1
+    `) as SiteSettingsRow[];
+    const row = rows[0];
+    if (!row) return null;
+    return {
+      postFallbackImage: row.post_fallback_image || "",
+    };
+  } catch (err) {
+    console.error("Failed to load site_settings:", err);
+    return null;
+  }
+}
+
+async function upsertSiteSettings(payload: SiteSettings) {
+  await ensureSiteSettingsTable();
+  await sql`
+    INSERT INTO site_settings (id, post_fallback_image, updated_at)
+    VALUES (1, ${payload.postFallbackImage || ""}, NOW())
+    ON CONFLICT (id) DO UPDATE SET
+      post_fallback_image = EXCLUDED.post_fallback_image,
+      updated_at = NOW()
+  `;
 }
 
 async function getHomeFeatured(): Promise<HomeFeatured | null> {
@@ -159,7 +251,7 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
     await ensureHomeFeaturedTable();
     const rows = (await sql`
       SELECT * FROM home_featured WHERE id = 1 LIMIT 1
-    `) as any[];
+    `) as HomeFeaturedRow[];
     const row = rows[0];
     if (!row) return null;
     return {
@@ -173,6 +265,7 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
       cards: [
         {
           image: row.card1_image || "",
+          fallbackImage: row.card1_fallback_image || "",
           title: row.card1_title || "",
           category: row.card1_category || "",
           excerpt: row.card1_excerpt || "",
@@ -182,6 +275,7 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
         },
         {
           image: row.card2_image || "",
+          fallbackImage: row.card2_fallback_image || "",
           title: row.card2_title || "",
           category: row.card2_category || "",
           excerpt: row.card2_excerpt || "",
@@ -191,6 +285,7 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
         },
         {
           image: row.card3_image || "",
+          fallbackImage: row.card3_fallback_image || "",
           title: row.card3_title || "",
           category: row.card3_category || "",
           excerpt: row.card3_excerpt || "",
@@ -209,9 +304,9 @@ async function getHomeFeatured(): Promise<HomeFeatured | null> {
 async function upsertHomeFeatured(payload: HomeFeatured) {
   await ensureHomeFeaturedTable();
   const cards = payload.cards ?? [];
-  const c1 = cards[0] ?? { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" };
-  const c2 = cards[1] ?? { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" };
-  const c3 = cards[2] ?? { image: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" };
+  const c1 = cards[0] ?? { image: "", fallbackImage: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" };
+  const c2 = cards[1] ?? { image: "", fallbackImage: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" };
+  const c3 = cards[2] ?? { image: "", fallbackImage: "", title: "", category: "", excerpt: "", date: "", link: "", readMoreLabel: "" };
 
   await sql`
     INSERT INTO home_featured (
@@ -224,6 +319,7 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       bubble_title,
       bubble_description,
       card1_image,
+      card1_fallback_image,
       card1_title,
       card1_category,
       card1_excerpt,
@@ -231,6 +327,7 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       card1_link,
       card1_read_more,
       card2_image,
+      card2_fallback_image,
       card2_title,
       card2_category,
       card2_excerpt,
@@ -238,6 +335,7 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       card2_link,
       card2_read_more,
       card3_image,
+      card3_fallback_image,
       card3_title,
       card3_category,
       card3_excerpt,
@@ -255,6 +353,7 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       ${payload.bubbleTitle || ""},
       ${payload.bubbleDescription || ""},
       ${c1.image || ""},
+      ${c1.fallbackImage || ""},
       ${c1.title || ""},
       ${c1.category || ""},
       ${c1.excerpt || ""},
@@ -262,6 +361,7 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       ${c1.link || ""},
       ${c1.readMoreLabel || ""},
       ${c2.image || ""},
+      ${c2.fallbackImage || ""},
       ${c2.title || ""},
       ${c2.category || ""},
       ${c2.excerpt || ""},
@@ -269,6 +369,7 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       ${c2.link || ""},
       ${c2.readMoreLabel || ""},
       ${c3.image || ""},
+      ${c3.fallbackImage || ""},
       ${c3.title || ""},
       ${c3.category || ""},
       ${c3.excerpt || ""},
@@ -283,6 +384,7 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       hero_subtitle = EXCLUDED.hero_subtitle,
       hero_category = EXCLUDED.hero_category,
       card1_image = EXCLUDED.card1_image,
+      card1_fallback_image = EXCLUDED.card1_fallback_image,
       card1_title = EXCLUDED.card1_title,
       card1_category = EXCLUDED.card1_category,
       card1_excerpt = EXCLUDED.card1_excerpt,
@@ -290,6 +392,7 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       card1_link = EXCLUDED.card1_link,
       card1_read_more = EXCLUDED.card1_read_more,
       card2_image = EXCLUDED.card2_image,
+      card2_fallback_image = EXCLUDED.card2_fallback_image,
       card2_title = EXCLUDED.card2_title,
       card2_category = EXCLUDED.card2_category,
       card2_excerpt = EXCLUDED.card2_excerpt,
@@ -297,6 +400,7 @@ async function upsertHomeFeatured(payload: HomeFeatured) {
       card2_link = EXCLUDED.card2_link,
       card2_read_more = EXCLUDED.card2_read_more,
       card3_image = EXCLUDED.card3_image,
+      card3_fallback_image = EXCLUDED.card3_fallback_image,
       card3_title = EXCLUDED.card3_title,
       card3_category = EXCLUDED.card3_category,
       card3_excerpt = EXCLUDED.card3_excerpt,
@@ -355,6 +459,14 @@ async function isSlugTaken(slug: string, excludePostId?: string): Promise<boolea
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
+    const settings = url.searchParams.get("settings");
+    if (settings === "1") {
+      const data = await getSiteSettings();
+      return new Response(JSON.stringify(data ?? null), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const home = url.searchParams.get("home");
     if (home === "1") {
       const data = await getHomeFeatured();
@@ -400,8 +512,8 @@ export async function GET(req: Request) {
           status: 404,
           headers: { "Content-Type": "application/json" },
         });
-      } catch (err: any) {
-        const message = err?.message || "";
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "";
         if (message.includes("post_slug_aliases") && message.includes("does not exist")) {
           return new Response(JSON.stringify({ error: "Not found" }), {
             status: 404,
@@ -452,6 +564,16 @@ export async function PUT(req: Request) {
 
   try {
     const url = new URL(req.url);
+    const settings = url.searchParams.get("settings");
+    if (settings === "1") {
+      const payload = (await req.json()) as SiteSettings;
+      await upsertSiteSettings(payload);
+      const updated = await getSiteSettings();
+      return new Response(JSON.stringify(updated ?? null), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const home = url.searchParams.get("home");
     if (home === "1") {
       const payload = (await req.json()) as HomeFeatured;
@@ -540,8 +662,8 @@ export async function PUT(req: Request) {
         WHERE id = ${id}
         RETURNING *
       `) as DbRow[];
-    } catch (err: any) {
-      const message = err?.message || "";
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "";
       if (message.includes("scheduled_at") || message.includes("main_featured") || message.includes("hidden")) {
         console.warn("Missing posts columns; updating without scheduling/main_featured/hidden.");
         result = (await sql`
@@ -572,7 +694,7 @@ export async function PUT(req: Request) {
       });
     }
 
-    const updatedPost = mapRow(result[0]);
+    const updatedPost: BlogPost = mapRow(result[0]);
 
     if (currentSlug && currentSlug !== slug) {
       try {
@@ -588,7 +710,7 @@ export async function PUT(req: Request) {
     }
 
     if (updatedPost.status === "published") {
-      sendUpdateEmailToSubscribers(updatedPost as any).catch((err) =>
+      sendUpdateEmailToSubscribers(updatedPost).catch((err) =>
         console.error("Failed to send subscriber update emails:", err)
       );
     }
@@ -597,8 +719,8 @@ export async function PUT(req: Request) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err: any) {
-    const message = err?.message || "Server error";
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Server error";
     console.error("PUT /api/posts failed:", err);
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
@@ -633,8 +755,8 @@ export async function DELETE(req: Request) {
     }
 
     return new Response(null, { status: 204 });
-  } catch (err: any) {
-    const message = err?.message || "Server error";
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Server error";
     console.error("DELETE /api/posts failed:", err);
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
@@ -722,8 +844,8 @@ export async function POST(req: Request) {
           0
         )
       `;
-    } catch (err: any) {
-      const message = err?.message || "";
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "";
       if (message.includes("main_featured") || message.includes("scheduled_at") || message.includes("likes_count") || message.includes("reads_count") || message.includes("hidden")) {
         console.warn("Missing posts columns; inserting without scheduling/likes/reads/hidden.");
         await sql`
@@ -766,23 +888,11 @@ export async function POST(req: Request) {
       SELECT * FROM posts WHERE id = ${id}
     `) as DbRow[];
 
-    const post = rows.length ? mapRow(rows[0]) : null;
+    const post: BlogPost | null = rows.length ? mapRow(rows[0]) : null;
 
     // Send emails to subscribers if post is published
     if (post && body.status === "published" && !shouldSchedule) {
-      sendEmailsToSubscribers({
-        id: post.id,
-        slug: post.slug,
-        title: post.title,
-        date: post.date,
-        excerpt: post.excerpt,
-        image: post.image,
-        category: post.category,
-        featured: post.featured,
-        mainFeatured: post.mainFeatured,
-        content: post.content,
-        status: post.status,
-      } as any).catch((err) => {
+      sendEmailsToSubscribers(post).catch((err) => {
         console.error("Failed to send subscriber emails for new post:", err);
         // Don't fail the request if email sending fails
       });
@@ -792,8 +902,8 @@ export async function POST(req: Request) {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err: any) {
-    const message = err?.message || "Server error";
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Server error";
     console.error("POST /api/posts failed:", err);
     return new Response(
       JSON.stringify({ error: message }),

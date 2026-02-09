@@ -2,6 +2,21 @@ export const runtime = "nodejs";
 
 import { sql } from "../posts/db.js";
 import { sendEmailsToSubscribers } from "../_helpers/sendEmails.js";
+import type { BlogPost } from "../../src/data/posts";
+
+type ScheduledPostRow = {
+  id: string;
+  slug: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  image: string;
+  category: string;
+  featured: boolean;
+  main_featured: boolean | null;
+  content: string;
+  status: "draft" | "published";
+};
 
 export async function GET(req: Request) {
   const cronHeader = req.headers.get("x-vercel-cron");
@@ -32,10 +47,10 @@ export async function GET(req: Request) {
         AND scheduled_at IS NOT NULL
         AND scheduled_at <= NOW()
       RETURNING *
-    `) as any[];
+    `) as ScheduledPostRow[];
 
     for (const row of rows) {
-      const post = {
+      const post: BlogPost = {
         id: row.id,
         slug: row.slug,
         title: row.title,
@@ -47,7 +62,7 @@ export async function GET(req: Request) {
         mainFeatured: row.main_featured ?? false,
         content: row.content,
         status: row.status,
-      } as any;
+      };
 
       sendEmailsToSubscribers(post).catch((err) =>
         console.error("Failed to send scheduled post emails:", err)
@@ -61,10 +76,11 @@ export async function GET(req: Request) {
         headers: { "Content-Type": "application/json" },
       }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Cron publish failed";
     console.error("Cron publish failed:", err);
     return new Response(
-      JSON.stringify({ error: err?.message || "Cron publish failed" }),
+      JSON.stringify({ error: message }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },

@@ -5,6 +5,11 @@ import type { BlogPost } from "../../src/data/posts";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+type SubscriberRow = {
+  email: string;
+  category: string | null;
+};
+
 function getSiteUrl(): string {
   const raw = process.env.VERCEL_URL || "";
   if (!raw) return "https://shared-experiences.com";
@@ -60,7 +65,7 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
     console.log(`Sending emails to ${subscribers.length} subscribers for ${post.category}...`);
 
     // Send email to each subscriber
-    const emailPromises = subscribers.map((sub: any) => {
+    const emailPromises = (subscribers as SubscriberRow[]).map((sub) => {
       const unsubscribeCategoryUrl = buildUnsubscribeUrl(sub.email, sub.category);
       const unsubscribeAllUrl = buildUnsubscribeUrl(sub.email, "all");
       resend.emails.send({
@@ -150,7 +155,7 @@ export async function sendUpdateEmailToSubscribers(post: BlogPost) {
 
     console.log(`Sending update emails to ${subscribers.length} subscribers for ${post.category}...`);
 
-    const emailPromises = subscribers.map((sub: any) => {
+    const emailPromises = (subscribers as SubscriberRow[]).map((sub) => {
       const unsubscribeCategoryUrl = buildUnsubscribeUrl(sub.email, sub.category);
       const unsubscribeAllUrl = buildUnsubscribeUrl(sub.email, "all");
       resend.emails.send({

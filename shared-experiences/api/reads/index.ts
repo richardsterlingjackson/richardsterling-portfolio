@@ -32,8 +32,8 @@ export async function POST(req: Request) {
       JSON.stringify({ readsCount: updated[0]?.reads_count ?? 0 }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
-  } catch (err: any) {
-    const message = err?.message || "Server error";
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Server error";
     if (message.includes("reads_count")) {
       return new Response(JSON.stringify({ readsCount: 0 }), {
         status: 200,

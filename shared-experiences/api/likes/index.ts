@@ -79,10 +79,11 @@ export async function POST(req: Request) {
         headers: { "Content-Type": "application/json" },
       }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Server error";
     console.error("POST /api/likes failed:", err);
     return new Response(
-      JSON.stringify({ error: err?.message || "Server error" }),
+      JSON.stringify({ error: message }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },

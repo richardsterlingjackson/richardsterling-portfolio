@@ -8,6 +8,7 @@ import remarkBreaks from "remark-breaks";
 import { Button } from "@/components/ui/button";
 import type { BlogPost } from "@/data/posts";
 import { Helmet } from "react-helmet-async";
+import { usePostFallbackImage } from "@/hooks/use-post-fallback";
 
 // Helper: Calculate reading time (avg 200 words per minute)
 function calculateReadingTime(text: string): number {
@@ -52,6 +53,7 @@ export default function PostPage() {
   const [likesCount, setLikesCount] = useState(0);
   const [liked, setLiked] = useState(false);
   const [readsCount, setReadsCount] = useState(0);
+  const fallbackImage = usePostFallbackImage();
 
   //
   // LOAD POST BY SLUG
@@ -281,12 +283,14 @@ export default function PostPage() {
 
           <article className="lg:col-span-9 space-y-6">
             <img
-              src={post.image}
+              src={post.image || fallbackImage}
               alt={post.title}
               className="w-full h-[240px] sm:h-[320px] lg:h-[400px] object-cover rounded-lg border border-border"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src =
-                  "https://via.placeholder.com/800x400?text=Image+Unavailable";
+                const target = e.currentTarget as HTMLImageElement;
+                if (fallbackImage && target.src !== fallbackImage) {
+                  target.src = fallbackImage;
+                }
               }}
             />
 
@@ -403,12 +407,14 @@ export default function PostPage() {
                       className="group border border-border rounded-lg overflow-hidden hover:border-elegant-primary transition"
                     >
                       <img
-                        src={relPost.image}
+                        src={relPost.image || fallbackImage}
                         alt={relPost.title}
                         className="w-full h-[180px] object-cover group-hover:opacity-90 transition"
                         onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src =
-                            "https://via.placeholder.com/400x200?text=Image";
+                          const target = e.currentTarget as HTMLImageElement;
+                          if (fallbackImage && target.src !== fallbackImage) {
+                            target.src = fallbackImage;
+                          }
                         }}
                       />
                       <div className="p-4 space-y-2">
