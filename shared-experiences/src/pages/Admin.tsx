@@ -883,7 +883,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
 
       {/* Content container with relative positioning */}
       <div className="relative z-10">
-        <div className="max-w-2xl mx-auto mb-4">
+        <div className="max-w-5xl mx-auto mb-4">
           <a
             href="/"
             className="text-sm font-medium text-elegant-primary hover:text-elegant-secondary transition-colors"
@@ -893,14 +893,14 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
         </div>
         {/* Session timeout warning */}
         {timeoutWarning && (
-          <div className="mb-6 max-w-2xl mx-auto p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="mb-6 max-w-5xl mx-auto p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-sm text-yellow-800">
               ⚠️ Your session will expire in 3 minutes due to inactivity. Move your mouse or click to extend your session.
             </p>
           </div>
         )}
 
-        <div className="max-w-2xl mx-auto space-y-10">
+        <div className="max-w-5xl mx-auto space-y-10">
           {/* Header with stats and logout */}
           <div className="flex justify-between items-start gap-4">
             <div>
