@@ -1213,15 +1213,21 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               </Button>
 
               <div className="flex flex-1 flex-col sm:flex-row gap-2">
-                <Input
-                  type="file"
-                  className="w-full border border-gray-700 rounded px-3 py-2 text-sm"
-                  accept="application/json"
-                  onChange={(event) => {
-                    setBackupError("");
-                    setRestoreFile(event.target.files?.[0] ?? null);
-                  }}
-                />
+                <div className="flex items-center">
+                  <Input
+                    type="file"
+                    className="w-full border border-gray-700 rounded px-3 py-2 text-sm"
+                    accept="application/json"
+                    onChange={(event) => {
+                      setBackupError("");
+                      setRestoreFile(event.target.files?.[0] ?? null);
+                    }}
+                  />
+                  <div className="w-px h-6 bg-gray-300 mx-2" />
+                  <span className="text-sm text-muted-foreground">
+                    {restoreFile ? restoreFile.name : "No file chosen"}
+                  </span>
+                </div>
                 <Button
                   type="button"
                   variant="default"
