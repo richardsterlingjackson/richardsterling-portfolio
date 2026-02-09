@@ -11,7 +11,11 @@ const app = express();
 app.use(express.json());
 
 const DATA_PATH = path.resolve(__dirname, '../api/posts/dev_posts.json');
-let siteSettings = { postFallbackImage: "" };
+let siteSettings = {
+  postFallbackImage: "",
+  categoriesImage: "",
+  categoriesFallbackImage: "",
+};
 
 function readData() {
   try {
@@ -104,6 +108,8 @@ app.put('/api/posts', (req, res) => {
   if (req.query.settings === '1') {
     siteSettings = {
       postFallbackImage: req.body?.postFallbackImage || "",
+      categoriesImage: req.body?.categoriesImage || "",
+      categoriesFallbackImage: req.body?.categoriesFallbackImage || "",
     };
     return res.json(siteSettings);
   }

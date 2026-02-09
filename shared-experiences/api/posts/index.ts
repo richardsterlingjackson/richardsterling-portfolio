@@ -32,6 +32,8 @@ type DbRow = {
 
 type SiteSettingsRow = {
   post_fallback_image: string | null;
+  categories_image: string | null;
+  categories_fallback_image: string | null;
 };
 
 type HomeFeaturedRow = {
@@ -120,6 +122,8 @@ type HomeFeatured = {
 
 type SiteSettings = {
   postFallbackImage: string;
+  categoriesImage: string;
+  categoriesFallbackImage: string;
 };
 
 function mapRow(row: DbRow) {
@@ -211,9 +215,15 @@ async function ensureSiteSettingsTable() {
       CREATE TABLE IF NOT EXISTS site_settings (
         id integer PRIMARY KEY,
         post_fallback_image text NOT NULL DEFAULT '',
+        categories_image text NOT NULL DEFAULT '',
+        categories_fallback_image text NOT NULL DEFAULT '',
         updated_at timestamptz DEFAULT now()
       )
     `;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS post_fallback_image text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_image text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_fallback_image text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now()`;
   } catch (err) {
     console.warn("Failed to ensure site_settings table:", err);
   }
@@ -229,6 +239,8 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
     if (!row) return null;
     return {
       postFallbackImage: row.post_fallback_image || "",
+      categoriesImage: row.categories_image || "",
+      categoriesFallbackImage: row.categories_fallback_image || "",
     };
   } catch (err) {
     console.error("Failed to load site_settings:", err);
@@ -239,10 +251,18 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
 async function upsertSiteSettings(payload: SiteSettings) {
   await ensureSiteSettingsTable();
   await sql`
-    INSERT INTO site_settings (id, post_fallback_image, updated_at)
-    VALUES (1, ${payload.postFallbackImage || ""}, NOW())
+    INSERT INTO site_settings (id, post_fallback_image, categories_image, categories_fallback_image, updated_at)
+    VALUES (
+      1,
+      ${payload.postFallbackImage || ""},
+      ${payload.categoriesImage || ""},
+      ${payload.categoriesFallbackImage || ""},
+      NOW()
+    )
     ON CONFLICT (id) DO UPDATE SET
       post_fallback_image = EXCLUDED.post_fallback_image,
+      categories_image = EXCLUDED.categories_image,
+      categories_fallback_image = EXCLUDED.categories_fallback_image,
       updated_at = NOW()
   `;
 }

@@ -1,5 +1,7 @@
 export type SiteSettings = {
   postFallbackImage: string;
+  categoriesImage: string;
+  categoriesFallbackImage: string;
 };
 
 let cachedSettings: SiteSettings | null = null;
@@ -12,7 +14,12 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data && typeof data.postFallbackImage === "string") {
-          cachedSettings = data as SiteSettings;
+          cachedSettings = {
+            postFallbackImage: data.postFallbackImage || "",
+            categoriesImage: typeof data.categoriesImage === "string" ? data.categoriesImage : "",
+            categoriesFallbackImage:
+              typeof data.categoriesFallbackImage === "string" ? data.categoriesFallbackImage : "",
+          };
           return cachedSettings;
         }
         return null;

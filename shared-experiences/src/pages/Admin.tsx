@@ -62,6 +62,8 @@ type HomeFeaturedPayload = {
 
 type SiteSettingsPayload = {
   postFallbackImage: string;
+  categoriesImage: string;
+  categoriesFallbackImage: string;
 };
 
 type MediaLibraryAsset = {
@@ -278,10 +280,18 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const [cloudInfo, setCloudInfo] = React.useState<{ cloudName: string; apiKey: string } | null>(null);
   const [mediaLibraryReady, setMediaLibraryReady] = React.useState(false);
   const [homeSaving, setHomeSaving] = React.useState(false);
-  const [siteSettings, setSiteSettings] = React.useState<SiteSettingsPayload>({ postFallbackImage: "" });
+  const [siteSettings, setSiteSettings] = React.useState<SiteSettingsPayload>({
+    postFallbackImage: "",
+    categoriesImage: "",
+    categoriesFallbackImage: "",
+  });
   const [settingsSaving, setSettingsSaving] = React.useState(false);
   const [settingsFileLabel, setSettingsFileLabel] = React.useState("");
   const settingsFileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [categoriesImageLabel, setCategoriesImageLabel] = React.useState("");
+  const categoriesImageInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [categoriesFallbackLabel, setCategoriesFallbackLabel] = React.useState("");
+  const categoriesFallbackInputRef = React.useRef<HTMLInputElement | null>(null);
   const [homeFeatured, setHomeFeatured] = React.useState<HomeFeaturedPayload>({
     heroImage: "",
     heroTitle: "",
@@ -603,6 +613,8 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           if (settingsData) {
             setSiteSettings({
               postFallbackImage: settingsData.postFallbackImage || "",
+              categoriesImage: settingsData.categoriesImage || "",
+              categoriesFallbackImage: settingsData.categoriesFallbackImage || "",
             });
           }
         }
@@ -657,9 +669,11 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       if (updated) {
         setSiteSettings({
           postFallbackImage: updated.postFallbackImage || "",
+          categoriesImage: updated.categoriesImage || "",
+          categoriesFallbackImage: updated.categoriesFallbackImage || "",
         });
       }
-      toast({ title: "Settings saved", description: "Site-wide image fallback updated." });
+      toast({ title: "Settings saved", description: "Site-wide images updated." });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Unable to save site settings.";
       console.error("Save site settings failed:", err);
@@ -1688,7 +1702,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-elegant-text">Site Settings</h2>
-                <p className="text-sm text-muted-foreground">Control global fallbacks used across posts.</p>
+                <p className="text-sm text-muted-foreground">Control global images used across posts and category pages.</p>
               </div>
               <Button
                 type="button"
@@ -1700,68 +1714,202 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               </Button>
             </div>
 
-            <div className="space-y-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Post Fallback Image</p>
-              <Input
-                placeholder="Fallback image URL"
-                value={siteSettings.postFallbackImage}
-                onChange={(e) =>
-                  setSiteSettings((prev) => ({ ...prev, postFallbackImage: e.target.value }))
-                }
-              />
-              <input
-                ref={settingsFileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setSettingsFileLabel(file.name);
-                    handleHomeImageUpload(file, (url) =>
-                      setSiteSettings((prev) => ({ ...prev, postFallbackImage: url }))
-                    );
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Post Fallback Image</p>
+                <Input
+                  placeholder="Fallback image URL"
+                  value={siteSettings.postFallbackImage}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, postFallbackImage: e.target.value }))
                   }
-                }}
-              />
-              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                <button
-                  type="button"
-                  className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                  onClick={() => settingsFileInputRef.current?.click()}
-                  disabled={homeUploading}
-                >
-                  Upload
-                </button>
-                <button
-                  type="button"
-                  className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                  onClick={() =>
-                    openMediaLibrary((url) => {
-                      setSettingsFileLabel("From library");
-                      setSiteSettings((prev) => ({ ...prev, postFallbackImage: url }));
-                    })
-                  }
-                  disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
-                >
-                  Library
-                </button>
-                <span className="text-xs text-muted-foreground">
-                  {homeUploading ? "Uploading..." : "JPG/PNG"}
-                </span>
-                {settingsFileLabel && (
-                  <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
-                    {settingsFileLabel}
+                />
+                <input
+                  ref={settingsFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setSettingsFileLabel(file.name);
+                      handleHomeImageUpload(file, (url) =>
+                        setSiteSettings((prev) => ({ ...prev, postFallbackImage: url }))
+                      );
+                    }
+                  }}
+                />
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => settingsFileInputRef.current?.click()}
+                    disabled={homeUploading}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() =>
+                      openMediaLibrary((url) => {
+                        setSettingsFileLabel("From library");
+                        setSiteSettings((prev) => ({ ...prev, postFallbackImage: url }));
+                      })
+                    }
+                    disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {homeUploading ? "Uploading..." : "JPG/PNG"}
                   </span>
+                  {settingsFileLabel && (
+                    <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                      {settingsFileLabel}
+                    </span>
+                  )}
+                </div>
+                {siteSettings.postFallbackImage && (
+                  <img
+                    src={siteSettings.postFallbackImage}
+                    alt="Post fallback"
+                    className="w-full max-w-sm rounded-md border"
+                  />
                 )}
               </div>
-              {siteSettings.postFallbackImage && (
-                <img
-                  src={siteSettings.postFallbackImage}
-                  alt="Post fallback"
-                  className="w-full max-w-sm rounded-md border"
-                />
-              )}
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                <div className="space-y-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Categories Header Image</p>
+                  <Input
+                    placeholder="Header image URL"
+                    value={siteSettings.categoriesImage}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, categoriesImage: e.target.value }))
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">If empty, the fallback image is used.</p>
+                  <input
+                    ref={categoriesImageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setCategoriesImageLabel(file.name);
+                        handleHomeImageUpload(file, (url) =>
+                          setSiteSettings((prev) => ({ ...prev, categoriesImage: url }))
+                        );
+                      }
+                    }}
+                  />
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                      onClick={() => categoriesImageInputRef.current?.click()}
+                      disabled={homeUploading}
+                    >
+                      Upload
+                    </button>
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                      onClick={() =>
+                        openMediaLibrary((url) => {
+                          setCategoriesImageLabel("From library");
+                          setSiteSettings((prev) => ({ ...prev, categoriesImage: url }));
+                        })
+                      }
+                      disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                    >
+                      Library
+                    </button>
+                    <span className="text-xs text-muted-foreground">
+                      {homeUploading ? "Uploading..." : "JPG/PNG"}
+                    </span>
+                    {categoriesImageLabel && (
+                      <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                        {categoriesImageLabel}
+                      </span>
+                    )}
+                  </div>
+                  {siteSettings.categoriesImage && (
+                    <img
+                      src={siteSettings.categoriesImage}
+                      alt="Categories header"
+                      className="w-full max-w-sm rounded-md border"
+                    />
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Categories Fallback Image</p>
+                  <Input
+                    placeholder="Fallback image URL"
+                    value={siteSettings.categoriesFallbackImage}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, categoriesFallbackImage: e.target.value }))
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">Leave blank to use the local default.</p>
+                  <input
+                    ref={categoriesFallbackInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setCategoriesFallbackLabel(file.name);
+                        handleHomeImageUpload(file, (url) =>
+                          setSiteSettings((prev) => ({ ...prev, categoriesFallbackImage: url }))
+                        );
+                      }
+                    }}
+                  />
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                      onClick={() => categoriesFallbackInputRef.current?.click()}
+                      disabled={homeUploading}
+                    >
+                      Upload
+                    </button>
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                      onClick={() =>
+                        openMediaLibrary((url) => {
+                          setCategoriesFallbackLabel("From library");
+                          setSiteSettings((prev) => ({ ...prev, categoriesFallbackImage: url }));
+                        })
+                      }
+                      disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                    >
+                      Library
+                    </button>
+                    <span className="text-xs text-muted-foreground">
+                      {homeUploading ? "Uploading..." : "JPG/PNG"}
+                    </span>
+                    {categoriesFallbackLabel && (
+                      <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                        {categoriesFallbackLabel}
+                      </span>
+                    )}
+                  </div>
+                  {siteSettings.categoriesFallbackImage && (
+                    <img
+                      src={siteSettings.categoriesFallbackImage}
+                      alt="Categories fallback"
+                      className="w-full max-w-sm rounded-md border"
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
