@@ -1208,7 +1208,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               Download a JSON backup of all posts. Restore will overwrite all existing posts.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-              <Button type="button" variant="outline" onClick={handleBackupDownload}>
+              <Button type="button" variant="default" size="default" onClick={handleBackupDownload}>
                 Download Backup
               </Button>
 
