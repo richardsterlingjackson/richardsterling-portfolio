@@ -11,6 +11,10 @@ export type SiteSettings = {
   articlesSpotlightEyebrow: string;
   articlesSpotlightTitle: string;
   articlesSpotlightSubtitle: string;
+  headerHeroEyebrow: string;
+  headerHeroTitle: string;
+  headerHeroSubtitle: string;
+  headerHeroDivider: string;
 };
 
 let cachedSettings: SiteSettings | null = null;
@@ -52,6 +56,14 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
               typeof data.articlesSpotlightTitle === "string" ? data.articlesSpotlightTitle : "",
             articlesSpotlightSubtitle:
               typeof data.articlesSpotlightSubtitle === "string" ? data.articlesSpotlightSubtitle : "",
+            headerHeroEyebrow:
+              typeof data.headerHeroEyebrow === "string" ? data.headerHeroEyebrow : "",
+            headerHeroTitle:
+              typeof data.headerHeroTitle === "string" ? data.headerHeroTitle : "",
+            headerHeroSubtitle:
+              typeof data.headerHeroSubtitle === "string" ? data.headerHeroSubtitle : "",
+            headerHeroDivider:
+              typeof data.headerHeroDivider === "string" ? data.headerHeroDivider : "",
           };
           return cachedSettings;
         }

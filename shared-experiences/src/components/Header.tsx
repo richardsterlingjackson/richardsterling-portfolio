@@ -4,9 +4,16 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import heroBanner from "@/assets/hero-banner-1.webp";
+import { getSiteSettings } from "@/lib/siteSettings";
 
 export default function Header() {
   const [query, setQuery] = useState("");
+  const [heroCopy, setHeroCopy] = useState({
+    eyebrow: "",
+    title: "",
+    subtitle: "",
+    divider: "",
+  });
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -39,6 +46,22 @@ export default function Header() {
     setQuery(value);
   }, [isSearchPage, location.search]);
 
+  useEffect(() => {
+    let active = true;
+    getSiteSettings().then((settings) => {
+      if (!active || !settings) return;
+      setHeroCopy({
+        eyebrow: settings.headerHeroEyebrow || "",
+        title: settings.headerHeroTitle || "",
+        subtitle: settings.headerHeroSubtitle || "",
+        divider: settings.headerHeroDivider || "",
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   //
   // SEARCH HANDLER
   //
@@ -62,13 +85,26 @@ export default function Header() {
         className="relative h-[220px] sm:h-[260px] md:h-[320px] bg-cover bg-center"
         style={{ backgroundImage: `url(${heroBanner})` }}
       >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/60"></div>
         <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-          <h1 className="font-playfair text-3xl sm:text-5xl md:text-7xl font-bold text-white mb-2 text-shadow-md text-outline">
-            Shared Experiences
-          </h1>
-          <p className="font-inter text-base sm:text-2xl md:text-4xl font-extrabold italic text-white text-shadow-md text-outline">
-            thoughts, insights, ideas... into memories
-          </p>
+          <div className="max-w-3xl space-y-3">
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-white/80">
+              {heroCopy.eyebrow || "Thoughts • Insights • Ideas"}
+            </p>
+            <h1 className="font-playfair text-3xl sm:text-5xl md:text-7xl font-semibold text-white drop-shadow-md">
+              {heroCopy.title || "Shared Experiences"}
+            </h1>
+            <div className="flex items-center justify-center gap-3 text-white/60">
+              <span className="h-px w-10 bg-white/40"></span>
+              <span className="text-[10px] uppercase tracking-[0.35em]">
+                {heroCopy.divider || "Journal"}
+              </span>
+              <span className="h-px w-10 bg-white/40"></span>
+            </div>
+            <p className="font-inter text-sm sm:text-lg md:text-xl italic text-white/90 drop-shadow-md">
+              {heroCopy.subtitle || "Turning everyday reflections into shared memories."}
+            </p>
+          </div>
         </div>
       </div>
 

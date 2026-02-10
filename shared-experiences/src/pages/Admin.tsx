@@ -73,6 +73,10 @@ type SiteSettingsPayload = {
   articlesSpotlightEyebrow: string;
   articlesSpotlightTitle: string;
   articlesSpotlightSubtitle: string;
+  headerHeroEyebrow: string;
+  headerHeroTitle: string;
+  headerHeroSubtitle: string;
+  headerHeroDivider: string;
 };
 
 type MediaLibraryAsset = {
@@ -304,6 +308,10 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     articlesSpotlightEyebrow: "",
     articlesSpotlightTitle: "",
     articlesSpotlightSubtitle: "",
+    headerHeroEyebrow: "",
+    headerHeroTitle: "",
+    headerHeroSubtitle: "",
+    headerHeroDivider: "",
   });
   const [settingsSaving, setSettingsSaving] = React.useState(false);
   const [settingsFileLabel, setSettingsFileLabel] = React.useState("");
@@ -678,6 +686,10 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               articlesSpotlightEyebrow: settingsData.articlesSpotlightEyebrow || "",
               articlesSpotlightTitle: settingsData.articlesSpotlightTitle || "",
               articlesSpotlightSubtitle: settingsData.articlesSpotlightSubtitle || "",
+              headerHeroEyebrow: settingsData.headerHeroEyebrow || "",
+              headerHeroTitle: settingsData.headerHeroTitle || "",
+              headerHeroSubtitle: settingsData.headerHeroSubtitle || "",
+              headerHeroDivider: settingsData.headerHeroDivider || "",
             });
           }
         }
@@ -744,6 +756,10 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           articlesSpotlightEyebrow: updated.articlesSpotlightEyebrow || "",
           articlesSpotlightTitle: updated.articlesSpotlightTitle || "",
           articlesSpotlightSubtitle: updated.articlesSpotlightSubtitle || "",
+          headerHeroEyebrow: updated.headerHeroEyebrow || "",
+          headerHeroTitle: updated.headerHeroTitle || "",
+          headerHeroSubtitle: updated.headerHeroSubtitle || "",
+          headerHeroDivider: updated.headerHeroDivider || "",
         });
       }
       if (!options?.silent) {
@@ -1868,6 +1884,42 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             </div>
 
             <div className="space-y-6">
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Header Hero Copy</p>
+                <Input
+                  placeholder="Eyebrow (e.g., Thoughts • Insights • Ideas)"
+                  value={siteSettings.headerHeroEyebrow}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, headerHeroEyebrow: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Title (e.g., Shared Experiences)"
+                  value={siteSettings.headerHeroTitle}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, headerHeroTitle: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Divider label (e.g., Journal)"
+                  value={siteSettings.headerHeroDivider}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, headerHeroDivider: e.target.value }))
+                  }
+                />
+                <Textarea
+                  placeholder="Subtitle (e.g., a journal of small stories that become memories)"
+                  value={siteSettings.headerHeroSubtitle}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, headerHeroSubtitle: e.target.value }))
+                  }
+                  rows={2}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Shows on the hero banner across the site.
+                </p>
+              </div>
+
               <div className="space-y-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Post Fallback Image</p>
                 <Input

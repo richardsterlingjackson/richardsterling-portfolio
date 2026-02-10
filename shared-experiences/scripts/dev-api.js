@@ -24,6 +24,10 @@ let siteSettings = {
   articlesSpotlightEyebrow: "",
   articlesSpotlightTitle: "",
   articlesSpotlightSubtitle: "",
+  headerHeroEyebrow: "",
+  headerHeroTitle: "",
+  headerHeroSubtitle: "",
+  headerHeroDivider: "",
 };
 
 function readData() {
@@ -132,6 +136,10 @@ app.put('/api/posts', (req, res) => {
       articlesSpotlightEyebrow: req.body?.articlesSpotlightEyebrow || "",
       articlesSpotlightTitle: req.body?.articlesSpotlightTitle || "",
       articlesSpotlightSubtitle: req.body?.articlesSpotlightSubtitle || "",
+      headerHeroEyebrow: req.body?.headerHeroEyebrow || "",
+      headerHeroTitle: req.body?.headerHeroTitle || "",
+      headerHeroSubtitle: req.body?.headerHeroSubtitle || "",
+      headerHeroDivider: req.body?.headerHeroDivider || "",
     };
     return res.json(siteSettings);
   }
