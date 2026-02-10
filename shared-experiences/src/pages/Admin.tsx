@@ -2284,7 +2284,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                           </span>
                         )}
                         {post.hidden && (
-                          <span className="text-[10px] uppercase tracking-wide bg-slate-400/20 text-slate-700 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-full">
                             Hidden
                           </span>
                         )}
