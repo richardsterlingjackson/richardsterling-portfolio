@@ -1142,7 +1142,13 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             </Button>
           </div>
 
-          {/* FORM */}
+          {/* Publish Post */}
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-elegant-text">Publish Post</h2>
+            <p className="text-sm text-muted-foreground">
+              Create or update posts. Preview the featured image whether you paste a URL or upload.
+            </p>
+          </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-background/95 p-6 rounded-lg border">
             <Input placeholder="Title" {...register("title")} />
             {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
@@ -1381,7 +1387,19 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             </div>
 
             {imageMode === "url" ? (
-              <Input placeholder="Image URL" {...register("image")} />
+              <div className="space-y-2">
+                <Input placeholder="Image URL" {...register("image")} />
+                {watch("image") && (
+                  <div className="space-y-2">
+                    <img
+                      src={watch("image")}
+                      alt="Post preview"
+                      className="w-full max-w-sm rounded-md border"
+                    />
+                    <p className="text-xs text-muted-foreground">Preview from URL</p>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="space-y-2">
                 <input type="hidden" {...register("image")} />
