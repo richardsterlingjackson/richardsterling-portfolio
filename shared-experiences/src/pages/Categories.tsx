@@ -25,6 +25,11 @@ export default function Categories() {
     Record<string, { image?: string; fallbackImage?: string }>
   >({});
   const [categoryCardExcerpts, setCategoryCardExcerpts] = useState<Record<string, string>>({});
+  const [headingCopy, setHeadingCopy] = useState({
+    eyebrow: "",
+    title: "",
+    subtitle: "",
+  });
 
   //
   // LOAD POSTS
@@ -57,6 +62,11 @@ export default function Categories() {
       setHeaderImage(hero);
       setCategoryCardImages(settings?.categoryCardImages || {});
       setCategoryCardExcerpts(settings?.categoryCardExcerpts || {});
+      setHeadingCopy({
+        eyebrow: settings?.categoriesHeadingEyebrow || "",
+        title: settings?.categoriesHeadingTitle || "",
+        subtitle: settings?.categoriesHeadingSubtitle || "",
+      });
     });
     return () => {
       active = false;
@@ -129,13 +139,13 @@ export default function Categories() {
 
               <div className="space-y-3">
                 <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                  Browse by theme
+                  {headingCopy.eyebrow || "Browse by theme"}
                 </p>
                 <h1 className="text-4xl sm:text-5xl font-playfair font-bold text-elegant-text tracking-tight">
-                  Categories
+                  {headingCopy.title || "Categories"}
                 </h1>
                 <p className="text-muted-foreground text-lg max-w-2xl">
-                  Browse curated themes and topics explored across the blog.
+                  {headingCopy.subtitle || "Browse curated themes and topics explored across the blog."}
                 </p>
                 <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                   <span className="px-3 py-1 rounded-full border border-border bg-background">

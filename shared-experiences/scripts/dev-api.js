@@ -18,6 +18,12 @@ let siteSettings = {
   categoryCardImages: {},
   categoryCardExcerpts: {},
   featuredArticleSlug: "",
+  categoriesHeadingEyebrow: "",
+  categoriesHeadingTitle: "",
+  categoriesHeadingSubtitle: "",
+  articlesSpotlightEyebrow: "",
+  articlesSpotlightTitle: "",
+  articlesSpotlightSubtitle: "",
 };
 
 function readData() {
@@ -118,6 +124,12 @@ app.put('/api/posts', (req, res) => {
       categoryCardImages: req.body?.categoryCardImages || {},
       categoryCardExcerpts: req.body?.categoryCardExcerpts || {},
       featuredArticleSlug: req.body?.featuredArticleSlug || "",
+      categoriesHeadingEyebrow: req.body?.categoriesHeadingEyebrow || "",
+      categoriesHeadingTitle: req.body?.categoriesHeadingTitle || "",
+      categoriesHeadingSubtitle: req.body?.categoriesHeadingSubtitle || "",
+      articlesSpotlightEyebrow: req.body?.articlesSpotlightEyebrow || "",
+      articlesSpotlightTitle: req.body?.articlesSpotlightTitle || "",
+      articlesSpotlightSubtitle: req.body?.articlesSpotlightSubtitle || "",
     };
     return res.json(siteSettings);
   }

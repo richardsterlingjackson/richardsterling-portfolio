@@ -12,6 +12,11 @@ export default function Articles() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [featuredSlug, setFeaturedSlug] = useState("");
+  const [spotlightCopy, setSpotlightCopy] = useState({
+    eyebrow: "",
+    title: "",
+    subtitle: "",
+  });
   const location = useLocation();
 
   useEffect(() => {
@@ -40,6 +45,11 @@ export default function Articles() {
     getSiteSettings().then((settings) => {
       if (!active) return;
       setFeaturedSlug(settings?.featuredArticleSlug || "");
+      setSpotlightCopy({
+        eyebrow: settings?.articlesSpotlightEyebrow || "",
+        title: settings?.articlesSpotlightTitle || "",
+        subtitle: settings?.articlesSpotlightSubtitle || "",
+      });
     });
     return () => {
       active = false;
@@ -112,13 +122,13 @@ export default function Articles() {
             <section className="space-y-6">
               <div className="space-y-2 max-w-2xl">
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  Article Spotlight
+                  {spotlightCopy.eyebrow || "Article Spotlight"}
                 </p>
                 <h2 className="font-playfair text-2xl sm:text-3xl font-semibold text-elegant-text">
-                  Deep dives and long-form explorations.
+                  {spotlightCopy.title || "Deep dives and long-form explorations."}
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  Curated pieces with more depth, context, and narrative focus.
+                  {spotlightCopy.subtitle || "Curated pieces with more depth, context, and narrative focus."}
                 </p>
               </div>
 

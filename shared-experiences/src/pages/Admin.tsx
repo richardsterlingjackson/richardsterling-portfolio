@@ -67,6 +67,12 @@ type SiteSettingsPayload = {
   categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
   categoryCardExcerpts: Record<string, string>;
   featuredArticleSlug: string;
+  categoriesHeadingEyebrow: string;
+  categoriesHeadingTitle: string;
+  categoriesHeadingSubtitle: string;
+  articlesSpotlightEyebrow: string;
+  articlesSpotlightTitle: string;
+  articlesSpotlightSubtitle: string;
 };
 
 type MediaLibraryAsset = {
@@ -292,6 +298,12 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     categoryCardImages: {},
     categoryCardExcerpts: {},
     featuredArticleSlug: "",
+    categoriesHeadingEyebrow: "",
+    categoriesHeadingTitle: "",
+    categoriesHeadingSubtitle: "",
+    articlesSpotlightEyebrow: "",
+    articlesSpotlightTitle: "",
+    articlesSpotlightSubtitle: "",
   });
   const [settingsSaving, setSettingsSaving] = React.useState(false);
   const [settingsFileLabel, setSettingsFileLabel] = React.useState("");
@@ -658,6 +670,12 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               categoryCardImages: settingsData.categoryCardImages || {},
               categoryCardExcerpts: settingsData.categoryCardExcerpts || {},
               featuredArticleSlug: settingsData.featuredArticleSlug || "",
+              categoriesHeadingEyebrow: settingsData.categoriesHeadingEyebrow || "",
+              categoriesHeadingTitle: settingsData.categoriesHeadingTitle || "",
+              categoriesHeadingSubtitle: settingsData.categoriesHeadingSubtitle || "",
+              articlesSpotlightEyebrow: settingsData.articlesSpotlightEyebrow || "",
+              articlesSpotlightTitle: settingsData.articlesSpotlightTitle || "",
+              articlesSpotlightSubtitle: settingsData.articlesSpotlightSubtitle || "",
             });
           }
         }
@@ -718,6 +736,12 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           categoryCardImages: updated.categoryCardImages || {},
           categoryCardExcerpts: updated.categoryCardExcerpts || {},
           featuredArticleSlug: updated.featuredArticleSlug || "",
+          categoriesHeadingEyebrow: updated.categoriesHeadingEyebrow || "",
+          categoriesHeadingTitle: updated.categoriesHeadingTitle || "",
+          categoriesHeadingSubtitle: updated.categoriesHeadingSubtitle || "",
+          articlesSpotlightEyebrow: updated.articlesSpotlightEyebrow || "",
+          articlesSpotlightTitle: updated.articlesSpotlightTitle || "",
+          articlesSpotlightSubtitle: updated.articlesSpotlightSubtitle || "",
         });
       }
       if (!options?.silent) {
@@ -1997,6 +2021,60 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       className="w-full max-w-sm rounded-md border"
                     />
                   )}
+                </div>
+              </div>
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                <div className="space-y-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Categories Heading</p>
+                  <Input
+                    placeholder="Eyebrow (e.g., Browse by theme)"
+                    value={siteSettings.categoriesHeadingEyebrow}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, categoriesHeadingEyebrow: e.target.value }))
+                    }
+                  />
+                  <Input
+                    placeholder="Title (e.g., Categories)"
+                    value={siteSettings.categoriesHeadingTitle}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, categoriesHeadingTitle: e.target.value }))
+                    }
+                  />
+                  <Textarea
+                    placeholder="Subtitle"
+                    value={siteSettings.categoriesHeadingSubtitle}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, categoriesHeadingSubtitle: e.target.value }))
+                    }
+                    rows={2}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Articles Spotlight Copy</p>
+                  <Input
+                    placeholder="Eyebrow (e.g., Article Spotlight)"
+                    value={siteSettings.articlesSpotlightEyebrow}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, articlesSpotlightEyebrow: e.target.value }))
+                    }
+                  />
+                  <Input
+                    placeholder="Title"
+                    value={siteSettings.articlesSpotlightTitle}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, articlesSpotlightTitle: e.target.value }))
+                    }
+                  />
+                  <Textarea
+                    placeholder="Subtitle"
+                    value={siteSettings.articlesSpotlightSubtitle}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, articlesSpotlightSubtitle: e.target.value }))
+                    }
+                    rows={2}
+                  />
                 </div>
               </div>
 

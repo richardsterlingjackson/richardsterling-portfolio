@@ -5,6 +5,12 @@ export type SiteSettings = {
   categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
   categoryCardExcerpts: Record<string, string>;
   featuredArticleSlug: string;
+  categoriesHeadingEyebrow: string;
+  categoriesHeadingTitle: string;
+  categoriesHeadingSubtitle: string;
+  articlesSpotlightEyebrow: string;
+  articlesSpotlightTitle: string;
+  articlesSpotlightSubtitle: string;
 };
 
 let cachedSettings: SiteSettings | null = null;
@@ -34,6 +40,18 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
             categoryCardExcerpts: rawCategoryExcerpts as Record<string, string>,
             featuredArticleSlug:
               typeof data.featuredArticleSlug === "string" ? data.featuredArticleSlug : "",
+            categoriesHeadingEyebrow:
+              typeof data.categoriesHeadingEyebrow === "string" ? data.categoriesHeadingEyebrow : "",
+            categoriesHeadingTitle:
+              typeof data.categoriesHeadingTitle === "string" ? data.categoriesHeadingTitle : "",
+            categoriesHeadingSubtitle:
+              typeof data.categoriesHeadingSubtitle === "string" ? data.categoriesHeadingSubtitle : "",
+            articlesSpotlightEyebrow:
+              typeof data.articlesSpotlightEyebrow === "string" ? data.articlesSpotlightEyebrow : "",
+            articlesSpotlightTitle:
+              typeof data.articlesSpotlightTitle === "string" ? data.articlesSpotlightTitle : "",
+            articlesSpotlightSubtitle:
+              typeof data.articlesSpotlightSubtitle === "string" ? data.articlesSpotlightSubtitle : "",
           };
           return cachedSettings;
         }

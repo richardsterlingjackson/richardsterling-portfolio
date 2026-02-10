@@ -38,6 +38,12 @@ type SiteSettingsRow = {
   categories_images_json: string | null;
   categories_excerpts_json: string | null;
   featured_article_slug: string | null;
+  categories_heading_eyebrow: string | null;
+  categories_heading_title: string | null;
+  categories_heading_subtitle: string | null;
+  articles_spotlight_eyebrow: string | null;
+  articles_spotlight_title: string | null;
+  articles_spotlight_subtitle: string | null;
 };
 
 type HomeFeaturedRow = {
@@ -133,6 +139,12 @@ type SiteSettings = {
   categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
   categoryCardExcerpts: Record<string, string>;
   featuredArticleSlug: string;
+  categoriesHeadingEyebrow: string;
+  categoriesHeadingTitle: string;
+  categoriesHeadingSubtitle: string;
+  articlesSpotlightEyebrow: string;
+  articlesSpotlightTitle: string;
+  articlesSpotlightSubtitle: string;
 };
 
 function mapRow(row: DbRow) {
@@ -238,6 +250,12 @@ async function ensureSiteSettingsTable() {
         categories_images_json text NOT NULL DEFAULT '',
         categories_excerpts_json text NOT NULL DEFAULT '',
         featured_article_slug text NOT NULL DEFAULT '',
+        categories_heading_eyebrow text NOT NULL DEFAULT '',
+        categories_heading_title text NOT NULL DEFAULT '',
+        categories_heading_subtitle text NOT NULL DEFAULT '',
+        articles_spotlight_eyebrow text NOT NULL DEFAULT '',
+        articles_spotlight_title text NOT NULL DEFAULT '',
+        articles_spotlight_subtitle text NOT NULL DEFAULT '',
         updated_at timestamptz DEFAULT now()
       )
     `;
@@ -247,6 +265,12 @@ async function ensureSiteSettingsTable() {
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_images_json text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_excerpts_json text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS featured_article_slug text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_heading_eyebrow text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_heading_title text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_heading_subtitle text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_spotlight_eyebrow text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_spotlight_title text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_spotlight_subtitle text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now()`;
   } catch (err) {
     console.warn("Failed to ensure site_settings table:", err);
@@ -290,6 +314,12 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
       categoryCardImages,
       categoryCardExcerpts,
       featuredArticleSlug: row.featured_article_slug || "",
+      categoriesHeadingEyebrow: row.categories_heading_eyebrow || "",
+      categoriesHeadingTitle: row.categories_heading_title || "",
+      categoriesHeadingSubtitle: row.categories_heading_subtitle || "",
+      articlesSpotlightEyebrow: row.articles_spotlight_eyebrow || "",
+      articlesSpotlightTitle: row.articles_spotlight_title || "",
+      articlesSpotlightSubtitle: row.articles_spotlight_subtitle || "",
     };
   } catch (err) {
     console.error("Failed to load site_settings:", err);
@@ -300,7 +330,7 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
 async function upsertSiteSettings(payload: SiteSettings) {
   await ensureSiteSettingsTable();
   await sql`
-    INSERT INTO site_settings (id, post_fallback_image, categories_image, categories_fallback_image, categories_images_json, categories_excerpts_json, featured_article_slug, updated_at)
+    INSERT INTO site_settings (id, post_fallback_image, categories_image, categories_fallback_image, categories_images_json, categories_excerpts_json, featured_article_slug, categories_heading_eyebrow, categories_heading_title, categories_heading_subtitle, articles_spotlight_eyebrow, articles_spotlight_title, articles_spotlight_subtitle, updated_at)
     VALUES (
       1,
       ${payload.postFallbackImage || ""},
@@ -309,6 +339,12 @@ async function upsertSiteSettings(payload: SiteSettings) {
       ${JSON.stringify(payload.categoryCardImages || {})},
       ${JSON.stringify(payload.categoryCardExcerpts || {})},
       ${payload.featuredArticleSlug || ""},
+      ${payload.categoriesHeadingEyebrow || ""},
+      ${payload.categoriesHeadingTitle || ""},
+      ${payload.categoriesHeadingSubtitle || ""},
+      ${payload.articlesSpotlightEyebrow || ""},
+      ${payload.articlesSpotlightTitle || ""},
+      ${payload.articlesSpotlightSubtitle || ""},
       NOW()
     )
     ON CONFLICT (id) DO UPDATE SET
@@ -318,6 +354,12 @@ async function upsertSiteSettings(payload: SiteSettings) {
       categories_images_json = EXCLUDED.categories_images_json,
       categories_excerpts_json = EXCLUDED.categories_excerpts_json,
       featured_article_slug = EXCLUDED.featured_article_slug,
+      categories_heading_eyebrow = EXCLUDED.categories_heading_eyebrow,
+      categories_heading_title = EXCLUDED.categories_heading_title,
+      categories_heading_subtitle = EXCLUDED.categories_heading_subtitle,
+      articles_spotlight_eyebrow = EXCLUDED.articles_spotlight_eyebrow,
+      articles_spotlight_title = EXCLUDED.articles_spotlight_title,
+      articles_spotlight_subtitle = EXCLUDED.articles_spotlight_subtitle,
       updated_at = NOW()
   `;
 }
