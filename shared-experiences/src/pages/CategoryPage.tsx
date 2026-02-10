@@ -35,6 +35,7 @@ export default function CategoryPage() {
         const filtered = allPosts.filter(
           (p) =>
             p.status === "published" &&
+            !p.article &&
             p.category?.toLowerCase() === label.toLowerCase()
         );
 

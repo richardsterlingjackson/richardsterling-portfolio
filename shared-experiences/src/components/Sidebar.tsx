@@ -40,7 +40,7 @@ export default function Sidebar() {
   //
   const recentPosts = useMemo(() => {
     return allPosts
-      .filter((p) => p.status === "published" && !p.hidden)
+      .filter((p) => p.status === "published" && !p.hidden && !p.article)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 5);
   }, [allPosts]);
@@ -50,7 +50,7 @@ export default function Sidebar() {
   //
   const popularPosts = useMemo(() => {
     return allPosts
-      .filter((p) => p.status === "published" && !p.hidden)
+      .filter((p) => p.status === "published" && !p.hidden && !p.article)
       .sort((a, b) => {
         const readsDiff = (b.readsCount || 0) - (a.readsCount || 0);
         if (readsDiff !== 0) return readsDiff;
@@ -64,7 +64,7 @@ export default function Sidebar() {
   //
   const categoryWithCounts = useMemo(() => {
     return categories.map(({ slug, label }) => {
-      const count = allPosts.filter((p) => p.category === label && p.status === "published" && !p.hidden).length;
+      const count = allPosts.filter((p) => p.category === label && p.status === "published" && !p.hidden && !p.article).length;
       return { slug, label, count };
     });
   }, [allPosts]);

@@ -13,6 +13,7 @@ import PostPage from "@/pages/PostPage";
 import CategoryPage from "@/pages/CategoryPage"; // ✅ corrected import
 import NotFound from "@/pages/NotFound";
 import { SearchResults } from "@/pages/SearchResults";
+import Articles from "@/pages/Articles";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/articles" element={<Articles />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/posts/:postId" element={<PostPage />} />

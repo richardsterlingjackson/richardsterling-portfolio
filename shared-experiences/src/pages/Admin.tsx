@@ -65,6 +65,7 @@ type SiteSettingsPayload = {
   categoriesImage: string;
   categoriesFallbackImage: string;
   categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
+  categoryCardExcerpts: Record<string, string>;
 };
 
 type MediaLibraryAsset = {
@@ -232,6 +233,8 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
             status: newStatus,
             featured: post.featured ?? false,
             mainFeatured: newStatus === "published" ? post.mainFeatured ?? false : false,
+            hidden: post.hidden ?? false,
+            article: post.article ?? false,
             slug: post.slug,
           };
           const ok = await updatePost(id, payload);
@@ -286,6 +289,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     categoriesImage: "",
     categoriesFallbackImage: "",
     categoryCardImages: {},
+    categoryCardExcerpts: {},
   });
   const [settingsSaving, setSettingsSaving] = React.useState(false);
   const [settingsFileLabel, setSettingsFileLabel] = React.useState("");
@@ -380,6 +384,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     featured: z.boolean().optional(),
     mainFeatured: z.boolean().optional(),
     hidden: z.boolean().optional(),
+    article: z.boolean().optional(),
     content: z.string().min(20),
     status: z.enum(["draft", "published"]),
     scheduledAt: z.string().optional(),
@@ -397,6 +402,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       featured: false,
       mainFeatured: false,
       hidden: false,
+      article: false,
       content: "",
       status: "draft",
       scheduledAt: "",
@@ -528,6 +534,16 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     []
   );
 
+  const updateCategoryCardExcerpt = React.useCallback((slug: string, value: string) => {
+    setSiteSettings((prev) => ({
+      ...prev,
+      categoryCardExcerpts: {
+        ...prev.categoryCardExcerpts,
+        [slug]: value,
+      },
+    }));
+  }, []);
+
   const handleCardImageUpload = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -638,6 +654,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               categoriesImage: settingsData.categoriesImage || "",
               categoriesFallbackImage: settingsData.categoriesFallbackImage || "",
               categoryCardImages: settingsData.categoryCardImages || {},
+              categoryCardExcerpts: settingsData.categoryCardExcerpts || {},
             });
           }
         }
@@ -695,6 +712,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           categoriesImage: updated.categoriesImage || "",
           categoriesFallbackImage: updated.categoriesFallbackImage || "",
           categoryCardImages: updated.categoryCardImages || {},
+          categoryCardExcerpts: updated.categoryCardExcerpts || {},
         });
       }
       toast({ title: "Settings saved", description: "Site-wide images updated." });
@@ -868,6 +886,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           featured: !!data.featured,
           mainFeatured: !!(editingPost.mainFeatured && data.featured && data.status === "published"),
           hidden: !!data.hidden,
+          article: !!data.article,
           slug: slugifyTitle(data.title),
           scheduledAt: data.scheduledAt || null,
         };
@@ -891,6 +910,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           featured: !!data.featured,
           mainFeatured: false,
           hidden: typeof data.hidden === "boolean" ? data.hidden : false,
+          article: typeof data.article === "boolean" ? data.article : false,
         };
 
         const created = await savePost({
@@ -929,6 +949,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       featured: post.featured ?? false,
       mainFeatured: post.mainFeatured ?? false,
       hidden: post.hidden ?? false,
+      article: post.article ?? false,
       content: post.content,
       status: post.status,
       scheduledAt: post.scheduledAt ?? "",
@@ -1397,6 +1418,17 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               />
               <label htmlFor="hidden" className="text-sm text-elegant-text">
                 Is hidden (exclude from recent lists)
+              </label>
+            </div>
+            <div className="bg-muted/50 border rounded px-3 py-2 text-sm flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="article"
+                {...register("article")}
+                className="h-4 w-4 accent-elegant-primary"
+              />
+              <label htmlFor="article" className="text-sm text-elegant-text">
+                Article (show only on Articles page)
               </label>
             </div>
 
@@ -1951,6 +1983,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       image: "",
                       fallbackImage: "",
                     };
+                    const excerpt = siteSettings.categoryCardExcerpts[category.slug] || "";
                     const preview = config.image || config.fallbackImage;
                     return (
                       <div key={category.slug} className="rounded-lg border border-border p-4 space-y-3 bg-card/40">
@@ -2086,6 +2119,18 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                               </span>
                             )}
                           </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Textarea
+                            placeholder="Card excerpt (optional)"
+                            value={excerpt}
+                            onChange={(e) => updateCategoryCardExcerpt(category.slug, e.target.value)}
+                            rows={2}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Shows on the Categories page below the title.
+                          </p>
                         </div>
                       </div>
                     );

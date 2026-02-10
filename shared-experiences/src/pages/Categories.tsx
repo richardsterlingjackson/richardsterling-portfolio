@@ -24,6 +24,7 @@ export default function Categories() {
   const [categoryCardImages, setCategoryCardImages] = useState<
     Record<string, { image?: string; fallbackImage?: string }>
   >({});
+  const [categoryCardExcerpts, setCategoryCardExcerpts] = useState<Record<string, string>>({});
 
   //
   // LOAD POSTS
@@ -34,7 +35,7 @@ export default function Categories() {
     async function load() {
       try {
         const data = await getStoredPosts();
-        setPosts(data.filter((p) => p.status === "published"));
+        setPosts(data.filter((p) => p.status === "published" && !p.article));
       } catch (err) {
         console.error("Failed to load posts:", err);
         setPosts([]);
@@ -55,6 +56,7 @@ export default function Categories() {
       setHeaderFallbackImage(fallback);
       setHeaderImage(hero);
       setCategoryCardImages(settings?.categoryCardImages || {});
+      setCategoryCardExcerpts(settings?.categoryCardExcerpts || {});
     });
     return () => {
       active = false;
@@ -156,6 +158,7 @@ export default function Categories() {
                   const config = categoryCardImages[slug] || {};
                   const fallbackImage = config.fallbackImage || categoriesFallback;
                   const cardImage = config.image || fallbackImage;
+                  const cardExcerpt = categoryCardExcerpts[slug] || `Explore posts curated under ${label}.`;
                   return (
                     <li
                       key={slug}
@@ -184,9 +187,7 @@ export default function Categories() {
                             {count} post{count > 1 ? "s" : ""}
                           </span>
                         </div>
-                      <p className="text-sm text-muted-foreground">
-                        Explore posts curated under {label}.
-                      </p>
+                      <p className="text-sm text-muted-foreground">{cardExcerpt}</p>
                       {latestDate && (
                         <p className="text-xs text-muted-foreground">
                           Latest: {latestDate}

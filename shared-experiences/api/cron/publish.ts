@@ -17,6 +17,14 @@ type ScheduledPostRow = {
   main_featured: boolean | null;
   content: string;
   status: "draft" | "published";
+  created_at: string | null;
+  updated_at: string | null;
+  version: number | null;
+  scheduled_at: string | null;
+  likes_count: number | null;
+  reads_count: number | null;
+  hidden: boolean | null;
+  article: boolean | null;
 };
 
 export async function GET(req: Request) {
@@ -70,6 +78,7 @@ export async function GET(req: Request) {
         likesCount: row.likes_count ?? 0,
         readsCount: row.reads_count ?? 0,
         hidden: row.hidden ?? false,
+        article: row.article ?? false,
       };
 
       sendEmailsToSubscribers(post).catch((err) =>

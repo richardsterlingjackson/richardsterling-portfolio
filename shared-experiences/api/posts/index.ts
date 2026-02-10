@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 // Posts API: CRUD for posts, home featured config, and site settings.
 import { sql } from "./db.js";
 import { checkAdmin, isAdmin } from "../_helpers/auth.js";
-import { sendEmailsToSubscribers, sendUpdateEmailToSubscribers } from "../_helpers/sendEmails.js";
+import { sendEmailsToSubscribers } from "../_helpers/sendEmails.js";
 import { v4 as uuid } from "uuid";
 import type { BlogPost } from "../../src/data/posts";
 
@@ -28,6 +28,7 @@ type DbRow = {
   likes_count: number | null;
   reads_count: number | null;
   hidden: boolean | null;
+  article: boolean | null;
 };
 
 type SiteSettingsRow = {
@@ -35,6 +36,7 @@ type SiteSettingsRow = {
   categories_image: string | null;
   categories_fallback_image: string | null;
   categories_images_json: string | null;
+  categories_excerpts_json: string | null;
 };
 
 type HomeFeaturedRow = {
@@ -84,6 +86,7 @@ type CreateBody = {
   slug?: string;
   scheduledAt?: string | null;
   hidden?: boolean;
+  article?: boolean;
 };
 
 type UpdateBody = {
@@ -99,6 +102,7 @@ type UpdateBody = {
   slug?: string;
   scheduledAt?: string | null;
   hidden?: boolean;
+  article?: boolean;
 };
 
 type HomeFeatured = {
@@ -126,6 +130,7 @@ type SiteSettings = {
   categoriesImage: string;
   categoriesFallbackImage: string;
   categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
+  categoryCardExcerpts: Record<string, string>;
 };
 
 function mapRow(row: DbRow) {
@@ -148,6 +153,7 @@ function mapRow(row: DbRow) {
     likesCount: row.likes_count ?? 0,
     readsCount: row.reads_count ?? 0,
     hidden: row.hidden ?? false,
+    article: row.article ?? false,
   };
 }
 
@@ -158,6 +164,14 @@ function slugify(input: string): string {
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+}
+
+async function ensurePostColumns() {
+  try {
+    await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS article boolean NOT NULL DEFAULT false`;
+  } catch (err) {
+    console.warn("Failed to ensure posts columns:", err);
+  }
 }
 
 async function ensureHomeFeaturedTable() {
@@ -220,6 +234,7 @@ async function ensureSiteSettingsTable() {
         categories_image text NOT NULL DEFAULT '',
         categories_fallback_image text NOT NULL DEFAULT '',
         categories_images_json text NOT NULL DEFAULT '',
+        categories_excerpts_json text NOT NULL DEFAULT '',
         updated_at timestamptz DEFAULT now()
       )
     `;
@@ -227,6 +242,7 @@ async function ensureSiteSettingsTable() {
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_image text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_fallback_image text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_images_json text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_excerpts_json text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now()`;
   } catch (err) {
     console.warn("Failed to ensure site_settings table:", err);
@@ -242,6 +258,7 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
     const row = rows[0];
     if (!row) return null;
     let categoryCardImages: Record<string, { image: string; fallbackImage: string }> = {};
+    let categoryCardExcerpts: Record<string, string> = {};
     if (row.categories_images_json) {
       try {
         const parsed = JSON.parse(row.categories_images_json);
@@ -252,11 +269,22 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
         categoryCardImages = {};
       }
     }
+    if (row.categories_excerpts_json) {
+      try {
+        const parsed = JSON.parse(row.categories_excerpts_json);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          categoryCardExcerpts = parsed as Record<string, string>;
+        }
+      } catch {
+        categoryCardExcerpts = {};
+      }
+    }
     return {
       postFallbackImage: row.post_fallback_image || "",
       categoriesImage: row.categories_image || "",
       categoriesFallbackImage: row.categories_fallback_image || "",
       categoryCardImages,
+      categoryCardExcerpts,
     };
   } catch (err) {
     console.error("Failed to load site_settings:", err);
@@ -267,13 +295,14 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
 async function upsertSiteSettings(payload: SiteSettings) {
   await ensureSiteSettingsTable();
   await sql`
-    INSERT INTO site_settings (id, post_fallback_image, categories_image, categories_fallback_image, categories_images_json, updated_at)
+    INSERT INTO site_settings (id, post_fallback_image, categories_image, categories_fallback_image, categories_images_json, categories_excerpts_json, updated_at)
     VALUES (
       1,
       ${payload.postFallbackImage || ""},
       ${payload.categoriesImage || ""},
       ${payload.categoriesFallbackImage || ""},
       ${JSON.stringify(payload.categoryCardImages || {})},
+      ${JSON.stringify(payload.categoryCardExcerpts || {})},
       NOW()
     )
     ON CONFLICT (id) DO UPDATE SET
@@ -281,6 +310,7 @@ async function upsertSiteSettings(payload: SiteSettings) {
       categories_image = EXCLUDED.categories_image,
       categories_fallback_image = EXCLUDED.categories_fallback_image,
       categories_images_json = EXCLUDED.categories_images_json,
+      categories_excerpts_json = EXCLUDED.categories_excerpts_json,
       updated_at = NOW()
   `;
 }
@@ -647,6 +677,7 @@ export async function PUT(req: Request) {
     const currentSlug = currentRows[0].slug;
 
     const body = (await req.json()) as UpdateBody;
+    await ensurePostColumns();
 
     const scheduledAt = body.scheduledAt ? new Date(body.scheduledAt) : null;
     const shouldSchedule = scheduledAt ? scheduledAt.getTime() > Date.now() : false;
@@ -692,6 +723,7 @@ export async function PUT(req: Request) {
           featured = ${body.featured ?? false},
           main_featured = ${body.mainFeatured ?? false},
           hidden = ${body.hidden ?? false},
+          article = ${body.article ?? false},
           content = ${body.content},
           status = ${shouldSchedule ? "draft" : body.status},
           slug = ${slug},
@@ -703,8 +735,13 @@ export async function PUT(req: Request) {
       `) as DbRow[];
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "";
-      if (message.includes("scheduled_at") || message.includes("main_featured") || message.includes("hidden")) {
-        console.warn("Missing posts columns; updating without scheduling/main_featured/hidden.");
+      if (
+        message.includes("scheduled_at") ||
+        message.includes("main_featured") ||
+        message.includes("hidden") ||
+        message.includes("article")
+      ) {
+        console.warn("Missing posts columns; updating without scheduling/main_featured/hidden/article.");
         result = (await sql`
           UPDATE posts SET
             title = ${body.title},
@@ -746,12 +783,6 @@ export async function PUT(req: Request) {
       } catch (err) {
         console.warn("Failed to save slug alias:", err);
       }
-    }
-
-    if (updatedPost.status === "published") {
-      sendUpdateEmailToSubscribers(updatedPost).catch((err) =>
-        console.error("Failed to send subscriber update emails:", err)
-      );
     }
 
     return new Response(JSON.stringify(updatedPost), {
@@ -810,6 +841,7 @@ export async function POST(req: Request) {
 
   try {
     const body = (await req.json()) as CreateBody;
+    await ensurePostColumns();
 
     const scheduledAt = body.scheduledAt ? new Date(body.scheduledAt) : null;
     const shouldSchedule = scheduledAt ? scheduledAt.getTime() > Date.now() : false;
@@ -853,6 +885,7 @@ export async function POST(req: Request) {
           featured,
           main_featured,
           hidden,
+          article,
           content,
           status,
           slug,
@@ -872,6 +905,7 @@ export async function POST(req: Request) {
           ${body.featured ?? false},
           ${body.mainFeatured ?? false},
           ${body.hidden ?? false},
+          ${body.article ?? false},
           ${body.content},
           ${shouldSchedule ? "draft" : body.status},
           ${slug},
@@ -885,8 +919,15 @@ export async function POST(req: Request) {
       `;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "";
-      if (message.includes("main_featured") || message.includes("scheduled_at") || message.includes("likes_count") || message.includes("reads_count") || message.includes("hidden")) {
-        console.warn("Missing posts columns; inserting without scheduling/likes/reads/hidden.");
+      if (
+        message.includes("main_featured") ||
+        message.includes("scheduled_at") ||
+        message.includes("likes_count") ||
+        message.includes("reads_count") ||
+        message.includes("hidden") ||
+        message.includes("article")
+      ) {
+        console.warn("Missing posts columns; inserting without scheduling/likes/reads/hidden/article.");
         await sql`
           INSERT INTO posts (
             id,

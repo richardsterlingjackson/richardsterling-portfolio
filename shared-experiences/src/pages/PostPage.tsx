@@ -90,7 +90,8 @@ export default function PostPage() {
               (p) =>
                 p.category === found.category &&
                 p.id !== found.id &&
-                p.status === "published"
+                p.status === "published" &&
+                !p.article
             )
             .slice(0, 3); // Limit to 3 related posts
           setRelatedPosts(related);

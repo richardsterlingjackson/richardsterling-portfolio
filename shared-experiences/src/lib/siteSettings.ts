@@ -3,6 +3,7 @@ export type SiteSettings = {
   categoriesImage: string;
   categoriesFallbackImage: string;
   categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
+  categoryCardExcerpts: Record<string, string>;
 };
 
 let cachedSettings: SiteSettings | null = null;
@@ -19,12 +20,17 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
             data.categoryCardImages && typeof data.categoryCardImages === "object" && !Array.isArray(data.categoryCardImages)
               ? data.categoryCardImages
               : {};
+          const rawCategoryExcerpts =
+            data.categoryCardExcerpts && typeof data.categoryCardExcerpts === "object" && !Array.isArray(data.categoryCardExcerpts)
+              ? data.categoryCardExcerpts
+              : {};
           cachedSettings = {
             postFallbackImage: data.postFallbackImage || "",
             categoriesImage: typeof data.categoriesImage === "string" ? data.categoriesImage : "",
             categoriesFallbackImage:
               typeof data.categoriesFallbackImage === "string" ? data.categoriesFallbackImage : "",
             categoryCardImages: rawCategoryImages as Record<string, { image: string; fallbackImage: string }>,
+            categoryCardExcerpts: rawCategoryExcerpts as Record<string, string>,
           };
           return cachedSettings;
         }

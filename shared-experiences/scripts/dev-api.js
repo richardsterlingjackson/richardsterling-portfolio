@@ -16,6 +16,7 @@ let siteSettings = {
   categoriesImage: "",
   categoriesFallbackImage: "",
   categoryCardImages: {},
+  categoryCardExcerpts: {},
 };
 
 function readData() {
@@ -60,6 +61,7 @@ app.post('/api/posts', (req, res) => {
     category: body.category,
     featured: body.featured ?? false,
     mainFeatured: body.mainFeatured ?? false,
+    article: body.article ?? false,
     content: body.content,
     status: body.status,
     created_at: now,
@@ -93,6 +95,7 @@ app.put('/api/posts/:id', (req, res) => {
     category: body.category,
     featured: body.featured ?? false,
     mainFeatured: body.mainFeatured ?? false,
+    article: body.article ?? false,
     content: body.content,
     status: body.status,
     slug: body.slug,
@@ -112,6 +115,7 @@ app.put('/api/posts', (req, res) => {
       categoriesImage: req.body?.categoriesImage || "",
       categoriesFallbackImage: req.body?.categoriesFallbackImage || "",
       categoryCardImages: req.body?.categoryCardImages || {},
+      categoryCardExcerpts: req.body?.categoryCardExcerpts || {},
     };
     return res.json(siteSettings);
   }
@@ -134,6 +138,7 @@ app.put('/api/posts', (req, res) => {
     category: body.category,
     featured: body.featured ?? false,
     mainFeatured: body.mainFeatured ?? false,
+    article: body.article ?? false,
     content: body.content,
     status: body.status,
     slug: body.slug,

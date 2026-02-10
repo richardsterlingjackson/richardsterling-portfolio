@@ -57,7 +57,12 @@ export function SearchResults() {
 
     return posts.filter((post) => {
       const title = post.title?.toLowerCase() || "";
-      return title.includes(query);
+      return (
+        post.status === "published" &&
+        !post.hidden &&
+        !post.article &&
+        title.includes(query)
+      );
     });
   }, [posts, query]);
 

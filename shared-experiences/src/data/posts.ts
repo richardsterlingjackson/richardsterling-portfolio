@@ -22,6 +22,7 @@ export type BlogPost = {
   likesCount: number;
   readsCount: number;
   hidden: boolean;
+  article: boolean;
 };
 
 // Legacy placeholder array — kept empty on purpose.

@@ -21,6 +21,7 @@ export default function Header() {
       "/": "Shared Experiences – Home",
       "/about": "About – Shared Experiences",
       "/categories": "Categories – Shared Experiences",
+      "/articles": "Articles – Shared Experiences",
       "/contact": "Contact – Shared Experiences",
       "/admin": "Admin – Shared Experiences",
     };
@@ -75,6 +76,7 @@ export default function Header() {
               <HeaderLink to="/" label="HOME" />
               <HeaderLink to="/about" label="ABOUT" />
               <HeaderLink to="/categories" label="CATEGORIES" />
+              <HeaderLink to="/articles" label="ARTICLES" />
               <HeaderLink to="/contact" label="CONTACT" />
             </div>
 
