@@ -66,6 +66,7 @@ type SiteSettingsPayload = {
   categoriesFallbackImage: string;
   categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
   categoryCardExcerpts: Record<string, string>;
+  featuredArticleSlug: string;
 };
 
 type MediaLibraryAsset = {
@@ -290,6 +291,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     categoriesFallbackImage: "",
     categoryCardImages: {},
     categoryCardExcerpts: {},
+    featuredArticleSlug: "",
   });
   const [settingsSaving, setSettingsSaving] = React.useState(false);
   const [settingsFileLabel, setSettingsFileLabel] = React.useState("");
@@ -655,6 +657,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               categoriesFallbackImage: settingsData.categoriesFallbackImage || "",
               categoryCardImages: settingsData.categoryCardImages || {},
               categoryCardExcerpts: settingsData.categoryCardExcerpts || {},
+              featuredArticleSlug: settingsData.featuredArticleSlug || "",
             });
           }
         }
@@ -692,15 +695,16 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     }
   };
 
-  const handleSaveSiteSettings = async () => {
+  const saveSiteSettings = async (next?: SiteSettingsPayload, options?: { silent?: boolean }) => {
     setHomeUploadError("");
     setSettingsSaving(true);
     try {
+      const payload = next ?? siteSettings;
       const res = await fetch("/api/posts?settings=1", {
         method: "PUT",
         headers: { "Content-Type": "application/json", "X-Admin-Request": "1" },
         credentials: "include",
-        body: JSON.stringify(siteSettings),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         throw new Error("Failed to save site settings");
@@ -713,16 +717,25 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           categoriesFallbackImage: updated.categoriesFallbackImage || "",
           categoryCardImages: updated.categoryCardImages || {},
           categoryCardExcerpts: updated.categoryCardExcerpts || {},
+          featuredArticleSlug: updated.featuredArticleSlug || "",
         });
       }
-      toast({ title: "Settings saved", description: "Site-wide images updated." });
+      if (!options?.silent) {
+        toast({ title: "Settings saved", description: "Site-wide settings updated." });
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Unable to save site settings.";
       console.error("Save site settings failed:", err);
-      toast({ title: "Save Failed", description: message, variant: "destructive" });
+      if (!options?.silent) {
+        toast({ title: "Save Failed", description: message, variant: "destructive" });
+      }
     } finally {
       setSettingsSaving(false);
     }
+  };
+
+  const handleSaveSiteSettings = async () => {
+    await saveSiteSettings();
   };
 
   const handleBackupDownload = async () => {
@@ -788,6 +801,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       featured: Boolean(data.featured),
       mainFeatured: Boolean(data.mainFeatured),
       hidden: typeof data.hidden === "boolean" ? data.hidden : false,
+      article: typeof data.article === "boolean" ? data.article : false,
       scheduledAt: typeof data.scheduledAt === "string" ? data.scheduledAt : null,
       slug: typeof data.slug === "string" ? data.slug : undefined,
     };
@@ -1026,6 +1040,21 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     }
 
     setMainFeatured(post.id);
+  };
+
+  const handleSetFeaturedArticle = async (post: BlogPost) => {
+    if (!post.article) {
+      toast({ title: "Not an article", description: "Only article posts can be featured here.", variant: "destructive" });
+      return;
+    }
+    if (post.status !== "published") {
+      toast({ title: "Publish first", description: "Only published articles can be featured.", variant: "destructive" });
+      return;
+    }
+    const next = { ...siteSettings, featuredArticleSlug: post.slug };
+    setSiteSettings(next);
+    await saveSiteSettings(next, { silent: true });
+    toast({ title: "Featured article set", description: `"${post.title}" will appear at the top of Articles.` });
   };
 
   return (
@@ -2240,6 +2269,16 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                             Main Feature
                           </span>
                         )}
+                        {post.article && (
+                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-full">
+                            Article
+                          </span>
+                        )}
+                        {post.slug === siteSettings.featuredArticleSlug && (
+                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/20 text-amber-800 px-2 py-0.5 rounded-full">
+                            Featured Article
+                          </span>
+                        )}
                       </div>
                       <p className="whitespace-pre-line text-xs text-muted-foreground">
                         {post.excerpt}
@@ -2250,6 +2289,16 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                     </div>
 
                     <div className="flex gap-2">
+                      {post.article && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSetFeaturedArticle(post)}
+                          disabled={post.status !== "published"}
+                        >
+                          ⭐ Feature Article
+                        </Button>
+                      )}
                       {post.featured && (
                         <Button
                           variant="default"

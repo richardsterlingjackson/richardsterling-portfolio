@@ -1,5 +1,5 @@
 // Blog post card used across lists (featured, recent, category, search).
-import { Calendar } from "lucide-react";
+import { Calendar, Eye, Heart, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePostFallbackImage } from "@/hooks/use-post-fallback";
 
@@ -14,10 +14,13 @@ interface BlogPostProps {
     slug: string;
     category: string;
     featured?: boolean;
+    likesCount?: number;
+    readsCount?: number;
   };
+  showStats?: boolean;
 }
 
-export default function BlogPost({ post }: BlogPostProps) {
+export default function BlogPost({ post, showStats = false }: BlogPostProps) {
   const fallbackImage = usePostFallbackImage();
   const {
     title,
@@ -27,6 +30,8 @@ export default function BlogPost({ post }: BlogPostProps) {
     slug,
     category,
     featured = false,
+    likesCount = 0,
+    readsCount = 0,
   } = post;
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -40,6 +45,13 @@ export default function BlogPost({ post }: BlogPostProps) {
     month: "short",
     day: "numeric",
   });
+
+  const readTime = (() => {
+    if (!showStats || !post.content) return null;
+    const words = post.content.trim().split(/\s+/).filter(Boolean).length;
+    const minutes = Math.max(1, Math.ceil(words / 200));
+    return `${minutes} min read`;
+  })();
 
   const PostTitle = featured ? "h2" : "h3";
 
@@ -77,6 +89,24 @@ export default function BlogPost({ post }: BlogPostProps) {
             </>
           )}
         </div>
+        {showStats && (
+          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mb-4">
+            <span className="inline-flex items-center gap-1">
+              <Eye className="h-3.5 w-3.5" />
+              {readsCount}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Heart className="h-3.5 w-3.5" />
+              {likesCount}
+            </span>
+            {readTime && (
+              <span className="inline-flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" />
+                {readTime}
+              </span>
+            )}
+          </div>
+        )}
 
         <Link to={`/posts/${slug}`}>
           <PostTitle className={titleClass}>{title}</PostTitle>

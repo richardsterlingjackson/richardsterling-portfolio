@@ -37,6 +37,7 @@ type SiteSettingsRow = {
   categories_fallback_image: string | null;
   categories_images_json: string | null;
   categories_excerpts_json: string | null;
+  featured_article_slug: string | null;
 };
 
 type HomeFeaturedRow = {
@@ -131,6 +132,7 @@ type SiteSettings = {
   categoriesFallbackImage: string;
   categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
   categoryCardExcerpts: Record<string, string>;
+  featuredArticleSlug: string;
 };
 
 function mapRow(row: DbRow) {
@@ -235,6 +237,7 @@ async function ensureSiteSettingsTable() {
         categories_fallback_image text NOT NULL DEFAULT '',
         categories_images_json text NOT NULL DEFAULT '',
         categories_excerpts_json text NOT NULL DEFAULT '',
+        featured_article_slug text NOT NULL DEFAULT '',
         updated_at timestamptz DEFAULT now()
       )
     `;
@@ -243,6 +246,7 @@ async function ensureSiteSettingsTable() {
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_fallback_image text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_images_json text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS categories_excerpts_json text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS featured_article_slug text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now()`;
   } catch (err) {
     console.warn("Failed to ensure site_settings table:", err);
@@ -285,6 +289,7 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
       categoriesFallbackImage: row.categories_fallback_image || "",
       categoryCardImages,
       categoryCardExcerpts,
+      featuredArticleSlug: row.featured_article_slug || "",
     };
   } catch (err) {
     console.error("Failed to load site_settings:", err);
@@ -295,7 +300,7 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
 async function upsertSiteSettings(payload: SiteSettings) {
   await ensureSiteSettingsTable();
   await sql`
-    INSERT INTO site_settings (id, post_fallback_image, categories_image, categories_fallback_image, categories_images_json, categories_excerpts_json, updated_at)
+    INSERT INTO site_settings (id, post_fallback_image, categories_image, categories_fallback_image, categories_images_json, categories_excerpts_json, featured_article_slug, updated_at)
     VALUES (
       1,
       ${payload.postFallbackImage || ""},
@@ -303,6 +308,7 @@ async function upsertSiteSettings(payload: SiteSettings) {
       ${payload.categoriesFallbackImage || ""},
       ${JSON.stringify(payload.categoryCardImages || {})},
       ${JSON.stringify(payload.categoryCardExcerpts || {})},
+      ${payload.featuredArticleSlug || ""},
       NOW()
     )
     ON CONFLICT (id) DO UPDATE SET
@@ -311,6 +317,7 @@ async function upsertSiteSettings(payload: SiteSettings) {
       categories_fallback_image = EXCLUDED.categories_fallback_image,
       categories_images_json = EXCLUDED.categories_images_json,
       categories_excerpts_json = EXCLUDED.categories_excerpts_json,
+      featured_article_slug = EXCLUDED.featured_article_slug,
       updated_at = NOW()
   `;
 }
@@ -544,6 +551,8 @@ export async function GET(req: Request) {
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    await ensurePostColumns();
 
     const resolveSlug = url.searchParams.get("resolveSlug");
     if (resolveSlug) {

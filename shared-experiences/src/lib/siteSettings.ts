@@ -4,6 +4,7 @@ export type SiteSettings = {
   categoriesFallbackImage: string;
   categoryCardImages: Record<string, { image: string; fallbackImage: string }>;
   categoryCardExcerpts: Record<string, string>;
+  featuredArticleSlug: string;
 };
 
 let cachedSettings: SiteSettings | null = null;
@@ -31,6 +32,8 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
               typeof data.categoriesFallbackImage === "string" ? data.categoriesFallbackImage : "",
             categoryCardImages: rawCategoryImages as Record<string, { image: string; fallbackImage: string }>,
             categoryCardExcerpts: rawCategoryExcerpts as Record<string, string>,
+            featuredArticleSlug:
+              typeof data.featuredArticleSlug === "string" ? data.featuredArticleSlug : "",
           };
           return cachedSettings;
         }

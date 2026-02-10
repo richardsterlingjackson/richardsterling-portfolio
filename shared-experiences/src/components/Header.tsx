@@ -47,6 +47,11 @@ export default function Header() {
     const trimmed = query.trim();
     if (!trimmed) return;
 
+    if (location.pathname === "/articles") {
+      navigate(`/articles?q=${encodeURIComponent(trimmed)}`);
+      return;
+    }
+
     navigate(`/search?q=${encodeURIComponent(trimmed)}`);
   };
 
