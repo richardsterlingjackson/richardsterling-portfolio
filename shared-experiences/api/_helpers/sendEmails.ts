@@ -50,20 +50,24 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
     }
 
     const allCategory = "All Categories";
+    const targetCategory = post.article ? "Articles" : post.category;
+    const categoryLabel = post.article
+      ? post.articleLabel?.trim() || "Articles"
+      : post.category;
 
     // Get all subscribers for this category (or all-categories subscribers)
     const subscribers = await sql`
       SELECT email, category FROM subscribers 
-      WHERE (category = ${post.category} OR category = ${allCategory})
+      WHERE (category = ${targetCategory} OR category = ${allCategory})
         AND created_at IS NOT NULL
     `;
 
     if (subscribers.length === 0) {
-      console.log(`No subscribers for category: ${post.category}`);
+      console.log(`No subscribers for category: ${targetCategory}`);
       return;
     }
 
-    console.log(`Sending emails to ${subscribers.length} subscribers for ${post.category}...`);
+    console.log(`Sending emails to ${subscribers.length} subscribers for ${targetCategory}...`);
 
     // Send email to each subscriber
     const emailPromises = (subscribers as SubscriberRow[]).map((sub) => {
@@ -80,7 +84,7 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #333;">${post.title}</h2>
             <p style="color: #666; font-size: 14px;">
-              <strong>${post.category}</strong> • ${post.date}
+              <strong>${categoryLabel}</strong> • ${post.date}
             </p>
             <img
               src="${post.image}"
@@ -96,7 +100,7 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
             </a>
             <hr style="margin-top: 32px; border: none; border-top: 1px solid #eee;">
             <p style="font-size: 10px; color: #999; margin-top: 18px;">
-              You received this email because you subscribed to "${post.category}" posts.
+              You received this email because you subscribed to "${categoryLabel}" posts.
             </p>
             ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
               <p style="font-size: 10px; color: #999; margin-top: 4px;">
@@ -106,7 +110,7 @@ export async function sendEmailsToSubscribers(post: BlogPost) {
               </p>
             ` : ""}
               <p style="font-size: 10px; color: #999; margin-top: 18px;">
-                You received this email because you subscribed to "${post.category}" posts.
+                You received this email because you subscribed to "${categoryLabel}" posts.
               </p>
               ${(unsubscribeCategoryUrl || unsubscribeAllUrl) ? `
                 <p style="font-size: 10px; color: #999; margin-top: 4px;">

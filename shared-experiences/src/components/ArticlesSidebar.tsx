@@ -1,7 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import type { BlogPost as BlogPostType } from "@/data/posts";
 
 type ArticlesSidebarProps = {
@@ -19,6 +21,10 @@ export default function ArticlesSidebar({
   onQueryChange,
   featuredArticleSlug = "",
 }: ArticlesSidebarProps) {
+  const [email, setEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
+  const { toast } = useToast();
+
   const groupedByYear = useMemo(() => {
     const groups = new Map<string, BlogPostType[]>();
     articles.forEach((post) => {
@@ -51,6 +57,36 @@ export default function ArticlesSidebar({
     const words = content.trim().split(/\s+/).filter(Boolean).length;
     const minutes = Math.max(1, Math.ceil(words / 200));
     return `${minutes} min read`;
+  };
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email.trim()) {
+      toast({ title: "Email required", description: "Please enter your email address.", variant: "destructive" });
+      return;
+    }
+
+    setSubscribing(true);
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, category: "Articles" }),
+      });
+
+      if (response.ok) {
+        toast({ title: "Subscribed!", description: "You'll receive new articles via email." });
+        setEmail("");
+      } else {
+        toast({ title: "Subscription failed", description: "Please try again later.", variant: "destructive" });
+      }
+    } catch (err) {
+      console.error("Subscribe error:", err);
+      toast({ title: "Error", description: "Failed to subscribe. Please try again.", variant: "destructive" });
+    } finally {
+      setSubscribing(false);
+    }
   };
 
   const renderArticleList = (items: BlogPostType[]) => (
@@ -94,6 +130,35 @@ export default function ArticlesSidebar({
           Published articles, newest first.
         </p>
       </div>
+
+      <section className="bg-gradient-to-br from-elegant-primary/10 to-elegant-secondary/10 border border-elegant-primary/20 rounded-lg p-4 space-y-3">
+        <h3 className="font-playfair text-base font-semibold text-elegant-text">
+          Get new articles in your email...
+        </h3>
+        <p className="text-xs text-muted-foreground">
+          Subscribe to new long-form pieces when they publish.
+        </p>
+        <form onSubmit={handleSubscribe} className="space-y-3">
+          <Input
+            type="email"
+            placeholder="Your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={subscribing}
+            className="text-sm"
+          />
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              size="sm"
+              disabled={subscribing}
+              className="h-auto px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide bg-elegant-primary text-white hover:bg-elegant-primary/90"
+            >
+              {subscribing ? "Subscribing..." : "Subscribe"}
+            </Button>
+          </div>
+        </form>
+      </section>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
