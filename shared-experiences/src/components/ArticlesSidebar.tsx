@@ -122,15 +122,6 @@ export default function ArticlesSidebar({
 
   return (
     <aside className="lg:col-span-3 space-y-4">
-      <div className="rounded-lg border border-border bg-card/70 p-4">
-        <h2 className="font-playfair text-lg font-semibold text-elegant-text">
-          Articles by Date
-        </h2>
-        <p className="text-xs text-muted-foreground mt-1">
-          Published articles, newest first.
-        </p>
-      </div>
-
       <section className="bg-gradient-to-br from-elegant-primary/10 to-elegant-secondary/10 border border-elegant-primary/20 rounded-lg p-4 space-y-3">
         <h3 className="font-playfair text-base font-semibold text-elegant-text">
           Get new articles in your email...
@@ -159,6 +150,15 @@ export default function ArticlesSidebar({
           </div>
         </form>
       </section>
+
+      <div className="rounded-lg border border-border bg-card/70 p-4">
+        <h2 className="font-playfair text-lg font-semibold text-elegant-text">
+          Articles by Date
+        </h2>
+        <p className="text-xs text-muted-foreground mt-1">
+          Published articles, newest first.
+        </p>
+      </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
