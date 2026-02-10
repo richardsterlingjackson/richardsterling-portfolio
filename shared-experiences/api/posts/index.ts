@@ -29,6 +29,7 @@ type DbRow = {
   reads_count: number | null;
   hidden: boolean | null;
   article: boolean | null;
+  article_label: string | null;
 };
 
 type SiteSettingsRow = {
@@ -94,6 +95,7 @@ type CreateBody = {
   scheduledAt?: string | null;
   hidden?: boolean;
   article?: boolean;
+  articleLabel?: string | null;
 };
 
 type UpdateBody = {
@@ -110,6 +112,7 @@ type UpdateBody = {
   scheduledAt?: string | null;
   hidden?: boolean;
   article?: boolean;
+  articleLabel?: string | null;
 };
 
 type HomeFeatured = {
@@ -168,6 +171,7 @@ function mapRow(row: DbRow) {
     readsCount: row.reads_count ?? 0,
     hidden: row.hidden ?? false,
     article: row.article ?? false,
+    articleLabel: row.article_label ?? "",
   };
 }
 
@@ -183,6 +187,7 @@ function slugify(input: string): string {
 async function ensurePostColumns() {
   try {
     await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS article boolean NOT NULL DEFAULT false`;
+    await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS article_label text NOT NULL DEFAULT ''`;
   } catch (err) {
     console.warn("Failed to ensure posts columns:", err);
   }
@@ -775,6 +780,7 @@ export async function PUT(req: Request) {
           main_featured = ${body.mainFeatured ?? false},
           hidden = ${body.hidden ?? false},
           article = ${body.article ?? false},
+          article_label = ${body.articleLabel ?? ""},
           content = ${body.content},
           status = ${shouldSchedule ? "draft" : body.status},
           slug = ${slug},
@@ -790,9 +796,10 @@ export async function PUT(req: Request) {
         message.includes("scheduled_at") ||
         message.includes("main_featured") ||
         message.includes("hidden") ||
-        message.includes("article")
+        message.includes("article") ||
+        message.includes("article_label")
       ) {
-        console.warn("Missing posts columns; updating without scheduling/main_featured/hidden/article.");
+        console.warn("Missing posts columns; updating without scheduling/main_featured/hidden/article/article_label.");
         result = (await sql`
           UPDATE posts SET
             title = ${body.title},
@@ -937,6 +944,7 @@ export async function POST(req: Request) {
           main_featured,
           hidden,
           article,
+          article_label,
           content,
           status,
           slug,
@@ -957,6 +965,7 @@ export async function POST(req: Request) {
           ${body.mainFeatured ?? false},
           ${body.hidden ?? false},
           ${body.article ?? false},
+          ${body.articleLabel ?? ""},
           ${body.content},
           ${shouldSchedule ? "draft" : body.status},
           ${slug},
@@ -976,9 +985,10 @@ export async function POST(req: Request) {
         message.includes("likes_count") ||
         message.includes("reads_count") ||
         message.includes("hidden") ||
-        message.includes("article")
+        message.includes("article") ||
+        message.includes("article_label")
       ) {
-        console.warn("Missing posts columns; inserting without scheduling/likes/reads/hidden/article.");
+        console.warn("Missing posts columns; inserting without scheduling/likes/reads/hidden/article/article_label.");
         await sql`
           INSERT INTO posts (
             id,

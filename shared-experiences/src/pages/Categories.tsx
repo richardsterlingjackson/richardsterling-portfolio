@@ -98,6 +98,7 @@ export default function Categories() {
 
     // Convert to array using official category list
     return categoryList
+      .filter(({ label }) => label !== "No Category")
       .map(({ label, slug }) => {
         const entry = map.get(label);
         return {

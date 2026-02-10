@@ -70,6 +70,7 @@ export default function Index() {
           p.status === "published" &&
           !p.hidden &&
           !p.article &&
+          p.category !== "No Category" &&
           (!featured || p.id !== featured.id)
       ),
     [posts, featured]

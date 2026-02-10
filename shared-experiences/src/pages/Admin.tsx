@@ -399,6 +399,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     mainFeatured: z.boolean().optional(),
     hidden: z.boolean().optional(),
     article: z.boolean().optional(),
+    articleLabel: z.string().optional(),
     content: z.string().min(20),
     status: z.enum(["draft", "published"]),
     scheduledAt: z.string().optional(),
@@ -417,6 +418,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       mainFeatured: false,
       hidden: false,
       article: false,
+      articleLabel: "",
       content: "",
       status: "draft",
       scheduledAt: "",
@@ -925,6 +927,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           mainFeatured: !!(editingPost.mainFeatured && data.featured && data.status === "published"),
           hidden: !!data.hidden,
           article: !!data.article,
+          articleLabel: data.article ? data.articleLabel?.trim() || "" : "",
           slug: slugifyTitle(data.title),
           scheduledAt: data.scheduledAt || null,
         };
@@ -949,6 +952,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           mainFeatured: false,
           hidden: typeof data.hidden === "boolean" ? data.hidden : false,
           article: typeof data.article === "boolean" ? data.article : false,
+          articleLabel: data.article ? data.articleLabel?.trim() || "" : "",
         };
 
         const created = await savePost({
@@ -988,6 +992,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       mainFeatured: post.mainFeatured ?? false,
       hidden: post.hidden ?? false,
       article: post.article ?? false,
+      articleLabel: post.articleLabel ?? "",
       content: post.content,
       status: post.status,
       scheduledAt: post.scheduledAt ?? "",
@@ -1505,6 +1510,17 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 Article (show only on Articles page)
               </label>
             </div>
+            {watch("article") && (
+              <div className="space-y-1">
+                <label className="text-sm text-muted-foreground">
+                  Article label (replaces category on article cards)
+                </label>
+                <Input
+                  placeholder="e.g., Deep Dive"
+                  {...register("articleLabel")}
+                />
+              </div>
+            )}
 
             <div className="flex justify-between items-center">
               <Button

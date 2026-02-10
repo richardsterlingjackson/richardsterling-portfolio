@@ -16,6 +16,8 @@ interface BlogPostProps {
     featured?: boolean;
     likesCount?: number;
     readsCount?: number;
+    article?: boolean;
+    articleLabel?: string | null;
   };
   showStats?: boolean;
 }
@@ -32,7 +34,11 @@ export default function BlogPost({ post, showStats = false }: BlogPostProps) {
     featured = false,
     likesCount = 0,
     readsCount = 0,
+    article = false,
+    articleLabel,
   } = post;
+
+  const displayCategory = article ? (articleLabel?.trim() || "Article") : category;
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     if (fallbackImage && e.currentTarget.src !== fallbackImage) {
@@ -78,7 +84,7 @@ export default function BlogPost({ post, showStats = false }: BlogPostProps) {
           <time dateTime={date}>{formattedDate}</time>
           <span>•</span>
           <span className="uppercase tracking-wide text-xs text-elegant-primary">
-            {category}
+            {displayCategory}
           </span>
           {featured && (
             <>
