@@ -1,15 +1,17 @@
 // Post page: loads a post by slug, renders content, and shows related posts.
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getStoredPosts } from "@/lib/postStore";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import ArticlesSidebar from "@/components/ArticlesSidebar";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { Button } from "@/components/ui/button";
 import type { BlogPost } from "@/data/posts";
 import { Helmet } from "react-helmet-async";
 import { usePostFallbackImage } from "@/hooks/use-post-fallback";
+import { getSiteSettings } from "@/lib/siteSettings";
 
 // Helper: Calculate reading time (avg 200 words per minute)
 function calculateReadingTime(text: string): number {
@@ -48,12 +50,15 @@ export default function PostPage() {
   const { postId } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState<BlogPost | null>(null);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [liked, setLiked] = useState(false);
   const [readsCount, setReadsCount] = useState(0);
+  const [articleQuery, setArticleQuery] = useState("");
+  const [featuredArticleSlug, setFeaturedArticleSlug] = useState("");
   const fallbackImage = usePostFallbackImage();
 
   //
@@ -63,6 +68,7 @@ export default function PostPage() {
     async function loadPost() {
       try {
         const storedPosts = await getStoredPosts();
+        setAllPosts(Array.isArray(storedPosts) ? storedPosts : []);
 
         // Find by slug (URL param)
         const found = storedPosts.find((p) => p.slug === postId) || null;
@@ -107,6 +113,29 @@ export default function PostPage() {
 
     loadPost();
   }, [postId, navigate]);
+
+  useEffect(() => {
+    let active = true;
+    getSiteSettings().then((settings) => {
+      if (!active) return;
+      setFeaturedArticleSlug(settings?.featuredArticleSlug || "");
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const articleList = useMemo(() => {
+    return allPosts
+      .filter((p) => p.status === "published" && p.article)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [allPosts]);
+
+  const filteredArticles = useMemo(() => {
+    const trimmed = articleQuery.trim().toLowerCase();
+    if (!trimmed) return articleList;
+    return articleList.filter((p) => p.title.toLowerCase().includes(trimmed));
+  }, [articleList, articleQuery]);
 
   useEffect(() => {
     if (!post) return;
@@ -289,7 +318,17 @@ export default function PostPage() {
         </Helmet>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-3">
-            <Sidebar />
+            {post.article ? (
+              <ArticlesSidebar
+                loading={loading}
+                articles={filteredArticles}
+                query={articleQuery}
+                onQueryChange={setArticleQuery}
+                featuredArticleSlug={featuredArticleSlug}
+              />
+            ) : (
+              <Sidebar />
+            )}
           </div>
 
           <article className="lg:col-span-9 space-y-6">
