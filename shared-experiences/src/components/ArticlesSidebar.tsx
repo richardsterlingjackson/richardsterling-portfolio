@@ -31,6 +31,10 @@ export default function ArticlesSidebar({
     return Array.from(groups.entries()).sort((a, b) => b[0].localeCompare(a[0]));
   }, [articles]);
 
+  const currentYear = String(new Date().getFullYear());
+  const currentYearGroup = groupedByYear.find(([year]) => year === currentYear);
+  const previousYears = groupedByYear.filter(([year]) => year !== currentYear);
+
   const formatDate = (date?: string) => {
     if (!date) return "";
     const parsed = new Date(date);
@@ -48,6 +52,37 @@ export default function ArticlesSidebar({
     const minutes = Math.max(1, Math.ceil(words / 200));
     return `${minutes} min read`;
   };
+
+  const renderArticleList = (items: BlogPostType[]) => (
+    <ul className="space-y-3">
+      {items.map((article) => (
+        <li key={article.id} className="rounded-md border border-border bg-background px-3 py-2">
+          <Link to={`/posts/${article.slug}`} className="block space-y-1">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                {formatDate(article.date)}
+              </p>
+              {article.slug === featuredArticleSlug ? (
+                <span className="text-[10px] uppercase tracking-[0.2em] text-amber-800">
+                  Main Featured Article
+                </span>
+              ) : article.featured ? (
+                <span className="text-[10px] uppercase tracking-[0.2em] text-amber-800">
+                  Featured Article
+                </span>
+              ) : null}
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+              {getReadTime(article.content)}
+            </p>
+            <p className="text-sm font-medium text-elegant-text hover:text-elegant-primary transition-colors">
+              {article.title}
+            </p>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <aside className="lg:col-span-3 space-y-4">
@@ -78,41 +113,38 @@ export default function ArticlesSidebar({
         <p className="text-sm text-muted-foreground">No articles published yet.</p>
       ) : (
         <div className="space-y-6">
-          {groupedByYear.map(([year, items]) => (
-            <div key={year} className="space-y-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                {year}
-              </p>
-              <ul className="space-y-3">
-                {items.map((article) => (
-                  <li key={article.id} className="rounded-md border border-border bg-background px-3 py-2">
-                    <Link to={`/posts/${article.slug}`} className="block space-y-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                          {formatDate(article.date)}
-                        </p>
-                        {article.slug === featuredArticleSlug ? (
-                          <span className="text-[10px] uppercase tracking-[0.2em] text-amber-800">
-                            Main Featured Article
-                          </span>
-                        ) : article.featured ? (
-                          <span className="text-[10px] uppercase tracking-[0.2em] text-amber-800">
-                            Featured Article
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                        {getReadTime(article.content)}
-                      </p>
-                      <p className="text-sm font-medium text-elegant-text hover:text-elegant-primary transition-colors">
-                        {article.title}
-                      </p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          {currentYearGroup ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                <span>This Year</span>
+                <span>{currentYearGroup[0]}</span>
+              </div>
+              {renderArticleList(currentYearGroup[1])}
             </div>
-          ))}
+          ) : null}
+
+          {previousYears.length > 0 ? (
+            <div className="space-y-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                Previous Years
+              </p>
+              <div className="space-y-3">
+                {previousYears.map(([year, items]) => (
+                  <details key={year} className="rounded-md border border-border bg-background/60">
+                    <summary className="cursor-pointer px-3 py-2 text-xs uppercase tracking-[0.2em] text-muted-foreground flex items-center justify-between">
+                      <span>{year}</span>
+                      <span className="text-[10px] bg-muted px-2 py-0.5 rounded-full text-foreground">
+                        {items.length} article{items.length === 1 ? "" : "s"}
+                      </span>
+                    </summary>
+                    <div className="px-3 pb-3 pt-1">
+                      {renderArticleList(items)}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
     </aside>
