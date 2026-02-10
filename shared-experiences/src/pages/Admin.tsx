@@ -2309,23 +2309,20 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                           size="sm"
                           onClick={() => handleSetFeaturedArticle(post)}
                           disabled={post.status !== "published" || !post.featured}
+                          className="border-elegant-primary/40 text-elegant-primary hover:bg-elegant-primary/10 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          {post.slug === siteSettings.featuredArticleSlug ? "⭐ Main Article" : "⭐ Set Main Article"}
+                          {post.slug === siteSettings.featuredArticleSlug ? "Main Article" : "Set Main Article"}
                         </Button>
                       )}
                       {post.featured && !post.article && (
                         <Button
-                          variant="default"
+                          variant="outline"
                           size="sm"
                           onClick={() => handleSetMainFeatured(post)}
                           disabled={post.status !== "published"}
-                          className={
-                            post.status !== "published"
-                              ? "bg-muted text-muted-foreground hover:bg-muted"
-                              : ""
-                          }
+                          className="border-elegant-primary/40 text-elegant-primary hover:bg-elegant-primary/10 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          {post.mainFeatured ? "⭐ Main Feature" : "⭐ Set Main"}
+                          {post.mainFeatured ? "Main Feature" : "Set Main Feature"}
                         </Button>
                       )}
 
