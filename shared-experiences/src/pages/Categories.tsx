@@ -134,7 +134,6 @@ export default function Categories() {
                     }
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/30 to-transparent" />
               </div>
 
               <div className="space-y-3">
