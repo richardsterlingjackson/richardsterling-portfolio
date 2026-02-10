@@ -2274,7 +2274,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                           </span>
                         )}
                         {post.featured && !post.article && (
-                          <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-sm">
+                          <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-sm font-medium">
                             Featured
                           </span>
                         )}
