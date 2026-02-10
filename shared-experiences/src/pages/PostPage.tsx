@@ -142,7 +142,12 @@ export default function PostPage() {
         day: "numeric",
       });
 
-      document.title = `${post.title} – ${post.category} – ${formattedDate} | ${baseTitle}`;
+      const articleLabel = post.articleLabel?.trim();
+      const displayCategory = post.article
+        ? articleLabel || (post.category === "No Category" ? "Article" : post.category)
+        : post.category;
+
+      document.title = `${post.title} – ${displayCategory} – ${formattedDate} | ${baseTitle}`;
     } else {
       document.title = `Post Not Found | ${baseTitle}`;
     }
@@ -260,6 +265,10 @@ export default function PostPage() {
     );
   }
 
+  const displayCategory = post.article
+    ? post.articleLabel?.trim() || (post.category === "No Category" ? "Article" : post.category)
+    : post.category;
+
   //
   // RENDER POST
   //
@@ -302,7 +311,7 @@ export default function PostPage() {
                 <time dateTime={post.date}>{formatPostDate(post.date)}</time>
                 <span>•</span>
                 <span className="uppercase tracking-wide text-xs text-elegant-primary">
-                  {post.category}
+                  {displayCategory}
                 </span>
                 <span>•</span>
                 <span className="text-xs bg-muted px-2 py-1 rounded">
