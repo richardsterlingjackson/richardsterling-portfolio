@@ -1730,6 +1730,13 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       </span>
                     )}
                   </div>
+                  {card.image && (
+                    <img
+                      src={card.image}
+                      alt={`Card ${index + 1}`}
+                      className="w-full max-w-sm rounded-md border"
+                    />
+                  )}
                   <Input
                     placeholder="Fallback image URL"
                     value={card.fallbackImage ?? ""}
