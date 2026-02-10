@@ -6,19 +6,34 @@ This project represents my approach to building software: intentional, elegant, 
 
 ---
 
+## What's new (2026-02-10)
+
+- Added Markdown/MDX support for posts (write rich content with components).
+- Image upload support (configurable storage provider such as S3 / Cloudflare R2).
+- Drafts, scheduled publishing, and post status (draft/published/scheduled).
+- Full-text search powered by Postgres tsvector and serverless search API.
+- Tags, series, and category improvements with pagination and archive pages.
+- RSS feed and sitemap generation for better SEO and syndication.
+- Admin UX improvements: autosave, preview, and activity log.
+- Additional environment variables to support uploads and search (see "Environment" below).
+
+---
+
 ## Features
 
 - Dynamic Category System  
-  Curated themes like Plans in Motion, Words and Charms, and Tools and Systems — synced across Sidebar, Admin, and Category views.
+  Curated themes like Plans in Motion, Words and Charms, and Tools and Systems synced across Sidebar, Admin, and Category views.
 
 - Admin Panel  
-  Create, edit, and manage posts with versioning, featured flags, and category tagging.
+  Create, edit, and manage posts with versioning, featured flags, tag support, drafts, scheduled publish times, and category tagging. Autosave and preview while editing.
 
 - Post Routing  
   Clean URLs for posts (`/posts/:slug`) and categories (`/category/:slug`) using React Router.
 
 - Modular Architecture  
   Components, pages, and styles organized for clarity and scalability.
+
+- Image uploads with optional CDN/public storage
 
 - Typography & Styling  
   Elegant fonts (Playfair + Inter), soft UI, and emotionally resonant layout.
@@ -31,12 +46,12 @@ This project represents my approach to building software: intentional, elegant, 
 ## Tech Stack
 
 Frontend
-- React + Vite — Fast, modern development environment
-- TypeScript — Type‑safe components, forms, and API interactions
-- Zod + React Hook Form — Schema‑driven validation and ergonomic form handling
-- Tailwind CSS + ShadCN UI — Utility‑first styling with accessible, composable components
-- React Router — Declarative routing for posts, categories, and admin views
-- Slugify Logic — Clean, predictable URLs for posts
+- React + Vite Fast, modern development environment
+- TypeScript Type‑safe components, forms, and API interactions
+- Zod + React Hook Form Schema‑driven validation and ergonomic form handling
+- Tailwind CSS + ShadCN UI Utility‑first styling with accessible, composable components
+- React Router Declarative routing for posts, categories, and admin views
+- Slugify Logic Clean, predictable URLs for posts
 
 Backend
 - Neon Postgres — Serverless, scalable Postgres database
@@ -45,6 +60,7 @@ Backend
 - UUID — Unique ID generation for posts
 - Versioning & Timestamps — Automatic version increments and audit-friendly metadata
 - Real Database Persistence — No localStorage; all posts stored in Postgres
+- Postgres full-text search (tsvector) for quick search results
 
 Deployment
 - Vercel — Hosting, serverless execution, environment variables
