@@ -9,6 +9,7 @@ type ArticlesSidebarProps = {
   articles: BlogPostType[];
   query: string;
   onQueryChange: (value: string) => void;
+  featuredArticleSlug?: string;
 };
 
 export default function ArticlesSidebar({
@@ -16,6 +17,7 @@ export default function ArticlesSidebar({
   articles,
   query,
   onQueryChange,
+  featuredArticleSlug = "",
 }: ArticlesSidebarProps) {
   const groupedByYear = useMemo(() => {
     const groups = new Map<string, BlogPostType[]>();
@@ -85,9 +87,20 @@ export default function ArticlesSidebar({
                 {items.map((article) => (
                   <li key={article.id} className="rounded-md border border-border bg-background px-3 py-2">
                     <Link to={`/posts/${article.slug}`} className="block space-y-1">
-                      <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                        {formatDate(article.date)}
-                      </p>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                          {formatDate(article.date)}
+                        </p>
+                        {article.slug === featuredArticleSlug ? (
+                          <span className="text-[10px] uppercase tracking-[0.2em] text-amber-700">
+                            Main
+                          </span>
+                        ) : article.featured ? (
+                          <span className="text-[10px] uppercase tracking-[0.2em] text-amber-700">
+                            Featured
+                          </span>
+                        ) : null}
+                      </div>
                       <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                         {getReadTime(article.content)}
                       </p>

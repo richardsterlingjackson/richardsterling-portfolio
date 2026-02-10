@@ -1047,6 +1047,10 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
       toast({ title: "Not an article", description: "Only article posts can be featured here.", variant: "destructive" });
       return;
     }
+    if (!post.featured) {
+      toast({ title: "Mark as featured", description: "Only featured articles can be set as main.", variant: "destructive" });
+      return;
+    }
     if (post.status !== "published") {
       toast({ title: "Publish first", description: "Only published articles can be featured.", variant: "destructive" });
       return;
@@ -2274,6 +2278,16 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                             Article
                           </span>
                         )}
+                        {post.article && post.featured && (
+                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/20 text-amber-800 px-2 py-0.5 rounded-full">
+                            Featured
+                          </span>
+                        )}
+                        {post.hidden && (
+                          <span className="text-[10px] uppercase tracking-wide bg-slate-400/20 text-slate-700 px-2 py-0.5 rounded-full">
+                            Hidden
+                          </span>
+                        )}
                         {post.slug === siteSettings.featuredArticleSlug && (
                           <span className="text-[10px] uppercase tracking-wide bg-amber-500/20 text-amber-800 px-2 py-0.5 rounded-full">
                             Featured Article
@@ -2294,12 +2308,12 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                           variant="outline"
                           size="sm"
                           onClick={() => handleSetFeaturedArticle(post)}
-                          disabled={post.status !== "published"}
+                          disabled={post.status !== "published" || !post.featured}
                         >
-                          ⭐ Feature Article
+                          {post.slug === siteSettings.featuredArticleSlug ? "⭐ Main Article" : "⭐ Set Main Article"}
                         </Button>
                       )}
-                      {post.featured && (
+                      {post.featured && !post.article && (
                         <Button
                           variant="default"
                           size="sm"

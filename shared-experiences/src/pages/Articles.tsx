@@ -52,13 +52,14 @@ export default function Articles() {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [posts]);
 
+  const featuredArticles = useMemo(() => {
+    return articles.filter((post) => post.featured);
+  }, [articles]);
+
   const featuredArticle = useMemo(() => {
-    if (!articles.length) return null;
-    const preferred = featuredSlug
-      ? articles.find((post) => post.slug === featuredSlug)
-      : null;
-    return preferred ?? articles[0];
-  }, [articles, featuredSlug]);
+    if (!featuredSlug) return null;
+    return featuredArticles.find((post) => post.slug === featuredSlug) || null;
+  }, [featuredArticles, featuredSlug]);
 
   const filteredArticles = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
@@ -100,6 +101,7 @@ export default function Articles() {
             articles={filteredArticles}
             query={query}
             onQueryChange={setQuery}
+            featuredArticleSlug={featuredSlug}
           />
 
           <div className="lg:col-span-9 space-y-8">
