@@ -2269,7 +2269,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                       <div className="flex items-center gap-2">
                         <h4 className="font-medium text-elegant-text">{post.title}</h4>
                         {post.mainFeatured && (
-                          <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-sm">
+                          <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-sm font-medium">
                             Main Feature
                           </span>
                         )}
