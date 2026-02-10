@@ -93,11 +93,11 @@ export default function ArticlesSidebar({
                         </p>
                         {article.slug === featuredArticleSlug ? (
                           <span className="text-[10px] uppercase tracking-[0.2em] text-amber-700">
-                            Main
+                            Main Featured Article
                           </span>
                         ) : article.featured ? (
                           <span className="text-[10px] uppercase tracking-[0.2em] text-amber-700">
-                            Featured
+                            Featured Article
                           </span>
                         ) : null}
                       </div>

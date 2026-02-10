@@ -2284,7 +2284,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                           </span>
                         )}
                         {post.article && post.featured && (
-                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/20 text-amber-800 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/20 text-amber-700 px-2 py-0.5 rounded-full">
                             Featured
                           </span>
                         )}
@@ -2294,7 +2294,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                           </span>
                         )}
                         {post.slug === siteSettings.featuredArticleSlug && (
-                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/20 text-amber-800 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/20 text-amber-700 px-2 py-0.5 rounded-full">
                             Featured Article
                           </span>
                         )}
