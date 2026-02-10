@@ -38,7 +38,10 @@ export default function BlogPost({ post, showStats = false }: BlogPostProps) {
     articleLabel,
   } = post;
 
-  const displayCategory = article ? (articleLabel?.trim() || "Article") : category;
+  const normalizedArticleLabel = articleLabel?.trim();
+  const displayCategory = article
+    ? normalizedArticleLabel || (category === "No Category" ? "Article" : category)
+    : category;
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     if (fallbackImage && e.currentTarget.src !== fallbackImage) {

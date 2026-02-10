@@ -2129,7 +2129,7 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 </div>
 
                 <div className="grid gap-5 lg:grid-cols-2">
-                  {categories.map((category, index) => {
+                  {categories.filter((category) => category.label !== "No Category").map((category, index) => {
                     const config = siteSettings.categoryCardImages[category.slug] || {
                       image: "",
                       fallbackImage: "",
