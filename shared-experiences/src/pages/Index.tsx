@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BlogPost from "@/components/BlogPost";
 import { getStoredPosts } from "@/lib/postStore";
+import { getSiteSettings } from "@/lib/siteSettings";
 import type { BlogPost as BlogPostType } from "@/data/posts";
 import { Link } from "react-router-dom";
 import { Calendar } from "lucide-react";
@@ -33,6 +34,7 @@ export default function Index() {
       readMoreLabel: string;
     }>;
   } | null>(null);
+  const [articlesDividerLabel, setArticlesDividerLabel] = useState("");
 
   useEffect(() => {
     document.title = "Home – Shared Experiences";
@@ -46,6 +48,8 @@ export default function Index() {
           const homeData = await homeRes.json();
           setHomeFeatured(homeData);
         }
+        const settings = await getSiteSettings();
+        setArticlesDividerLabel(settings?.articlesDividerLabel || "");
       } catch (err) {
         console.error("Failed to load posts:", err);
         setPosts([]);
@@ -116,11 +120,10 @@ export default function Index() {
                   {homeFeatured?.heroCategory || "Relatable Connections"}
                 </p>
                 <h2 className="font-playfair text-2xl sm:text-3xl font-semibold text-elegant-text">
-                  {homeFeatured?.heroTitle || "Notes on building, learning, and living in public."}
+                  {homeFeatured?.heroTitle || "Stories of our lives"}
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  {homeFeatured?.heroSubtitle ||
-                    "A running journal of experiments, reflections, and systems. Every post is a practical artifact or a small story designed to be useful later."}
+                  {homeFeatured?.heroSubtitle || "Never having felt more understood..."}
                 </p>
               </div>
 
@@ -170,14 +173,14 @@ export default function Index() {
                   style={{ textShadow: "0 10px 30px rgba(0,0,0,0.45)" }}
                 >
                   <p className="text-xs uppercase tracking-[0.2em] text-white/80">
-                    {homeFeatured?.bubbleHeading || "New Articles Arriving Soon"}
+                    {homeFeatured?.bubbleHeading || "New Articles Have Arrived"}
                   </p>
                   <h3 className="font-playfair text-2xl sm:text-3xl font-semibold text-white">
-                    {homeFeatured?.bubbleTitle || "A quiet place for ideas that earn their keep.."}
+                    {homeFeatured?.bubbleTitle || "Exhibiting human quality makes life easier to navigate."}
                   </h3>
                   <p className="text-sm sm:text-base text-white/90">
                     {homeFeatured?.bubbleDescription ||
-                      "Trying things, falling fast, and writing about it."}
+                      "Everyday moments can bring joy, quiet reflection, peaceful insight. Exercising stillness and surrendering can have something good in store for all of us."}
                   </p>
                 </div>
                 </div>
@@ -185,7 +188,7 @@ export default function Index() {
               <div>
                 <div className="flex items-center justify-between">
                   <h2 className="font-playfair text-xl sm:text-2xl font-semibold text-elegant-text">
-                    Featured Articles
+                    {articlesDividerLabel || "Featured Articles"}
                   </h2>
                     <a href="/posts" className="text-sm text-elegant-primary hover:underline">
                       View all

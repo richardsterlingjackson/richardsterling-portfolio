@@ -6,12 +6,15 @@ import ArticlesSidebar from "@/components/ArticlesSidebar";
 import { getStoredPosts } from "@/lib/postStore";
 import { getSiteSettings } from "@/lib/siteSettings";
 import type { BlogPost as BlogPostType } from "@/data/posts";
+import articlesFallback from "@/assets/hero-banner-1.webp";
 
 export default function Articles() {
   const [posts, setPosts] = useState<BlogPostType[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [featuredSlug, setFeaturedSlug] = useState("");
+  const [headerImage, setHeaderImage] = useState(articlesFallback);
+  const [headerFallbackImage, setHeaderFallbackImage] = useState(articlesFallback);
   const [spotlightCopy, setSpotlightCopy] = useState({
     eyebrow: "",
     title: "",
@@ -45,6 +48,10 @@ export default function Articles() {
     getSiteSettings().then((settings) => {
       if (!active) return;
       setFeaturedSlug(settings?.featuredArticleSlug || "");
+      const fallback = settings?.articlesHeaderFallbackImage || articlesFallback;
+      const hero = settings?.articlesHeaderImage || fallback;
+      setHeaderFallbackImage(fallback);
+      setHeaderImage(hero);
       setSpotlightCopy({
         eyebrow: settings?.articlesSpotlightEyebrow || "",
         title: settings?.articlesSpotlightTitle || "",
@@ -118,6 +125,20 @@ export default function Articles() {
             {showFeatured && featuredDisplay && (
               <BlogPost post={featuredDisplay} showStats />
             )}
+
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/30">
+              <img
+                src={headerImage}
+                alt="Articles header"
+                className="w-full h-[220px] sm:h-[280px] object-cover"
+                loading="lazy"
+                onError={() => {
+                  if (headerImage !== headerFallbackImage) {
+                    setHeaderImage(headerFallbackImage);
+                  }
+                }}
+              />
+            </div>
 
             <section className="space-y-6">
               <div className="space-y-2 max-w-2xl">

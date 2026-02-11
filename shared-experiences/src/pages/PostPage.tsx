@@ -59,7 +59,7 @@ export default function PostPage() {
   const [readsCount, setReadsCount] = useState(0);
   const [articleQuery, setArticleQuery] = useState("");
   const [featuredArticleSlug, setFeaturedArticleSlug] = useState("");
-  const fallbackImage = usePostFallbackImage();
+  const fallbackImage = usePostFallbackImage(post?.article ?? false);
 
   //
   // LOAD POST BY SLUG

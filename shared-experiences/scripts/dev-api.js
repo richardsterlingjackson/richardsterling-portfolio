@@ -24,9 +24,13 @@ let siteSettings = {
   articlesSpotlightEyebrow: "",
   articlesSpotlightTitle: "",
   articlesSpotlightSubtitle: "",
+  articlesDividerLabel: "",
   headerHeroEyebrow: "",
   headerHeroTitle: "",
   headerHeroSubtitle: "",
+  articlesFallbackImage: "",
+  articlesHeaderImage: "",
+  articlesHeaderFallbackImage: "",
   headerHeroDivider: "",
 };
 
@@ -136,9 +140,13 @@ app.put('/api/posts', (req, res) => {
       articlesSpotlightEyebrow: req.body?.articlesSpotlightEyebrow || "",
       articlesSpotlightTitle: req.body?.articlesSpotlightTitle || "",
       articlesSpotlightSubtitle: req.body?.articlesSpotlightSubtitle || "",
+      articlesDividerLabel: req.body?.articlesDividerLabel || "",
       headerHeroEyebrow: req.body?.headerHeroEyebrow || "",
       headerHeroTitle: req.body?.headerHeroTitle || "",
       headerHeroSubtitle: req.body?.headerHeroSubtitle || "",
+      articlesFallbackImage: req.body?.articlesFallbackImage || "",
+      articlesHeaderImage: req.body?.articlesHeaderImage || "",
+      articlesHeaderFallbackImage: req.body?.articlesHeaderFallbackImage || "",
       headerHeroDivider: req.body?.headerHeroDivider || "",
     };
     return res.json(siteSettings);

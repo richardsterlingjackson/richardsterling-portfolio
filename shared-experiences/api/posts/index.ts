@@ -45,9 +45,13 @@ type SiteSettingsRow = {
   articles_spotlight_eyebrow: string | null;
   articles_spotlight_title: string | null;
   articles_spotlight_subtitle: string | null;
+  articles_divider_label: string | null;
   header_hero_eyebrow: string | null;
   header_hero_title: string | null;
   header_hero_subtitle: string | null;
+  articles_fallback_image: string | null;
+  articles_header_image: string | null;
+  articles_header_fallback_image: string | null;
   header_hero_divider: string | null;
 };
 
@@ -152,9 +156,13 @@ type SiteSettings = {
   articlesSpotlightEyebrow: string;
   articlesSpotlightTitle: string;
   articlesSpotlightSubtitle: string;
+  articlesDividerLabel: string;
   headerHeroEyebrow: string;
   headerHeroTitle: string;
   headerHeroSubtitle: string;
+  articlesFallbackImage: string;
+  articlesHeaderImage: string;
+  articlesHeaderFallbackImage: string;
   headerHeroDivider: string;
 };
 
@@ -269,9 +277,13 @@ async function ensureSiteSettingsTable() {
         articles_spotlight_eyebrow text NOT NULL DEFAULT '',
         articles_spotlight_title text NOT NULL DEFAULT '',
         articles_spotlight_subtitle text NOT NULL DEFAULT '',
+        articles_divider_label text NOT NULL DEFAULT '',
         header_hero_eyebrow text NOT NULL DEFAULT '',
         header_hero_title text NOT NULL DEFAULT '',
         header_hero_subtitle text NOT NULL DEFAULT '',
+        articles_fallback_image text NOT NULL DEFAULT '',
+        articles_header_image text NOT NULL DEFAULT '',
+        articles_header_fallback_image text NOT NULL DEFAULT '',
         header_hero_divider text NOT NULL DEFAULT '',
         updated_at timestamptz DEFAULT now()
       )
@@ -288,9 +300,13 @@ async function ensureSiteSettingsTable() {
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_spotlight_eyebrow text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_spotlight_title text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_spotlight_subtitle text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_divider_label text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS header_hero_eyebrow text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS header_hero_title text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS header_hero_subtitle text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_fallback_image text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_header_image text NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS articles_header_fallback_image text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS header_hero_divider text NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now()`;
   } catch (err) {
@@ -341,9 +357,13 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
       articlesSpotlightEyebrow: row.articles_spotlight_eyebrow || "",
       articlesSpotlightTitle: row.articles_spotlight_title || "",
       articlesSpotlightSubtitle: row.articles_spotlight_subtitle || "",
+      articlesDividerLabel: row.articles_divider_label || "",
       headerHeroEyebrow: row.header_hero_eyebrow || "",
       headerHeroTitle: row.header_hero_title || "",
       headerHeroSubtitle: row.header_hero_subtitle || "",
+      articlesFallbackImage: row.articles_fallback_image || "",
+      articlesHeaderImage: row.articles_header_image || "",
+      articlesHeaderFallbackImage: row.articles_header_fallback_image || "",
       headerHeroDivider: row.header_hero_divider || "",
     };
   } catch (err) {
@@ -355,7 +375,7 @@ async function getSiteSettings(): Promise<SiteSettings | null> {
 async function upsertSiteSettings(payload: SiteSettings) {
   await ensureSiteSettingsTable();
   await sql`
-    INSERT INTO site_settings (id, post_fallback_image, categories_image, categories_fallback_image, categories_images_json, categories_excerpts_json, featured_article_slug, categories_heading_eyebrow, categories_heading_title, categories_heading_subtitle, articles_spotlight_eyebrow, articles_spotlight_title, articles_spotlight_subtitle, header_hero_eyebrow, header_hero_title, header_hero_subtitle, header_hero_divider, updated_at)
+    INSERT INTO site_settings (id, post_fallback_image, categories_image, categories_fallback_image, categories_images_json, categories_excerpts_json, featured_article_slug, categories_heading_eyebrow, categories_heading_title, categories_heading_subtitle, articles_spotlight_eyebrow, articles_spotlight_title, articles_spotlight_subtitle, articles_divider_label, header_hero_eyebrow, header_hero_title, header_hero_subtitle, articles_fallback_image, articles_header_image, articles_header_fallback_image, header_hero_divider, updated_at)
     VALUES (
       1,
       ${payload.postFallbackImage || ""},
@@ -370,9 +390,13 @@ async function upsertSiteSettings(payload: SiteSettings) {
       ${payload.articlesSpotlightEyebrow || ""},
       ${payload.articlesSpotlightTitle || ""},
       ${payload.articlesSpotlightSubtitle || ""},
+      ${payload.articlesDividerLabel || ""},
       ${payload.headerHeroEyebrow || ""},
       ${payload.headerHeroTitle || ""},
       ${payload.headerHeroSubtitle || ""},
+      ${payload.articlesFallbackImage || ""},
+      ${payload.articlesHeaderImage || ""},
+      ${payload.articlesHeaderFallbackImage || ""},
       ${payload.headerHeroDivider || ""},
       NOW()
     )
@@ -389,9 +413,13 @@ async function upsertSiteSettings(payload: SiteSettings) {
       articles_spotlight_eyebrow = EXCLUDED.articles_spotlight_eyebrow,
       articles_spotlight_title = EXCLUDED.articles_spotlight_title,
       articles_spotlight_subtitle = EXCLUDED.articles_spotlight_subtitle,
+      articles_divider_label = EXCLUDED.articles_divider_label,
       header_hero_eyebrow = EXCLUDED.header_hero_eyebrow,
       header_hero_title = EXCLUDED.header_hero_title,
       header_hero_subtitle = EXCLUDED.header_hero_subtitle,
+      articles_fallback_image = EXCLUDED.articles_fallback_image,
+      articles_header_image = EXCLUDED.articles_header_image,
+      articles_header_fallback_image = EXCLUDED.articles_header_fallback_image,
       header_hero_divider = EXCLUDED.header_hero_divider,
       updated_at = NOW()
   `;

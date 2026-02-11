@@ -23,7 +23,7 @@ interface BlogPostProps {
 }
 
 export default function BlogPost({ post, showStats = false }: BlogPostProps) {
-  const fallbackImage = usePostFallbackImage();
+  const fallbackImage = usePostFallbackImage(post.article ?? false);
   const {
     title,
     date,

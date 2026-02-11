@@ -73,10 +73,14 @@ type SiteSettingsPayload = {
   articlesSpotlightEyebrow: string;
   articlesSpotlightTitle: string;
   articlesSpotlightSubtitle: string;
+  articlesDividerLabel: string;
   headerHeroEyebrow: string;
   headerHeroTitle: string;
   headerHeroSubtitle: string;
   headerHeroDivider: string;
+  articlesFallbackImage: string;
+  articlesHeaderImage: string;
+  articlesHeaderFallbackImage: string;
 };
 
 type MediaLibraryAsset = {
@@ -153,12 +157,13 @@ function AdminGate({ onSuccess }: { onSuccess: () => void }) {
 
       {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
-      <Button className="w-full" onClick={handleEnter}>
-        Access Admin Panel
-      </Button>
-    </div>
-  );
+  <Button className="w-full" onClick={handleEnter}>
+    Access Admin Panel
+  </Button>
+</div>
+);
 }
+
 
 export default function Admin() {
   const [authorized, setAuthorized] = React.useState(false);
@@ -308,10 +313,14 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
     articlesSpotlightEyebrow: "",
     articlesSpotlightTitle: "",
     articlesSpotlightSubtitle: "",
+    articlesDividerLabel: "",
     headerHeroEyebrow: "",
     headerHeroTitle: "",
     headerHeroSubtitle: "",
     headerHeroDivider: "",
+    articlesFallbackImage: "",
+    articlesHeaderImage: "",
+    articlesHeaderFallbackImage: "",
   });
   const [settingsSaving, setSettingsSaving] = React.useState(false);
   const [settingsFileLabel, setSettingsFileLabel] = React.useState("");
@@ -320,6 +329,12 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
   const categoriesImageInputRef = React.useRef<HTMLInputElement | null>(null);
   const [categoriesFallbackLabel, setCategoriesFallbackLabel] = React.useState("");
   const categoriesFallbackInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [articlesFallbackLabel, setArticlesFallbackLabel] = React.useState("");
+  const articlesFallbackInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [articlesHeaderImageLabel, setArticlesHeaderImageLabel] = React.useState("");
+  const articlesHeaderImageInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [articlesHeaderFallbackLabel, setArticlesHeaderFallbackLabel] = React.useState("");
+  const articlesHeaderFallbackInputRef = React.useRef<HTMLInputElement | null>(null);
   const [categoryCardImageLabels, setCategoryCardImageLabels] = React.useState<Record<string, string>>({});
   const [categoryCardFallbackLabels, setCategoryCardFallbackLabels] = React.useState<Record<string, string>>({});
   const categoryCardImageInputs = React.useRef<(HTMLInputElement | null)[]>([]);
@@ -686,10 +701,14 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
               articlesSpotlightEyebrow: settingsData.articlesSpotlightEyebrow || "",
               articlesSpotlightTitle: settingsData.articlesSpotlightTitle || "",
               articlesSpotlightSubtitle: settingsData.articlesSpotlightSubtitle || "",
+              articlesDividerLabel: settingsData.articlesDividerLabel || "",
               headerHeroEyebrow: settingsData.headerHeroEyebrow || "",
               headerHeroTitle: settingsData.headerHeroTitle || "",
               headerHeroSubtitle: settingsData.headerHeroSubtitle || "",
               headerHeroDivider: settingsData.headerHeroDivider || "",
+              articlesFallbackImage: settingsData.articlesFallbackImage || "",
+              articlesHeaderImage: settingsData.articlesHeaderImage || "",
+              articlesHeaderFallbackImage: settingsData.articlesHeaderFallbackImage || "",
             });
           }
         }
@@ -756,10 +775,14 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
           articlesSpotlightEyebrow: updated.articlesSpotlightEyebrow || "",
           articlesSpotlightTitle: updated.articlesSpotlightTitle || "",
           articlesSpotlightSubtitle: updated.articlesSpotlightSubtitle || "",
+          articlesDividerLabel: updated.articlesDividerLabel || "",
           headerHeroEyebrow: updated.headerHeroEyebrow || "",
           headerHeroTitle: updated.headerHeroTitle || "",
           headerHeroSubtitle: updated.headerHeroSubtitle || "",
           headerHeroDivider: updated.headerHeroDivider || "",
+          articlesFallbackImage: updated.articlesFallbackImage || "",
+          articlesHeaderImage: updated.articlesHeaderImage || "",
+          articlesHeaderFallbackImage: updated.articlesHeaderFallbackImage || "",
         });
       }
       if (!options?.silent) {
@@ -1116,559 +1139,602 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
         backgroundAttachment: "fixed",
       }}
     >
-      {/* Background overlay with 50% opacity */}
-      <div className="absolute inset-0 bg-white/50 z-0" />
+    {/* Background overlay with 50% opacity */}
+    <div className="absolute inset-0 bg-white/50 z-0" />
 
-      {/* Content container with relative positioning */}
-      <div className="relative z-10">
-        <div className="max-w-5xl mx-auto mb-4">
-          <a
-            href="/"
-            className="text-sm font-medium text-elegant-primary hover:text-elegant-secondary transition-colors"
-          >
-            ← Back to Home
-          </a>
+    {/* Content container with relative positioning */}
+    <div className="relative z-10">
+      <div className="max-w-5xl mx-auto mb-4">
+        <a
+          href="/"
+          className="text-sm font-medium text-elegant-primary hover:text-elegant-secondary transition-colors"
+        >
+          ← Back to Home
+        </a>
+      </div>
+      {/* Session timeout warning */}
+      {timeoutWarning && (
+        <div className="mb-6 max-w-5xl mx-auto p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800">
+            ⚠️ Your session will expire in 3 minutes due to inactivity. Move your mouse or click to extend your session.
+          </p>
         </div>
-        {/* Session timeout warning */}
-        {timeoutWarning && (
-          <div className="mb-6 max-w-5xl mx-auto p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              ⚠️ Your session will expire in 3 minutes due to inactivity. Move your mouse or click to extend your session.
+      )}
+
+      <div className="max-w-5xl mx-auto space-y-10">
+        {/* Header with stats and logout */}
+        <div className="flex justify-between items-start gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-elegant-text">Admin Panel</h1>
+            <div className="flex gap-6 mt-3 text-sm">
+              <div>
+                <p className="text-muted-foreground">Total Posts</p>
+                <p className="text-2xl font-semibold text-elegant-text">{totalPosts}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Published</p>
+                <p className="text-2xl font-semibold text-orange-500">{publishedPosts}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Drafts</p>
+                <p className="text-2xl font-semibold text-elegant-primary">{draftPosts}</p>
+              </div>
+            </div>
+          </div>
+          <Button variant="outline" onClick={onLogout}>
+            Logout
+          </Button>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-background/95 p-6 rounded-lg border">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-elegant-text">Publish Post</h2>
+            <p className="text-sm text-muted-foreground">
+              Create or update posts. Preview the featured image whether you paste a URL or upload.
             </p>
           </div>
-        )}
+          <Input placeholder="Title" {...register("title")} />
+          {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
 
-        <div className="max-w-5xl mx-auto space-y-10">
-          {/* Header with stats and logout */}
-          <div className="flex justify-between items-start gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-elegant-text">Admin Panel</h1>
-              <div className="flex gap-6 mt-3 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Total Posts</p>
-                  <p className="text-2xl font-semibold text-elegant-text">{totalPosts}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Published</p>
-                  <p className="text-2xl font-semibold text-orange-500">{publishedPosts}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Drafts</p>
-                  <p className="text-2xl font-semibold text-elegant-primary">{draftPosts}</p>
-                </div>
+          <Input type="date" {...register("date")} />
+          {errors.date && <p className="text-sm text-destructive">{errors.date.message}</p>}
+
+          <Textarea placeholder="Excerpt" rows={4} {...register("excerpt")} />
+          {errors.excerpt && <p className="text-sm text-destructive">{errors.excerpt.message}</p>}
+
+          {/* MARKDOWN EDITOR */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-elegant-text">Content</label>
+
+            {/* Formatting Toolbar */}
+            <div className="flex flex-wrap gap-2 p-3 bg-muted/50 border rounded">
+              <button
+                type="button"
+                onClick={() => {
+                  const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                  if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selected = watch("content").substring(start, end);
+                    const before = watch("content").substring(0, start);
+                    const after = watch("content").substring(end);
+                    setValue("content", `${before}**${selected || "bold text"}**${after}`);
+                  }
+                }}
+                className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted font-semibold"
+                title="Bold"
+              >
+                B
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                  if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selected = watch("content").substring(start, end);
+                    const before = watch("content").substring(0, start);
+                    const after = watch("content").substring(end);
+                    setValue("content", `${before}*${selected || "italic text"}*${after}`);
+                  }
+                }}
+                className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted italic"
+                title="Italic"
+              >
+                I
+              </button>
+
+              <div className="border-l border-border"></div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                  if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selected = watch("content").substring(start, end);
+                    const before = watch("content").substring(0, start);
+                    const after = watch("content").substring(end);
+                    setValue("content", `${before}# ${selected || "Heading"}${after}`);
+                  }
+                }}
+                className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted text-lg font-bold"
+                title="Heading 1"
+              >
+                H1
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                  if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selected = watch("content").substring(start, end);
+                    const before = watch("content").substring(0, start);
+                    const after = watch("content").substring(end);
+                    setValue("content", `${before}## ${selected || "Heading"}${after}`);
+                  }
+                }}
+                className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted text-base font-bold"
+                title="Heading 2"
+              >
+                H2
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                  if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selected = watch("content").substring(start, end);
+                    const before = watch("content").substring(0, start);
+                    const after = watch("content").substring(end);
+                    setValue("content", `${before}### ${selected || "Heading"}${after}`);
+                  }
+                }}
+                className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted font-bold"
+                title="Heading 3"
+              >
+                H3
+              </button>
+
+              <div className="border-l border-border"></div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                  if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selected = watch("content").substring(start, end);
+                    const before = watch("content").substring(0, start);
+                    const after = watch("content").substring(end);
+                    setValue("content", `${before}- ${selected || "List item"}\n${after}`);
+                  }
+                }}
+                className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted"
+                title="Bullet List"
+              >
+                • List
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                  if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selected = watch("content").substring(start, end);
+                    const before = watch("content").substring(0, start);
+                    const after = watch("content").substring(end);
+                    setValue("content", `${before}\`\`\`\n${selected || "code"}\n\`\`\`\n${after}`);
+                  }
+                }}
+                className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted font-mono"
+                title="Code Block"
+              >
+                Code
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                  if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selected = watch("content").substring(start, end);
+                    const before = watch("content").substring(0, start);
+                    const after = watch("content").substring(end);
+                    setValue("content", `${before}[${selected || "link text"}](https://example.com)${after}`);
+                  }
+                }}
+                className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted text-blue-600 underline"
+                title="Link"
+              >
+                Link
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
+                  if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selected = watch("content").substring(start, end);
+                    const before = watch("content").substring(0, start);
+                    const after = watch("content").substring(end);
+                    setValue("content", `${before}> ${selected || "Quote"}${after}`);
+                  }
+                }}
+                className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted border-l-4 border-l-muted-foreground pl-2"
+                title="Quote"
+              >
+                Quote
+              </button>
+            </div>
+
+            <Textarea
+              id="content-textarea"
+              placeholder="Write your markdown content here... Use the toolbar above for formatting"
+              rows={12}
+              value={watch("content")}
+              onChange={(e) => setValue("content", e.target.value)}
+            />
+
+            <div className="border rounded p-4 bg-muted/30">
+              <h3 className="text-sm font-semibold mb-2">Preview</h3>
+              <div className="prose prose-sm max-w-none">
+                <ReactMarkdown
+                  remarkPlugins={[remarkBreaks]}
+                  components={{
+                    p: ({ children }) => (
+                      <p className="mb-4 last:mb-0">{children}</p>
+                    ),
+                    br: () => <span className="block h-4" />,
+                  }}
+                >
+                  {watch("content")}
+                </ReactMarkdown>
               </div>
             </div>
-            <Button variant="outline" onClick={onLogout}>
-              Logout
-            </Button>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-background/95 p-6 rounded-lg border">
-            <div className="space-y-1">
-              <h2 className="text-xl font-semibold text-elegant-text">Publish Post</h2>
-              <p className="text-sm text-muted-foreground">
-                Create or update posts. Preview the featured image whether you paste a URL or upload.
-              </p>
-            </div>
-            <Input placeholder="Title" {...register("title")} />
-            {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+          {errors.content && <p className="text-sm text-destructive">{errors.content.message}</p>}
 
-            <Input type="date" {...register("date")} />
-            {errors.date && <p className="text-sm text-destructive">{errors.date.message}</p>}
+          <div className="flex items-center gap-2 text-xs">
+            <button
+              type="button"
+              onClick={() => setImageMode("url")}
+              className={`px-2 py-1 rounded border ${imageMode === "url" ? "border-elegant-primary text-elegant-primary" : "border-border text-muted-foreground"}`}
+            >
+              Use URL
+            </button>
+            <button
+              type="button"
+              onClick={handleSelectUploadMode}
+              className={`px-2 py-1 rounded border ${imageMode === "upload" ? "border-elegant-primary text-elegant-primary" : "border-border text-muted-foreground"}`}
+            >
+              Upload Image
+            </button>
+          </div>
 
-            <Textarea placeholder="Excerpt" rows={4} {...register("excerpt")} />
-            {errors.excerpt && <p className="text-sm text-destructive">{errors.excerpt.message}</p>}
-
-            {/* MARKDOWN EDITOR */}
+          {imageMode === "url" ? (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-elegant-text">Content</label>
-
-              {/* Formatting Toolbar */}
-              <div className="flex flex-wrap gap-2 p-3 bg-muted/50 border rounded">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
-                    if (textarea) {
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const selected = watch("content").substring(start, end);
-                      const before = watch("content").substring(0, start);
-                      const after = watch("content").substring(end);
-                      setValue("content", `${before}**${selected || "bold text"}**${after}`);
-                    }
-                  }}
-                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted font-semibold"
-                  title="Bold"
-                >
-                  B
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
-                    if (textarea) {
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const selected = watch("content").substring(start, end);
-                      const before = watch("content").substring(0, start);
-                      const after = watch("content").substring(end);
-                      setValue("content", `${before}*${selected || "italic text"}*${after}`);
-                    }
-                  }}
-                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted italic"
-                  title="Italic"
-                >
-                  I
-                </button>
-
-                <div className="border-l border-border"></div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
-                    if (textarea) {
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const selected = watch("content").substring(start, end);
-                      const before = watch("content").substring(0, start);
-                      const after = watch("content").substring(end);
-                      setValue("content", `${before}# ${selected || "Heading"}${after}`);
-                    }
-                  }}
-                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted text-lg font-bold"
-                  title="Heading 1"
-                >
-                  H1
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
-                    if (textarea) {
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const selected = watch("content").substring(start, end);
-                      const before = watch("content").substring(0, start);
-                      const after = watch("content").substring(end);
-                      setValue("content", `${before}## ${selected || "Heading"}${after}`);
-                    }
-                  }}
-                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted text-base font-bold"
-                  title="Heading 2"
-                >
-                  H2
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
-                    if (textarea) {
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const selected = watch("content").substring(start, end);
-                      const before = watch("content").substring(0, start);
-                      const after = watch("content").substring(end);
-                      setValue("content", `${before}### ${selected || "Heading"}${after}`);
-                    }
-                  }}
-                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted font-bold"
-                  title="Heading 3"
-                >
-                  H3
-                </button>
-
-                <div className="border-l border-border"></div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
-                    if (textarea) {
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const selected = watch("content").substring(start, end);
-                      const before = watch("content").substring(0, start);
-                      const after = watch("content").substring(end);
-                      setValue("content", `${before}- ${selected || "List item"}\n${after}`);
-                    }
-                  }}
-                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted"
-                  title="Bullet List"
-                >
-                  • List
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
-                    if (textarea) {
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const selected = watch("content").substring(start, end);
-                      const before = watch("content").substring(0, start);
-                      const after = watch("content").substring(end);
-                      setValue("content", `${before}\`\`\`\n${selected || "code"}\n\`\`\`\n${after}`);
-                    }
-                  }}
-                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted font-mono"
-                  title="Code Block"
-                >
-                  Code
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
-                    if (textarea) {
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const selected = watch("content").substring(start, end);
-                      const before = watch("content").substring(0, start);
-                      const after = watch("content").substring(end);
-                      setValue("content", `${before}[${selected || "link text"}](https://example.com)${after}`);
-                    }
-                  }}
-                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted text-blue-600 underline"
-                  title="Link"
-                >
-                  Link
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement;
-                    if (textarea) {
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const selected = watch("content").substring(start, end);
-                      const before = watch("content").substring(0, start);
-                      const after = watch("content").substring(end);
-                      setValue("content", `${before}> ${selected || "Quote"}${after}`);
-                    }
-                  }}
-                  className="px-3 py-1 bg-background border rounded text-sm hover:bg-muted border-l-4 border-l-muted-foreground pl-2"
-                  title="Quote"
-                >
-                  Quote
-                </button>
-              </div>
-
-              <Textarea
-                id="content-textarea"
-                placeholder="Write your markdown content here... Use the toolbar above for formatting"
-                rows={12}
-                value={watch("content")}
-                onChange={(e) => setValue("content", e.target.value)}
-              />
-
-              <div className="border rounded p-4 bg-muted/30">
-                <h3 className="text-sm font-semibold mb-2">Preview</h3>
-                <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkBreaks]}
-                    components={{
-                      p: ({ children }) => (
-                        <p className="mb-4 last:mb-0">{children}</p>
-                      ),
-                      br: () => <span className="block h-4" />,
-                    }}
-                  >
-                    {watch("content")}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            </div>
-
-            {errors.content && <p className="text-sm text-destructive">{errors.content.message}</p>}
-
-            <div className="flex items-center gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => setImageMode("url")}
-                className={`px-2 py-1 rounded border ${imageMode === "url" ? "border-elegant-primary text-elegant-primary" : "border-border text-muted-foreground"}`}
-              >
-                Use URL
-              </button>
-              <button
-                type="button"
-                onClick={handleSelectUploadMode}
-                className={`px-2 py-1 rounded border ${imageMode === "upload" ? "border-elegant-primary text-elegant-primary" : "border-border text-muted-foreground"}`}
-              >
-                Upload Image
-              </button>
-            </div>
-
-            {imageMode === "url" ? (
-              <div className="space-y-2">
-                <Input placeholder="Image URL" {...register("image")} />
-                {watch("image") && (
-                  <div className="space-y-2">
-                    <img
-                      src={watch("image")}
-                      alt="Post preview"
-                      className="w-full max-w-sm rounded-md border"
-                    />
-                    <p className="text-xs text-muted-foreground">Preview from URL</p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <input type="hidden" {...register("image")} />
-                <div className="flex flex-wrap items-center gap-2">
-                  <Input
-                    ref={uploadInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleImageUpload(file);
-                    }}
-                    disabled={uploadingImage}
-                    className="sm:w-auto"
+              <Input placeholder="Image URL" {...register("image")} />
+              {watch("image") && (
+                <div className="space-y-2">
+                  <img
+                    src={watch("image")}
+                    alt="Post preview"
+                    className="w-full max-w-sm rounded-md border"
                   />
-                  <button
-                    type="button"
-                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                    onClick={() =>
-                      openMediaLibrary((url) => {
-                        setValue("image", url, { shouldValidate: true });
-                        if (uploadInputRef.current) {
-                          uploadInputRef.current.value = "";
-                        }
-                      })
-                    }
-                    disabled={uploadingImage || !mediaLibraryReady || !cloudInfo}
-                  >
-                    Library
-                  </button>
-                  <span className="text-xs text-muted-foreground">
-                    {uploadingImage ? "Uploading…" : "JPG/PNG"}
-                  </span>
+                  <p className="text-xs text-muted-foreground">Preview from URL</p>
                 </div>
-                {watch("image") ? (
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={watch("image")}
-                      alt="Uploaded preview"
-                      className="h-16 w-16 rounded object-cover border"
-                    />
-                    <span className="text-xs text-muted-foreground">Image ready</span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-muted-foreground">No image uploaded yet</span>
-                )}
-              </div>
-            )}
-
-            {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}
-            {errors.image && <p className="text-sm text-destructive">{errors.image.message}</p>}
-
-            <select {...register("category")} className="w-full border rounded px-3 py-2 text-sm">
-              <option value="">Select a category</option>
-              {categories.map(({ label }) => (
-                <option key={label} value={label}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
-
-            <select {...register("status")} className="w-full border rounded px-3 py-2 text-sm">
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-            </select>
-            {errors.status && <p className="text-sm text-destructive">{errors.status.message}</p>}
-
-            <div className="space-y-1">
-              <label className="text-sm text-muted-foreground">Schedule publish (optional)</label>
-              <Input type="datetime-local" {...register("scheduledAt")} />
-            </div>
-
-            <div className="bg-muted/50 border rounded px-3 py-2 text-sm flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="featured"
-                {...register("featured")}
-                className="h-4 w-4 accent-elegant-primary"
-              />
-              <label htmlFor="featured" className="text-sm text-elegant-text">
-                Mark this post as featured
-              </label>
-            </div>
-            <div className="bg-muted/50 border rounded px-3 py-2 text-sm flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="hidden"
-                {...register("hidden")}
-                className="h-4 w-4 accent-elegant-primary"
-              />
-              <label htmlFor="hidden" className="text-sm text-elegant-text">
-                Is hidden (exclude from recent lists)
-              </label>
-            </div>
-            <div className="bg-muted/50 border rounded px-3 py-2 text-sm flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="article"
-                {...register("article")}
-                className="h-4 w-4 accent-elegant-primary"
-              />
-              <label htmlFor="article" className="text-sm text-elegant-text">
-                Article (show only on Articles page)
-              </label>
-            </div>
-            {watch("article") && (
-              <div className="space-y-1">
-                <label className="text-sm text-muted-foreground">
-                  Article label (replaces category on article cards)
-                </label>
-                <Input
-                  placeholder="e.g., Deep Dive"
-                  {...register("articleLabel")}
-                />
-              </div>
-            )}
-
-            <div className="flex justify-between items-center">
-              <Button
-                type="submit"
-                disabled={
-                  uploadingImage ||
-                  (imageMode === "upload" && !watch("image"))
-                }
-              >
-                {editingPost ? "Update Post" : "Publish"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  resetForm();
-                }}
-              >
-                Clear Form
-              </Button>
-            </div>
-          </form>
-
-          {/* BACKUP & RESTORE */}
-          <div className="space-y-3 bg-background/95 p-6 rounded-lg border">
-            <h2 className="text-xl font-semibold text-elegant-text">Backup & Restore</h2>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-              <Button type="button" variant="default" size="default" onClick={handleBackupDownload}>
-                Download Backup
-              </Button>
-              <div className="flex flex-1 flex-col sm:flex-row gap-2">
-                <div className="flex flex-col gap-1 flex-1">
-                  <input
-                    ref={restoreInputRef}
-                    type="file"
-                    accept="application/json"
-                    className="rounded border border-border bg-background/60 px-3 py-2 text-sm"
-                    onChange={(event) => {
-                      setBackupError("");
-                      setRestoreFile(event.target.files?.[0] ?? null);
-                    }}
-                  />
-
-                  {restoreFile && (
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-muted-foreground">
-                        Selected: {restoreFile.name} ({(restoreFile.size / 1024).toFixed(1)} KB)
-                      </p>
-                      <button
-                        type="button"
-                        className="text-xs underline text-muted-foreground hover:text-foreground"
-                        onClick={() => {
-                          setRestoreFile(null);
-                          if (restoreInputRef.current) {
-                            restoreInputRef.current.value = "";
-                          }
-                        }}
-                      >
-                        Clear
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <Button
-                  type="button"
-                  variant="default"
-                  size="sm"
-                  onClick={handleRestoreBackup}
-                  disabled={restoring || !restoreFile}
-                >
-                  {restoring ? "Restoring…" : "Restore Backup"}
-                </Button>
-              </div>
-
-              {backupError && (
-                <p className="text-sm text-destructive">{backupError}</p>
               )}
             </div>
+          ) : (
+            <div className="space-y-2">
+              <input type="hidden" {...register("image")} />
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  ref={uploadInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                  }}
+                  disabled={uploadingImage}
+                  className="sm:w-auto"
+                />
+                <button
+                  type="button"
+                  className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                  onClick={() =>
+                    openMediaLibrary((url) => {
+                      setValue("image", url, { shouldValidate: true });
+                      if (uploadInputRef.current) {
+                        uploadInputRef.current.value = "";
+                      }
+                    })
+                  }
+                  disabled={uploadingImage || !mediaLibraryReady || !cloudInfo}
+                >
+                  Library
+                </button>
+                <span className="text-xs text-muted-foreground">
+                  {uploadingImage ? "Uploading…" : "JPG/PNG"}
+                </span>
+              </div>
+              {watch("image") ? (
+                <div className="flex items-center gap-3">
+                  <img
+                    src={watch("image")}
+                    alt="Uploaded preview"
+                    className="h-16 w-16 rounded object-cover border"
+                  />
+                  <span className="text-xs text-muted-foreground">Image ready</span>
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">No image uploaded yet</span>
+              )}
+            </div>
+          )}
+
+          {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}
+          {errors.image && <p className="text-sm text-destructive">{errors.image.message}</p>}
+
+          <select {...register("category")} className="w-full border rounded px-3 py-2 text-sm">
+            <option value="">Select a category</option>
+            {categories.map(({ label }) => (
+              <option key={label} value={label}>
+                {label}
+              </option>
+            ))}
+          </select>
+          {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
+
+          <select {...register("status")} className="w-full border rounded px-3 py-2 text-sm">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+          {errors.status && <p className="text-sm text-destructive">{errors.status.message}</p>}
+
+          <div className="space-y-1">
+            <label className="text-sm text-muted-foreground">Schedule publish (optional)</label>
+            <Input type="datetime-local" {...register("scheduledAt")} />
           </div>
 
-          {/* HOME FEATURED */}
-          <div className="space-y-6 bg-background/95 p-6 rounded-lg border">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-elegant-text">Home Featured</h2>
-                <p className="text-sm text-muted-foreground">Controls the hero and "Good Things" cards on the home page.</p>
+          <div className="bg-muted/50 border rounded px-3 py-2 text-sm flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="featured"
+              {...register("featured")}
+              className="h-4 w-4 accent-elegant-primary"
+            />
+            <label htmlFor="featured" className="text-sm text-elegant-text">
+              Mark this post as featured
+            </label>
+          </div>
+          <div className="bg-muted/50 border rounded px-3 py-2 text-sm flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="hidden"
+              {...register("hidden")}
+              className="h-4 w-4 accent-elegant-primary"
+            />
+            <label htmlFor="hidden" className="text-sm text-elegant-text">
+              Is hidden (exclude from recent lists)
+            </label>
+          </div>
+          <div className="bg-muted/50 border rounded px-3 py-2 text-sm flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="article"
+              {...register("article")}
+              className="h-4 w-4 accent-elegant-primary"
+            />
+            <label htmlFor="article" className="text-sm text-elegant-text">
+              Article (show only on Articles page)
+            </label>
+          </div>
+          {watch("article") && (
+            <div className="space-y-1">
+              <label className="text-sm text-muted-foreground">
+                Article label (replaces category on article cards)
+              </label>
+              <Input
+                placeholder="e.g., Deep Dive"
+                {...register("articleLabel")}
+              />
+            </div>
+          )}
+
+          <div className="flex justify-between items-center">
+            <Button
+              type="submit"
+              disabled={
+                uploadingImage ||
+                (imageMode === "upload" && !watch("image"))
+              }
+            >
+              {editingPost ? "Update Post" : "Publish"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                resetForm();
+              }}
+            >
+              Clear Form
+            </Button>
+          </div>
+        </form>
+
+        {/* BACKUP & RESTORE */}
+        <div className="space-y-3 bg-background/95 p-6 rounded-lg border">
+          <h2 className="text-xl font-semibold text-elegant-text">Backup & Restore</h2>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+            <Button type="button" variant="default" size="default" onClick={handleBackupDownload}>
+              Download Backup
+            </Button>
+            <div className="flex flex-1 flex-col sm:flex-row gap-2">
+              <div className="flex flex-col gap-1 flex-1">
+                <input
+                  ref={restoreInputRef}
+                  type="file"
+                  accept="application/json"
+                  className="rounded border border-border bg-background/60 px-3 py-2 text-sm"
+                  onChange={(event) => {
+                    setBackupError("");
+                    setRestoreFile(event.target.files?.[0] ?? null);
+                  }}
+                />
+
+                {restoreFile && (
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-muted-foreground">
+                      Selected: {restoreFile.name} ({(restoreFile.size / 1024).toFixed(1)} KB)
+                    </p>
+                    <button
+                      type="button"
+                      className="text-xs underline text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        setRestoreFile(null);
+                        if (restoreInputRef.current) {
+                          restoreInputRef.current.value = "";
+                        }
+                      }}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
               </div>
               <Button
                 type="button"
                 variant="default"
-                size="default"
-                onClick={handleSaveHomeFeatured}
+                size="sm"
+                onClick={handleRestoreBackup}
+                disabled={restoring || !restoreFile}
               >
-                {homeSaving ? "Saving..." : "Save Home Section"}
+                {restoring ? "Restoring…" : "Restore Backup"}
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {backupError && (
+              <p className="text-sm text-destructive">{backupError}</p>
+            )}
+          </div>
+        </div>
+
+        {/* HOME FEATURED */}
+        <div className="space-y-6 bg-background/95 p-6 rounded-lg border">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-elegant-text">Home Featured</h2>
+              <p className="text-sm text-muted-foreground">Controls the hero and "Good Things" cards on the home page.</p>
+            </div>
+            <Button
+              type="button"
+              variant="default"
+              size="default"
+              onClick={handleSaveHomeFeatured}
+            >
+              {homeSaving ? "Saving..." : "Save Home Section"}
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-6">
               <div className="space-y-3 bg-card border border-border rounded-lg p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Hero Copy</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Hero Header</p>
                 <Input
-                  placeholder="Category label"
+                  placeholder="Eyebrow"
                   value={homeFeatured.heroCategory}
                   onChange={(e) => setHomeFeatured({ ...homeFeatured, heroCategory: e.target.value })}
                 />
                 <Input
-                  placeholder="Big headline"
+                  placeholder="Heading"
                   value={homeFeatured.heroTitle}
                   onChange={(e) => setHomeFeatured({ ...homeFeatured, heroTitle: e.target.value })}
                 />
                 <Textarea
-                  placeholder="Supporting subtitle"
+                  placeholder="Subheading"
                   value={homeFeatured.heroSubtitle}
                   onChange={(e) => setHomeFeatured({ ...homeFeatured, heroSubtitle: e.target.value })}
                   rows={2}
                 />
+              </div>
+
+              <div className="space-y-3 bg-card border border-border rounded-lg p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Hero Subheader</p>
                 <Input
-                  placeholder="Bubble heading"
+                  placeholder="Eyebrow"
                   value={homeFeatured.bubbleHeading}
                   onChange={(e) => setHomeFeatured({ ...homeFeatured, bubbleHeading: e.target.value })}
                 />
                 <Input
-                  placeholder="Bubble title"
+                  placeholder="Heading"
                   value={homeFeatured.bubbleTitle}
                   onChange={(e) => setHomeFeatured({ ...homeFeatured, bubbleTitle: e.target.value })}
                 />
                 <Textarea
-                  placeholder="Bubble description"
+                  placeholder="Subheading"
                   value={homeFeatured.bubbleDescription}
                   onChange={(e) => setHomeFeatured({ ...homeFeatured, bubbleDescription: e.target.value })}
                   rows={2}
                 />
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-3 bg-card border border-border rounded-lg p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Feature Header</p>
+                <Input
+                  placeholder="Eyebrow"
+                  value={siteSettings.headerHeroEyebrow}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, headerHeroEyebrow: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Heading"
+                  value={siteSettings.headerHeroTitle}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, headerHeroTitle: e.target.value }))
+                  }
+                />
+                <Textarea
+                  placeholder="Subheading"
+                  value={siteSettings.headerHeroSubtitle}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, headerHeroSubtitle: e.target.value }))
+                  }
+                  rows={2}
+                />
+                <Input
+                  placeholder="Featured Articles"
+                  value={siteSettings.articlesDividerLabel}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, articlesDividerLabel: e.target.value }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  Saved with Site Settings below.
+                </p>
               </div>
 
               <div className="space-y-3 bg-card border border-border rounded-lg p-4">
@@ -1705,12 +1771,12 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                   <button
                     type="button"
                     className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                    onClick={() => openMediaLibrary((url) =>
-                      setHomeFeatured((prev) => {
+                    onClick={() => {
+                      openMediaLibrary((url) => {
                         setHeroFileLabel("From library");
-                        return { ...prev, heroImage: url };
-                      })
-                    )}
+                        setHomeFeatured((prev) => ({ ...prev, heroImage: url }));
+                      });
+                    }}
                     disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
                   >
                     Library
@@ -1729,197 +1795,163 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 )}
               </div>
             </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {homeFeatured.cards.map((card, index) => (
-                <div key={index} className="space-y-3 bg-card border border-border rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-elegant-text">Card {index + 1}</h3>
-                  <Input
-                    placeholder="Image URL"
-                    value={card.image}
-                    onChange={(e) => updateCard(index, 'image', e.target.value)}
-                  />
-                  <input
-                    ref={(el) => {
-                      cardFileInputs.current[index] = el;
-                    }}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => handleCardImageUpload(e, index)}
-                  />
-                  <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
-                    <button
-                      type="button"
-                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                      onClick={() => cardFileInputs.current[index]?.click()}
-                      disabled={homeUploading}
-                    >
-                      Upload
-                    </button>
-                    <button
-                      type="button"
-                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                      onClick={() =>
-                        openMediaLibrary((url) => {
-                          setCardFileLabels((prev) => ({ ...prev, [index]: "From library" }));
-                          updateCard(index, 'image', url);
-                        })
-                      }
-                      disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
-                    >
-                      Library
-                    </button>
-                    <span className="text-xs text-muted-foreground">
-                      {homeUploading ? "Uploading..." : "JPG/PNG"}
-                    </span>
-                    {cardFileLabels[index] && (
-                      <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
-                        {cardFileLabels[index]}
-                      </span>
-                    )}
-                  </div>
-                  {card.image && (
-                    <img
-                      src={card.image}
-                      alt={`Card ${index + 1}`}
-                      className="w-full max-w-sm rounded-md border"
-                    />
-                  )}
-                  <Input
-                    placeholder="Fallback image URL"
-                    value={card.fallbackImage ?? ""}
-                    onChange={(e) => updateCard(index, 'fallbackImage', e.target.value)}
-                  />
-                  <input
-                    ref={(el) => {
-                      cardFallbackFileInputs.current[index] = el;
-                    }}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => handleCardFallbackUpload(e, index)}
-                  />
-                  <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
-                    <button
-                      type="button"
-                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                      onClick={() => cardFallbackFileInputs.current[index]?.click()}
-                      disabled={homeUploading}
-                    >
-                      Upload fallback
-                    </button>
-                    <button
-                      type="button"
-                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                      onClick={() =>
-                        openMediaLibrary((url) => {
-                          setCardFallbackLabels((prev) => ({ ...prev, [index]: "From library" }));
-                          updateCard(index, 'fallbackImage', url);
-                        })
-                      }
-                      disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
-                    >
-                      Library
-                    </button>
-                    {cardFallbackLabels[index] && (
-                      <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
-                        {cardFallbackLabels[index]}
-                      </span>
-                    )}
-                  </div>
-                  <Input
-                    placeholder="Category"
-                    value={card.category}
-                    onChange={(e) => updateCard(index, 'category', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Date (e.g., Feb 08, 2026)"
-                    value={card.date}
-                    onChange={(e) => updateCard(index, 'date', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Title"
-                    value={card.title}
-                    onChange={(e) => updateCard(index, 'title', e.target.value)}
-                  />
-                  <Textarea
-                    placeholder="Excerpt"
-                    value={card.excerpt ?? ''}
-                    onChange={(e) => updateCard(index, 'excerpt', e.target.value)}
-                    rows={2}
-                  />
-                  <Input
-                    placeholder="Link"
-                    value={card.link}
-                    onChange={(e) => updateCard(index, 'link', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Read more label"
-                    value={card.readMoreLabel}
-                    onChange={(e) => updateCard(index, 'readMoreLabel', e.target.value)}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {homeUploadError && <p className="text-sm text-destructive">{homeUploadError}</p>}
           </div>
 
-          {/* SITE SETTINGS */}
-          <div className="space-y-4 bg-background/95 p-6 rounded-lg border">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-elegant-text">Site Settings</h2>
-                <p className="text-sm text-muted-foreground">Control global images used across posts and category pages.</p>
-              </div>
-              <Button
-                type="button"
-                variant="default"
-                size="default"
-                onClick={handleSaveSiteSettings}
-              >
-                {settingsSaving ? "Saving..." : "Save Settings"}
-              </Button>
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Header Hero Copy</p>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {homeFeatured.cards.map((card, index) => (
+              <div key={index} className="space-y-3 bg-card border border-border rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-elegant-text">Card {index + 1}</h3>
                 <Input
-                  placeholder="Eyebrow (e.g., Thoughts • Insights • Ideas)"
-                  value={siteSettings.headerHeroEyebrow}
-                  onChange={(e) =>
-                    setSiteSettings((prev) => ({ ...prev, headerHeroEyebrow: e.target.value }))
-                  }
+                  placeholder="Image URL"
+                  value={card.image}
+                  onChange={(e) => updateCard(index, 'image', e.target.value)}
+                />
+                <input
+                  ref={(el) => {
+                    cardFileInputs.current[index] = el;
+                  }}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleCardImageUpload(e, index)}
+                />
+                <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => cardFileInputs.current[index]?.click()}
+                    disabled={homeUploading}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() =>
+                      openMediaLibrary((url) => {
+                        setCardFileLabels((prev) => ({ ...prev, [index]: "From library" }));
+                        updateCard(index, 'image', url);
+                      })
+                    }
+                    disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {homeUploading ? "Uploading..." : "JPG/PNG"}
+                  </span>
+                  {cardFileLabels[index] && (
+                    <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                      {cardFileLabels[index]}
+                    </span>
+                  )}
+                </div>
+                {card.image && (
+                  <img
+                    src={card.image}
+                    alt={`Card ${index + 1}`}
+                    className="w-full max-w-sm rounded-md border"
+                  />
+                )}
+                <Input
+                  placeholder="Fallback image URL"
+                  value={card.fallbackImage ?? ""}
+                  onChange={(e) => updateCard(index, 'fallbackImage', e.target.value)}
+                />
+                <input
+                  ref={(el) => {
+                    cardFallbackFileInputs.current[index] = el;
+                  }}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleCardFallbackUpload(e, index)}
+                />
+                <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => cardFallbackFileInputs.current[index]?.click()}
+                    disabled={homeUploading}
+                  >
+                    Upload fallback
+                  </button>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() =>
+                      openMediaLibrary((url) => {
+                        setCardFallbackLabels((prev) => ({ ...prev, [index]: "From library" }));
+                        updateCard(index, 'fallbackImage', url);
+                      })
+                    }
+                    disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
+                  {cardFallbackLabels[index] && (
+                    <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                      {cardFallbackLabels[index]}
+                    </span>
+                  )}
+                </div>
+                <Input
+                  placeholder="Category"
+                  value={card.category}
+                  onChange={(e) => updateCard(index, 'category', e.target.value)}
                 />
                 <Input
-                  placeholder="Title (e.g., Shared Experiences)"
-                  value={siteSettings.headerHeroTitle}
-                  onChange={(e) =>
-                    setSiteSettings((prev) => ({ ...prev, headerHeroTitle: e.target.value }))
-                  }
+                  placeholder="Date (e.g., Feb 08, 2026)"
+                  value={card.date}
+                  onChange={(e) => updateCard(index, 'date', e.target.value)}
                 />
                 <Input
-                  placeholder="Divider label (e.g., Journal)"
-                  value={siteSettings.headerHeroDivider}
-                  onChange={(e) =>
-                    setSiteSettings((prev) => ({ ...prev, headerHeroDivider: e.target.value }))
-                  }
+                  placeholder="Title"
+                  value={card.title}
+                  onChange={(e) => updateCard(index, 'title', e.target.value)}
                 />
                 <Textarea
-                  placeholder="Subtitle (e.g., a journal of small stories that become memories)"
-                  value={siteSettings.headerHeroSubtitle}
-                  onChange={(e) =>
-                    setSiteSettings((prev) => ({ ...prev, headerHeroSubtitle: e.target.value }))
-                  }
+                  placeholder="Excerpt"
+                  value={card.excerpt ?? ''}
+                  onChange={(e) => updateCard(index, 'excerpt', e.target.value)}
                   rows={2}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Shows on the hero banner across the site.
-                </p>
+                <Input
+                  placeholder="Link"
+                  value={card.link}
+                  onChange={(e) => updateCard(index, 'link', e.target.value)}
+                />
+                <Input
+                  placeholder="Read more label"
+                  value={card.readMoreLabel}
+                  onChange={(e) => updateCard(index, 'readMoreLabel', e.target.value)}
+                />
               </div>
+            ))}
+          </div>
 
+          {homeUploadError && <p className="text-sm text-destructive">{homeUploadError}</p>}
+        </div>
+
+        {/* SITE SETTINGS */}
+        <div className="space-y-4 bg-background/95 p-6 rounded-lg border">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-elegant-text">Site Settings</h2>
+              <p className="text-sm text-muted-foreground">Control global images used across posts and category pages.</p>
+            </div>
+            <Button
+              type="button"
+              variant="default"
+              size="default"
+              onClick={handleSaveSiteSettings}
+            >
+              {settingsSaving ? "Saving..." : "Save Settings"}
+            </Button>
+          </div>
+
+          <div className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
               <div className="space-y-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Post Fallback Image</p>
                 <Input
@@ -1984,560 +2016,823 @@ export function AdminContent({ onSessionExpired, onLogout }: { onSessionExpired:
                 )}
               </div>
 
-              <div className="grid gap-6 lg:grid-cols-2">
-                <div className="space-y-3">
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Categories Header Image</p>
-                  <Input
-                    placeholder="Header image URL"
-                    value={siteSettings.categoriesImage}
-                    onChange={(e) =>
-                      setSiteSettings((prev) => ({ ...prev, categoriesImage: e.target.value }))
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Article Fallback Image</p>
+                <Input
+                  placeholder="Fallback image URL"
+                  value={siteSettings.articlesFallbackImage}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, articlesFallbackImage: e.target.value }))
+                  }
+                />
+                <input
+                  ref={articlesFallbackInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setArticlesFallbackLabel(file.name);
+                      handleHomeImageUpload(file, (url) =>
+                        setSiteSettings((prev) => ({ ...prev, articlesFallbackImage: url }))
+                      );
                     }
-                  />
-                  <p className="text-xs text-muted-foreground">If empty, the fallback image is used.</p>
-                  <input
-                    ref={categoriesImageInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setCategoriesImageLabel(file.name);
-                        handleHomeImageUpload(file, (url) =>
-                          setSiteSettings((prev) => ({ ...prev, categoriesImage: url }))
-                        );
-                      }
-                    }}
-                  />
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    <button
-                      type="button"
-                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                      onClick={() => categoriesImageInputRef.current?.click()}
-                      disabled={homeUploading}
-                    >
-                      Upload
-                    </button>
-                    <button
-                      type="button"
-                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                      onClick={() =>
-                        openMediaLibrary((url) => {
-                          setCategoriesImageLabel("From library");
-                          setSiteSettings((prev) => ({ ...prev, categoriesImage: url }));
-                        })
-                      }
-                      disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
-                    >
-                      Library
-                    </button>
-                    <span className="text-xs text-muted-foreground">
-                      {homeUploading ? "Uploading..." : "JPG/PNG"}
+                  }}
+                />
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => articlesFallbackInputRef.current?.click()}
+                    disabled={homeUploading}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() =>
+                      openMediaLibrary((url) => {
+                        setArticlesFallbackLabel("From library");
+                        setSiteSettings((prev) => ({ ...prev, articlesFallbackImage: url }));
+                      })
+                    }
+                    disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {homeUploading ? "Uploading..." : "JPG/PNG"}
+                  </span>
+                  {articlesFallbackLabel && (
+                    <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                      {articlesFallbackLabel}
                     </span>
-                    {categoriesImageLabel && (
-                      <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
-                        {categoriesImageLabel}
-                      </span>
-                    )}
-                  </div>
-                  {siteSettings.categoriesImage && (
-                    <img
-                      src={siteSettings.categoriesImage}
-                      alt="Categories header"
-                      className="w-full max-w-sm rounded-md border"
-                    />
                   )}
                 </div>
+                {siteSettings.articlesFallbackImage && (
+                  <img
+                    src={siteSettings.articlesFallbackImage}
+                    alt="Article fallback"
+                    className="w-full max-w-sm rounded-md border"
+                  />
+                )}
+              </div>
+            </div>
 
-                <div className="space-y-3">
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Categories Fallback Image</p>
-                  <Input
-                    placeholder="Fallback image URL"
-                    value={siteSettings.categoriesFallbackImage}
-                    onChange={(e) =>
-                      setSiteSettings((prev) => ({ ...prev, categoriesFallbackImage: e.target.value }))
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Categories Header Image</p>
+                <Input
+                  placeholder="Header image URL"
+                  value={siteSettings.categoriesImage}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, categoriesImage: e.target.value }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground">If empty, the fallback image is used.</p>
+                <input
+                  ref={categoriesImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setCategoriesImageLabel(file.name);
+                      handleHomeImageUpload(file, (url) =>
+                        setSiteSettings((prev) => ({ ...prev, categoriesImage: url }))
+                      );
                     }
-                  />
-                  <p className="text-xs text-muted-foreground">Leave blank to use the local default.</p>
-                  <input
-                    ref={categoriesFallbackInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setCategoriesFallbackLabel(file.name);
-                        handleHomeImageUpload(file, (url) =>
-                          setSiteSettings((prev) => ({ ...prev, categoriesFallbackImage: url }))
-                        );
-                      }
-                    }}
-                  />
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    <button
-                      type="button"
-                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                      onClick={() => categoriesFallbackInputRef.current?.click()}
-                      disabled={homeUploading}
-                    >
-                      Upload
-                    </button>
-                    <button
-                      type="button"
-                      className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                      onClick={() =>
-                        openMediaLibrary((url) => {
-                          setCategoriesFallbackLabel("From library");
-                          setSiteSettings((prev) => ({ ...prev, categoriesFallbackImage: url }));
-                        })
-                      }
-                      disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
-                    >
-                      Library
-                    </button>
-                    <span className="text-xs text-muted-foreground">
-                      {homeUploading ? "Uploading..." : "JPG/PNG"}
+                  }}
+                />
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => categoriesImageInputRef.current?.click()}
+                    disabled={homeUploading}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() =>
+                      openMediaLibrary((url) => {
+                        setCategoriesImageLabel("From library");
+                        setSiteSettings((prev) => ({ ...prev, categoriesImage: url }));
+                      })
+                    }
+                    disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {homeUploading ? "Uploading..." : "JPG/PNG"}
+                  </span>
+                  {categoriesImageLabel && (
+                    <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                      {categoriesImageLabel}
                     </span>
-                    {categoriesFallbackLabel && (
-                      <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
-                        {categoriesFallbackLabel}
-                      </span>
-                    )}
-                  </div>
-                  {siteSettings.categoriesFallbackImage && (
-                    <img
-                      src={siteSettings.categoriesFallbackImage}
-                      alt="Categories fallback"
-                      className="w-full max-w-sm rounded-md border"
-                    />
                   )}
+                </div>
+                {siteSettings.categoriesImage && (
+                  <img
+                    src={siteSettings.categoriesImage}
+                    alt="Categories header"
+                    className="w-full max-w-sm rounded-md border"
+                  />
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Articles Header Image</p>
+                <Input
+                  placeholder="Header image URL"
+                  value={siteSettings.articlesHeaderImage}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, articlesHeaderImage: e.target.value }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground">If empty, the fallback image is used.</p>
+                <input
+                  ref={articlesHeaderImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setArticlesHeaderImageLabel(file.name);
+                      handleHomeImageUpload(file, (url) =>
+                        setSiteSettings((prev) => ({ ...prev, articlesHeaderImage: url }))
+                      );
+                    }
+                  }}
+                />
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => articlesHeaderImageInputRef.current?.click()}
+                    disabled={homeUploading}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() =>
+                      openMediaLibrary((url) => {
+                        setArticlesHeaderImageLabel("From library");
+                        setSiteSettings((prev) => ({ ...prev, articlesHeaderImage: url }));
+                      })
+                    }
+                    disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {homeUploading ? "Uploading..." : "JPG/PNG"}
+                  </span>
+                  {articlesHeaderImageLabel && (
+                    <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                      {articlesHeaderImageLabel}
+                    </span>
+                  )}
+                </div>
+                {siteSettings.articlesHeaderImage && (
+                  <img
+                    src={siteSettings.articlesHeaderImage}
+                    alt="Articles header"
+                    className="w-full max-w-sm rounded-md border"
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Categories Fallback Image</p>
+                <Input
+                  placeholder="Fallback image URL"
+                  value={siteSettings.categoriesFallbackImage}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, categoriesFallbackImage: e.target.value }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground">Leave blank to use the local default.</p>
+                <input
+                  ref={categoriesFallbackInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setCategoriesFallbackLabel(file.name);
+                      handleHomeImageUpload(file, (url) =>
+                        setSiteSettings((prev) => ({ ...prev, categoriesFallbackImage: url }))
+                      );
+                    }
+                  }}
+                />
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => categoriesFallbackInputRef.current?.click()}
+                    disabled={homeUploading}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() =>
+                      openMediaLibrary((url) => {
+                        setCategoriesFallbackLabel("From library");
+                        setSiteSettings((prev) => ({ ...prev, categoriesFallbackImage: url }));
+                      })
+                    }
+                    disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {homeUploading ? "Uploading..." : "JPG/PNG"}
+                  </span>
+                  {categoriesFallbackLabel && (
+                    <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                      {categoriesFallbackLabel}
+                    </span>
+                  )}
+                </div>
+                {siteSettings.categoriesFallbackImage && (
+                  <img
+                    src={siteSettings.categoriesFallbackImage}
+                    alt="Categories fallback"
+                    className="w-full max-w-sm rounded-md border"
+                  />
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Articles Header Fallback Image</p>
+                <Input
+                  placeholder="Fallback image URL"
+                  value={siteSettings.articlesHeaderFallbackImage}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, articlesHeaderFallbackImage: e.target.value }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground">Leave blank to use the local default.</p>
+                <input
+                  ref={articlesHeaderFallbackInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setArticlesHeaderFallbackLabel(file.name);
+                      handleHomeImageUpload(file, (url) =>
+                        setSiteSettings((prev) => ({ ...prev, articlesHeaderFallbackImage: url }))
+                      );
+                    }
+                  }}
+                />
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() => articlesHeaderFallbackInputRef.current?.click()}
+                    disabled={homeUploading}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                    onClick={() =>
+                      openMediaLibrary((url) => {
+                        setArticlesHeaderFallbackLabel("From library");
+                        setSiteSettings((prev) => ({ ...prev, articlesHeaderFallbackImage: url }));
+                      })
+                    }
+                    disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                  >
+                    Library
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {homeUploading ? "Uploading..." : "JPG/PNG"}
+                  </span>
+                  {articlesHeaderFallbackLabel && (
+                    <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                      {articlesHeaderFallbackLabel}
+                    </span>
+                  )}
+                </div>
+                {siteSettings.articlesHeaderFallbackImage && (
+                  <img
+                    src={siteSettings.articlesHeaderFallbackImage}
+                    alt="Articles header fallback"
+                    className="w-full max-w-sm rounded-md border"
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Categories Heading</p>
+                <Input
+                  placeholder="Eyebrow (e.g., Browse by theme)"
+                  value={siteSettings.categoriesHeadingEyebrow}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, categoriesHeadingEyebrow: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Title (e.g., Categories)"
+                  value={siteSettings.categoriesHeadingTitle}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, categoriesHeadingTitle: e.target.value }))
+                  }
+                />
+                <Textarea
+                  placeholder="Subtitle"
+                  value={siteSettings.categoriesHeadingSubtitle}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, categoriesHeadingSubtitle: e.target.value }))
+                  }
+                  rows={2}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Articles Heading</p>
+                <Input
+                  placeholder="Eyebrow (e.g., Article Spotlight)"
+                  value={siteSettings.articlesSpotlightEyebrow}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, articlesSpotlightEyebrow: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Title"
+                  value={siteSettings.articlesSpotlightTitle}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, articlesSpotlightTitle: e.target.value }))
+                  }
+                />
+                <Textarea
+                  placeholder="Subtitle"
+                  value={siteSettings.articlesSpotlightSubtitle}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({ ...prev, articlesSpotlightSubtitle: e.target.value }))
+                  }
+                  rows={2}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Category Card Images</p>
+                  <p className="text-xs text-muted-foreground">
+                    Leave both fields blank to use the local default fallback.
+                  </p>
                 </div>
               </div>
 
-              <div className="grid gap-6 lg:grid-cols-2">
-                <div className="space-y-3">
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Categories Heading</p>
-                  <Input
-                    placeholder="Eyebrow (e.g., Browse by theme)"
-                    value={siteSettings.categoriesHeadingEyebrow}
-                    onChange={(e) =>
-                      setSiteSettings((prev) => ({ ...prev, categoriesHeadingEyebrow: e.target.value }))
-                    }
-                  />
-                  <Input
-                    placeholder="Title (e.g., Categories)"
-                    value={siteSettings.categoriesHeadingTitle}
-                    onChange={(e) =>
-                      setSiteSettings((prev) => ({ ...prev, categoriesHeadingTitle: e.target.value }))
-                    }
-                  />
-                  <Textarea
-                    placeholder="Subtitle"
-                    value={siteSettings.categoriesHeadingSubtitle}
-                    onChange={(e) =>
-                      setSiteSettings((prev) => ({ ...prev, categoriesHeadingSubtitle: e.target.value }))
-                    }
-                    rows={2}
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Articles Spotlight Copy</p>
-                  <Input
-                    placeholder="Eyebrow (e.g., Article Spotlight)"
-                    value={siteSettings.articlesSpotlightEyebrow}
-                    onChange={(e) =>
-                      setSiteSettings((prev) => ({ ...prev, articlesSpotlightEyebrow: e.target.value }))
-                    }
-                  />
-                  <Input
-                    placeholder="Title"
-                    value={siteSettings.articlesSpotlightTitle}
-                    onChange={(e) =>
-                      setSiteSettings((prev) => ({ ...prev, articlesSpotlightTitle: e.target.value }))
-                    }
-                  />
-                  <Textarea
-                    placeholder="Subtitle"
-                    value={siteSettings.articlesSpotlightSubtitle}
-                    onChange={(e) =>
-                      setSiteSettings((prev) => ({ ...prev, articlesSpotlightSubtitle: e.target.value }))
-                    }
-                    rows={2}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Category Card Images</p>
-                    <p className="text-xs text-muted-foreground">
-                      Leave both fields blank to use the local default fallback.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid gap-5 lg:grid-cols-2">
-                  {categories.filter((category) => category.label !== "No Category").map((category, index) => {
-                    const config = siteSettings.categoryCardImages[category.slug] || {
-                      image: "",
-                      fallbackImage: "",
-                    };
-                    const excerpt = siteSettings.categoryCardExcerpts[category.slug] || "";
-                    const preview = config.image || config.fallbackImage;
-                    return (
-                      <div key={category.slug} className="rounded-lg border border-border p-4 space-y-3 bg-card/40">
-                        <div className="flex items-center justify-between gap-4">
-                          <div>
-                            <p className="text-sm font-semibold text-elegant-text">{category.label}</p>
-                            <p className="text-xs text-muted-foreground">{category.slug}</p>
-                          </div>
-                          {preview ? (
-                            <img
-                              src={preview}
-                              alt={`${category.label} preview`}
-                              className="h-12 w-20 rounded-md object-cover border border-border"
-                            />
-                          ) : null}
+              <div className="grid gap-5 lg:grid-cols-2">
+                {categories.filter((category) => category.label !== "No Category").map((category, index) => {
+                  const config = siteSettings.categoryCardImages[category.slug] || {
+                    image: "",
+                    fallbackImage: "",
+                  };
+                  const excerpt = siteSettings.categoryCardExcerpts[category.slug] || "";
+                  const preview = config.image || config.fallbackImage;
+                  return (
+                    <div key={category.slug} className="rounded-lg border border-border p-4 space-y-3 bg-card/40">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-sm font-semibold text-elegant-text">{category.label}</p>
+                          <p className="text-xs text-muted-foreground">{category.slug}</p>
                         </div>
-
-                        <div className="space-y-2">
-                          <Input
-                            placeholder="Image URL"
-                            value={config.image}
-                            onChange={(e) => updateCategoryCardImage(category.slug, "image", e.target.value)}
+                        {preview ? (
+                          <img
+                            src={preview}
+                            alt={`${category.label} preview`}
+                            className="h-12 w-20 rounded-md object-cover border border-border"
                           />
-                          <input
-                            ref={(el) => {
-                              categoryCardImageInputs.current[index] = el;
-                            }}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
+                        ) : null}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Input
+                          placeholder="Image URL"
+                          value={config.image}
+                          onChange={(e) => updateCategoryCardImage(category.slug, "image", e.target.value)}
+                        />
+                        <input
+                          ref={(el) => {
+                            categoryCardImageInputs.current[index] = el;
+                          }}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setCategoryCardImageLabels((prev) => ({
+                                ...prev,
+                                [category.slug]: file.name,
+                              }));
+                              handleHomeImageUpload(file, (url) =>
+                                updateCategoryCardImage(category.slug, "image", url)
+                              );
+                            }
+                          }}
+                        />
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                          <button
+                            type="button"
+                            className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                            onClick={() => categoryCardImageInputs.current[index]?.click()}
+                            disabled={homeUploading}
+                          >
+                            Upload
+                          </button>
+                          <button
+                            type="button"
+                            className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                            onClick={() =>
+                              openMediaLibrary((url) => {
                                 setCategoryCardImageLabels((prev) => ({
                                   ...prev,
-                                  [category.slug]: file.name,
+                                  [category.slug]: "From library",
                                 }));
-                                handleHomeImageUpload(file, (url) =>
-                                  updateCategoryCardImage(category.slug, "image", url)
-                                );
-                              }
-                            }}
-                          />
-                          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                            <button
-                              type="button"
-                              className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                              onClick={() => categoryCardImageInputs.current[index]?.click()}
-                              disabled={homeUploading}
-                            >
-                              Upload
-                            </button>
-                            <button
-                              type="button"
-                              className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                              onClick={() =>
-                                openMediaLibrary((url) => {
-                                  setCategoryCardImageLabels((prev) => ({
-                                    ...prev,
-                                    [category.slug]: "From library",
-                                  }));
-                                  updateCategoryCardImage(category.slug, "image", url);
-                                })
-                              }
-                              disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
-                            >
-                              Library
-                            </button>
-                            {categoryCardImageLabels[category.slug] && (
-                              <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
-                                {categoryCardImageLabels[category.slug]}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Input
-                            placeholder="Fallback image URL"
-                            value={config.fallbackImage}
-                            onChange={(e) =>
-                              updateCategoryCardImage(category.slug, "fallbackImage", e.target.value)
+                                updateCategoryCardImage(category.slug, "image", url);
+                              })
                             }
-                          />
-                          <input
-                            ref={(el) => {
-                              categoryCardFallbackInputs.current[index] = el;
-                            }}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
+                            disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                          >
+                            Library
+                          </button>
+                          {categoryCardImageLabels[category.slug] && (
+                            <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                              {categoryCardImageLabels[category.slug]}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Input
+                          placeholder="Fallback image URL"
+                          value={config.fallbackImage}
+                          onChange={(e) =>
+                            updateCategoryCardImage(category.slug, "fallbackImage", e.target.value)
+                          }
+                        />
+                        <input
+                          ref={(el) => {
+                            categoryCardFallbackInputs.current[index] = el;
+                          }}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setCategoryCardFallbackLabels((prev) => ({
+                                ...prev,
+                                [category.slug]: file.name,
+                              }));
+                              handleHomeImageUpload(file, (url) =>
+                                updateCategoryCardImage(category.slug, "fallbackImage", url)
+                              );
+                            }
+                          }}
+                        />
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                          <button
+                            type="button"
+                            className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                            onClick={() => categoryCardFallbackInputs.current[index]?.click()}
+                            disabled={homeUploading}
+                          >
+                            Upload
+                          </button>
+                          <button
+                            type="button"
+                            className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
+                            onClick={() =>
+                              openMediaLibrary((url) => {
                                 setCategoryCardFallbackLabels((prev) => ({
                                   ...prev,
-                                  [category.slug]: file.name,
+                                  [category.slug]: "From library",
                                 }));
-                                handleHomeImageUpload(file, (url) =>
-                                  updateCategoryCardImage(category.slug, "fallbackImage", url)
-                                );
-                              }
-                            }}
-                          />
-                          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                            <button
-                              type="button"
-                              className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                              onClick={() => categoryCardFallbackInputs.current[index]?.click()}
-                              disabled={homeUploading}
-                            >
-                              Upload
-                            </button>
-                            <button
-                              type="button"
-                              className="px-3 py-1.5 rounded border border-border bg-background hover:border-elegant-primary transition text-xs"
-                              onClick={() =>
-                                openMediaLibrary((url) => {
-                                  setCategoryCardFallbackLabels((prev) => ({
-                                    ...prev,
-                                    [category.slug]: "From library",
-                                  }));
-                                  updateCategoryCardImage(category.slug, "fallbackImage", url);
-                                })
-                              }
-                              disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
-                            >
-                              Library
-                            </button>
-                            {categoryCardFallbackLabels[category.slug] && (
-                              <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
-                                {categoryCardFallbackLabels[category.slug]}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Textarea
-                            placeholder="Card excerpt (optional)"
-                            value={excerpt}
-                            onChange={(e) => updateCategoryCardExcerpt(category.slug, e.target.value)}
-                            rows={2}
-                          />
-                          <p className="text-xs text-muted-foreground">
-                            Shows on the Categories page below the title.
-                          </p>
+                                updateCategoryCardImage(category.slug, "fallbackImage", url);
+                              })
+                            }
+                            disabled={homeUploading || !mediaLibraryReady || !cloudInfo}
+                          >
+                            Library
+                          </button>
+                          {categoryCardFallbackLabels[category.slug] && (
+                            <span className="text-[11px] px-2 py-1 rounded border border-border bg-muted/70 text-elegant-text">
+                              {categoryCardFallbackLabels[category.slug]}
+                            </span>
+                          )}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* POSTS LIST CONTROLS */}
-          <div className="space-y-3 bg-background/95 p-6 rounded-lg border">
-            <h2 className="text-xl font-semibold text-elegant-text">Saved Posts</h2>
-
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Input
-                placeholder="Search by title or excerpt"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="sm:flex-1"
-              />
-
-              <select
-                value={filterStatus}
-                onChange={(e) =>
-                  setFilterStatus(e.target.value as "all" | "draft" | "published")
-                }
-                className="border rounded px-3 py-2 text-sm"
-              >
-                <option value="all">All</option>
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-              </select>
-            </div>
-
-            {/* Bulk actions toolbar */}
-            {selectedPostIds.size > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded p-4 flex items-center justify-between gap-4">
-                <span className="text-sm font-medium text-blue-900">
-                  {selectedPostIds.size} post{selectedPostIds.size !== 1 ? "s" : ""} selected
-                </span>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleBulkStatusChange("published")}
-                  >
-                    Publish
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleBulkStatusChange("draft")}
-                  >
-                    Draft
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => {
-                      if (confirm(`Delete ${selectedPostIds.size} post${selectedPostIds.size !== 1 ? "s" : ""}?`)) {
-                        handleBulkDelete();
-                      }
-                    }}
-                  >
-                    Delete
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setSelectedPostIds(new Set())}
-                  >
-                    Clear
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {filteredPosts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No posts found.</p>
-            ) : (
-              <ul className="space-y-3">
-                <li className="flex items-center gap-3 text-sm font-medium text-muted-foreground pb-2 border-b">
-                  <input
-                    type="checkbox"
-                    checked={selectedPostIds.size === filteredPosts.length && filteredPosts.length > 0}
-                    onChange={toggleSelectAll}
-                    className="h-4 w-4"
-                  />
-                  <span className="flex-1">Select All</span>
-                </li>
-                {filteredPosts.map((post) => (
-                  <li
-                    key={post.id}
-                    className="border border-border rounded p-4 flex gap-4 items-start"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedPostIds.has(post.id)}
-                      onChange={() => toggleSelectPost(post.id)}
-                      className="h-4 w-4 mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-medium text-elegant-text">{post.title}</h4>
-                        {post.mainFeatured && (
-                          <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-sm font-medium">
-                            Main Feature
-                          </span>
-                        )}
-                        {post.featured && !post.article && (
-                          <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-sm font-medium">
-                            Featured
-                          </span>
-                        )}
-                        {post.article && (
-                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-sm">
-                            Article
-                          </span>
-                        )}
-                        {post.article && post.featured && (
-                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-sm">
-                            Featured
-                          </span>
-                        )}
-                        {post.hidden && (
-                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-sm">
-                            Hidden
-                          </span>
-                        )}
-                        {post.slug === siteSettings.featuredArticleSlug && (
-                          <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-sm">
-                            Featured Article
-                          </span>
-                        )}
+                      <div className="space-y-2">
+                        <Textarea
+                          placeholder="Card excerpt (optional)"
+                          value={excerpt}
+                          onChange={(e) => updateCategoryCardExcerpt(category.slug, e.target.value)}
+                          rows={2}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Shows on the Categories page below the title.
+                        </p>
                       </div>
-                      <p className="whitespace-pre-line text-xs text-muted-foreground">
-                        {post.excerpt}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {post.date} • {post.status} • v{post.version ?? 1}
-                      </p>
                     </div>
-
-                    <div className="flex gap-2">
-                      {post.article && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleSetFeaturedArticle(post)}
-                          disabled={post.status !== "published" || !post.featured}
-                          className="border-elegant-primary/40 text-elegant-primary hover:bg-elegant-primary/10 disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                          {post.slug === siteSettings.featuredArticleSlug ? "Main Article" : "Set Main Article"}
-                        </Button>
-                      )}
-                      {post.featured && !post.article && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleSetMainFeatured(post)}
-                          disabled={post.status !== "published"}
-                          className="border-elegant-primary/40 text-elegant-primary hover:bg-elegant-primary/10 disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                          {post.mainFeatured ? "Main Feature" : "Set Main Feature"}
-                        </Button>
-                      )}
-
-                      <Button variant="ghost" size="sm" onClick={() => handleEdit(post)}>
-                        Edit
-                      </Button>
-
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="sm">
-                            Delete
-                          </Button>
-                        </AlertDialogTrigger>
-
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete this post?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteConfirmed(post.id)}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* POSTS LIST CONTROLS */}
+        <PostsListSection
+          filteredPosts={filteredPosts}
+          selectedPostIds={selectedPostIds}
+          toggleSelectAll={toggleSelectAll}
+          toggleSelectPost={toggleSelectPost}
+          handleBulkStatusChange={handleBulkStatusChange}
+          handleBulkDelete={handleBulkDelete}
+          setSelectedPostIds={setSelectedPostIds}
+          handleSetFeaturedArticle={handleSetFeaturedArticle}
+          handleSetMainFeatured={handleSetMainFeatured}
+          handleEdit={handleEdit}
+          handleDeleteConfirmed={handleDeleteConfirmed}
+          siteSettings={siteSettings}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterStatus={filterStatus}
+          setFilterStatus={setFilterStatus}
+        />
       </div>
     </div>
   );
 }
+
+type PostsListSectionProps = {
+  filteredPosts: BlogPost[];
+  selectedPostIds: Set<string>;
+  toggleSelectAll: () => void;
+  toggleSelectPost: (id: string) => void;
+  handleBulkStatusChange: (newStatus: "draft" | "published") => Promise<void>;
+  handleBulkDelete: () => Promise<void>;
+  setSelectedPostIds: React.Dispatch<React.SetStateAction<Set<string>>>;
+  handleSetFeaturedArticle: (post: BlogPost) => void;
+  handleSetMainFeatured: (post: BlogPost) => void;
+  handleEdit: (post: BlogPost) => void;
+  handleDeleteConfirmed: (id: string) => Promise<void>;
+  siteSettings: SiteSettingsPayload;
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  filterStatus: "all" | "draft" | "published";
+  setFilterStatus: (value: "all" | "draft" | "published") => void;
+};
+
+function PostsListSection({
+  filteredPosts,
+  selectedPostIds,
+  toggleSelectAll,
+  toggleSelectPost,
+  handleBulkStatusChange,
+  handleBulkDelete,
+  setSelectedPostIds,
+  handleSetFeaturedArticle,
+  handleSetMainFeatured,
+  handleEdit,
+  handleDeleteConfirmed,
+  siteSettings,
+  searchTerm,
+  setSearchTerm,
+  filterStatus,
+  setFilterStatus,
+}: PostsListSectionProps) {
+  return (
+    <div className="space-y-3 bg-background/95 p-6 rounded-lg border">
+      <h2 className="text-xl font-semibold text-elegant-text">Saved Posts</h2>
+
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Input
+          placeholder="Search by title or excerpt"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="sm:flex-1"
+        />
+
+        <select
+          value={filterStatus}
+          onChange={(e) =>
+            setFilterStatus(e.target.value as "all" | "draft" | "published")
+          }
+          className="border rounded px-3 py-2 text-sm"
+        >
+          <option value="all">All</option>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+      </div>
+
+      {selectedPostIds.size > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded p-4 flex items-center justify-between gap-4">
+          <span className="text-sm font-medium text-blue-900">
+            {selectedPostIds.size} post{selectedPostIds.size !== 1 ? "s" : ""} selected
+          </span>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleBulkStatusChange("published")}
+            >
+              Publish
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleBulkStatusChange("draft")}
+            >
+              Draft
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => {
+                if (
+                  confirm(
+                    `Delete ${selectedPostIds.size} post${
+                      selectedPostIds.size !== 1 ? "s" : ""
+                    }?`
+                  )
+                ) {
+                  handleBulkDelete();
+                }
+              }}
+            >
+              Delete
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelectedPostIds(new Set())}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {filteredPosts.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No posts found.</p>
+      ) : (
+        <ul className="space-y-3">
+          <li className="flex items-center gap-3 text-sm font-medium text-muted-foreground pb-2 border-b">
+            <input
+              type="checkbox"
+              checked={selectedPostIds.size === filteredPosts.length && filteredPosts.length > 0}
+              onChange={toggleSelectAll}
+              className="h-4 w-4"
+            />
+            <span className="flex-1">Select All</span>
+          </li>
+          {filteredPosts.map((post) => (
+            <li
+              key={post.id}
+              className="border border-border rounded p-4 flex gap-4 items-start"
+            >
+              <input
+                type="checkbox"
+                checked={selectedPostIds.has(post.id)}
+                onChange={() => toggleSelectPost(post.id)}
+                className="h-4 w-4 mt-1"
+              />
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-medium text-elegant-text">{post.title}</h4>
+                  {post.mainFeatured && (
+                    <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-sm font-medium">
+                      Main Feature
+                    </span>
+                  )}
+                  {post.featured && !post.article && (
+                    <span className="text-[10px] uppercase tracking-wide bg-elegant-primary/10 text-elegant-primary px-2 py-0.5 rounded-sm font-medium">
+                      Featured
+                    </span>
+                  )}
+                  {post.article && (
+                    <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-sm">
+                      Article
+                    </span>
+                  )}
+                  {post.article && post.featured && (
+                    <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-sm">
+                      Featured
+                    </span>
+                  )}
+                  {post.hidden && (
+                    <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-sm">
+                      Hidden
+                    </span>
+                  )}
+                  {post.slug === siteSettings.featuredArticleSlug && (
+                    <span className="text-[10px] uppercase tracking-wide bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-sm">
+                      Featured Article
+                    </span>
+                  )}
+                </div>
+                <p className="whitespace-pre-line text-xs text-muted-foreground">
+                  {post.excerpt}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {post.date} � {post.status} � v{post.version ?? 1}
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                {post.article && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSetFeaturedArticle(post)}
+                    disabled={post.status !== "published" || !post.featured}
+                    className="border-elegant-primary/40 text-elegant-primary hover:bg-elegant-primary/10 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {post.slug === siteSettings.featuredArticleSlug
+                      ? "Main Article"
+                      : "Set Main Article"}
+                  </Button>
+                )}
+                {post.featured && !post.article && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSetMainFeatured(post)}
+                    disabled={post.status !== "published"}
+                    className="border-elegant-primary/40 text-elegant-primary hover:bg-elegant-primary/10 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {post.mainFeatured ? "Main Feature" : "Set Main Feature"}
+                  </Button>
+                )}
+
+                <Button variant="ghost" size="sm" onClick={() => handleEdit(post)}>
+                  Edit
+                </Button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm">
+                      Delete
+                    </Button>
+                  </AlertDialogTrigger>
+
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteConfirmed(post.id)}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
