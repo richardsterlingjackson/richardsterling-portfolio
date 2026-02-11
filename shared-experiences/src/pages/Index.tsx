@@ -34,7 +34,7 @@ export default function Index() {
       readMoreLabel: string;
     }>;
   } | null>(null);
-  const [articlesDividerLabel, setArticlesDividerLabel] = useState("");
+  const [homeDividerLabel, setHomeDividerLabel] = useState("");
 
   useEffect(() => {
     document.title = "Home – Shared Experiences";
@@ -49,7 +49,7 @@ export default function Index() {
           setHomeFeatured(homeData);
         }
         const settings = await getSiteSettings();
-        setArticlesDividerLabel(settings?.articlesDividerLabel || "");
+        setHomeDividerLabel(settings?.headerHeroDivider || settings?.articlesDividerLabel || "");
       } catch (err) {
         console.error("Failed to load posts:", err);
         setPosts([]);
@@ -188,7 +188,7 @@ export default function Index() {
               <div>
                 <div className="flex items-center justify-between">
                   <h2 className="font-playfair text-xl sm:text-2xl font-semibold text-elegant-text">
-                    {articlesDividerLabel || "Featured Articles"}
+                    {homeDividerLabel || "Featured Articles"}
                   </h2>
                     <a href="/posts" className="text-sm text-elegant-primary hover:underline">
                       View all
